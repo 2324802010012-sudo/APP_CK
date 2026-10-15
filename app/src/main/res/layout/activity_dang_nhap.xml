@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#FFFFFF"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_vertical">
+
+        <!-- BIEU TUONG -->
+        <TextView
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="⌖"
+            android:textSize="40sp"
+            android:textColor="#4F7C5A"
+            android:background="@drawable/nen_dn_logo"/>
+
+        <!-- TIEU DE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="Chào mừng trở lại!"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#24382D"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Đăng nhập để tiếp tục hành trình khám phá\nvà lưu những địa điểm yêu thích."
+            android:textSize="14sp"
+            android:lineSpacingExtra="4dp"
+            android:textColor="#7C8B7D"/>
+
+        <!-- TEN DANG NHAP -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:text="Tên đăng nhập"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#24382D"/>
+
+        <EditText
+            android:id="@+id/edtTenDangNhap"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp"
+            android:paddingHorizontal="16dp"
+            android:hint="Nhập tên đăng nhập"
+            android:textSize="15sp"
+            android:textColor="#24382D"
+            android:textColorHint="#A1ACA1"
+            android:singleLine="true"
+            android:inputType="text"
+            android:background="@drawable/nen_dn_input"/>
+
+        <!-- MAT KHAU -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="Mật khẩu"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#24382D"/>
+
+        <EditText
+            android:id="@+id/edtMatKhau"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp"
+            android:paddingHorizontal="16dp"
+            android:hint="Nhập mật khẩu"
+            android:textSize="15sp"
+            android:textColor="#24382D"
+            android:textColorHint="#A1ACA1"
+            android:singleLine="true"
+            android:inputType="textPassword"
+            android:background="@drawable/nen_dn_input"/>
+
+        <TextView
+            android:id="@+id/btnQuenMatKhau"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="end|center_vertical"
+            android:text="Quên mật khẩu?"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#4F7C5A"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <!-- DANG NHAP -->
+        <TextView
+            android:id="@+id/btnDangNhap"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="Đăng nhập   →"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/nen_dn_button"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <!-- DANG KY -->
+        <TextView
+            android:id="@+id/btnChuyenDangKy"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="Chưa có tài khoản?  Đăng ký ngay"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#4F7C5A"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <!-- PHAN TRANG TRI -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:gravity="center"
+            android:text="✦  KHÁM PHÁ VIỆT NAM  ✦"
+            android:textSize="12sp"
+            android:letterSpacing="0.15"
+            android:textStyle="bold"
+            android:textColor="#7FA06E"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Mỗi điểm đến là một câu chuyện"
+            android:textSize="13sp"
+            android:textColor="#7C8B7D"/>
+
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="400dp"
+    android:height="110dp"
+    android:viewportWidth="400"
+    android:viewportHeight="110">
+    <!-- Lop song xanh nhat phia sau -->
+    <path
+        android:fillColor="#C7D7BF"
+        android:pathData="M0,35 C55,0 110,10 165,38 C225,72 280,0 340,20 C365,28 385,38 400,30 L400,110 L0,110 Z" />
+    <!-- Lop song xanh mem -->
+    <path
+        android:fillColor="#DDE8D5"
+        android:pathData="M0,48 C70,10 115,55 180,57 C240,60 285,12 340,35 C370,48 385,48 400,42 L400,110 L0,110 Z" />
+    <!-- Lop song kem -->
+    <path
+        android:fillColor="#EEF4EA"
+        android:pathData="M0,62 C65,35 115,80 190,70 C260,60 290,32 350,55 C375,65 390,65 400,58 L400,110 L0,110 Z" />
+    <!-- Lop nen trang kem -->
+    <path
+        android:fillColor="#F6F8F1"
+        android:pathData="M0,82 C75,55 120,95 200,85 C265,75 305,62 355,80 C380,88 390,86 400,82 L400,110 L0,110 Z" />
+    <!-- Duong song trang mem -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeAlpha="0.75"
+        android:strokeWidth="2"
+        android:pathData="M0,58 C65,30 120,70 185,68 C255,65 300,28 350,50 C375,60 390,60 400,55" />
+</vector>

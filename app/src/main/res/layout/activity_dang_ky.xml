@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="600dp"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/dkNutQuayLai"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="‹"
+            android:textColor="#4F7C5A"
+            android:textSize="32sp"
+            android:background="@drawable/nen_dn_logo"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Quay lại" />
+
+        <TextView
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/nen_dn_logo"
+            android:gravity="center"
+            android:text="✦"
+            android:textColor="#4F7C5A"
+            android:textSize="38sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:gravity="center"
+            android:text="Tạo tài khoản"
+            android:textColor="#24382D"
+            android:textSize="27sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Bắt đầu hành trình khám phá và lưu giữ\nnhững địa điểm yêu thích."
+            android:textColor="#7C8B7D"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Tên đăng nhập"
+            android:textColor="#24382D"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/dkTenDangNhap"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/nen_dn_input"
+            android:hint="Tên đăng nhập (3–30 ký tự)"
+            android:inputType="textNoSuggestions"
+            android:singleLine="true"
+            android:paddingHorizontal="16dp"
+            android:textColor="#24382D"
+            android:textColorHint="#9AA59A"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Mật khẩu"
+            android:textColor="#24382D"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/dkMatKhau"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/nen_dn_input"
+            android:hint="Mật khẩu ít nhất 8 ký tự"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:paddingHorizontal="16dp"
+            android:textColor="#24382D"
+            android:textColorHint="#9AA59A"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Xác nhận mật khẩu"
+            android:textColor="#24382D"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/dkNhapLaiMatKhau"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/nen_dn_input"
+            android:hint="Nhập lại mật khẩu"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:paddingHorizontal="16dp"
+            android:textColor="#24382D"
+            android:textColorHint="#9AA59A"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/dkNutDangKy"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/nen_dn_button"
+            android:gravity="center"
+            android:text="Tạo tài khoản  →"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/dkNutDangNhap"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Đã có tài khoản?  Đăng nhập"
+            android:textColor="#4F7C5A"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:gravity="center"
+            android:text="✦  Mỗi điểm đến là một câu chuyện"
+            android:textColor="#7FA06E"
+            android:textSize="13sp" />
+    </LinearLayout>
+</ScrollView>
