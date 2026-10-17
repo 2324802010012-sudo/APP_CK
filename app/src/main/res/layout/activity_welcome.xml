@@ -35,25 +35,7 @@
                 android:orientation="vertical"
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="72dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Sổ tay du lịch thông minh"
-                    android:textColor="#FFFFFF"
-                    android:textSize="27sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Tra cứu điểm đến, nghe thuyết minh và lưu hành trình tham quan của bạn."
-                    android:textColor="#F4F7EF"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="3dp" />
-            </LinearLayout>
+                android:paddingBottom="72dp"/>
 
             <ImageView
                 android:layout_width="match_parent"
