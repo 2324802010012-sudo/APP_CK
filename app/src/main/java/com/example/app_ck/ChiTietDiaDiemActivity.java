@@ -1,4 +1,3 @@
-
 package com.example.app_ck;
 
 import android.content.ActivityNotFoundException;
@@ -18,8 +17,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Locale;
+import java.util.ArrayList;
+import android.util.Log;
 
-public class ChiTietDiaDiemActivity extends AppCompatActivity {
+public class ChiTietDiaDiemActivity extends BaseActivity {
 
     private TextToSpeech tts;
     private boolean sanSangDoc = false;
@@ -29,25 +30,27 @@ public class ChiTietDiaDiemActivity extends AppCompatActivity {
     private TextView nutTimYeuThich;
 
     // Danh sách địa điểm du lịch chính
-    private static final String[] TEN = {
+    private final String[] TEN = {
             "Dinh Độc Lập",
             "Bảo tàng Chứng tích Chiến tranh",
             "Bưu điện Trung tâm Sài Gòn"
     };
 
-    private static final String[] DANH_MUC = {
+
+    private final String[] DANH_MUC = {
             "Văn hóa – lịch sử",
             "Bảo tàng – lịch sử",
             "Kiến trúc – lịch sử"
     };
 
-    private static final String[] DIA_CHI = {
+
+    private final String[] DIA_CHI = {
             "135 Nam Kỳ Khởi Nghĩa, TP. Hồ Chí Minh",
             "28 Võ Văn Tần, TP. Hồ Chí Minh",
             "2 Công xã Paris, TP. Hồ Chí Minh"
     };
 
-    private static final String[] MO_TA = {
+    private final String[] MO_TA = {
             "Dinh Độc Lập là một di tích lịch sử nổi bật, " +
                     "gắn liền với những sự kiện quan trọng trong " +
                     "lịch sử Việt Nam. Công trình có nhiều không " +
@@ -88,14 +91,14 @@ public class ChiTietDiaDiemActivity extends AppCompatActivity {
             }
     };
 
-    private static final int[] ANH = {
+    private final int[] ANH = {
             R.drawable.anh_dinh_doc_lap,
             R.drawable.anh_bao_tang_chung_tich,
             R.drawable.anh_buu_dien_sai_gon
     };
 
     // Tọa độ GPS của các địa điểm du lịch chính
-    private static final double[][] TOA_DO = {
+    private final double[][] TOA_DO = {
             {10.7770, 106.6953},
             {10.7795, 106.6921},
             {10.7799, 106.6999}
@@ -113,6 +116,9 @@ public class ChiTietDiaDiemActivity extends AppCompatActivity {
         if (viTri < 0 || viTri >= TEN.length) {
             viTri = 0;
         }
+
+        // DOC THONG TIN DIA DIEM TU SQLITE TRUOC KHI HIEN THI
+        taiChiTietTuSQLite();
 
         // Hiển thị thông tin địa điểm
         ((ImageView) findViewById(R.id.anhChiTiet))
@@ -248,6 +254,79 @@ public class ChiTietDiaDiemActivity extends AppCompatActivity {
                                 ketQua != TextToSpeech.LANG_NOT_SUPPORTED;
             }
         });
+    }
+
+    // DONG BO DIA DIEM HIEN TAI TU BANG dia_diem
+    // GIU NGUYEN DU LIEU JAVA CU KHI TRUONG SQLITE CHUA CO
+    private void taiChiTietTuSQLite() {
+        try (TaiKhoanDb db = new TaiKhoanDb(this)) {
+            ArrayList<DiaDiem> danhSach = db.danhSachDiaDiem();
+
+            for (DiaDiem diaDiem : danhSach) {
+                if (diaDiem.id != viTri) {
+                    continue;
+                }
+
+                if (diaDiem.ten != null &&
+                        !diaDiem.ten.trim().isEmpty()) {
+                    TEN[viTri] = diaDiem.ten;
+                }
+
+                if (diaDiem.diaChi != null &&
+                        !diaDiem.diaChi.trim().isEmpty()) {
+                    DIA_CHI[viTri] = diaDiem.diaChi;
+                }
+
+                if (diaDiem.moTa != null &&
+                        !diaDiem.moTa.trim().isEmpty()) {
+                    MO_TA[viTri] = diaDiem.moTa;
+                }
+
+// DOC DANH MUC TU SQLITE
+                if (diaDiem.danhMuc != null &&
+                        !diaDiem.danhMuc.trim().isEmpty()) {
+
+                    DANH_MUC[viTri] = diaDiem.danhMuc;
+                }
+
+
+                if (Double.isFinite(diaDiem.viDo) &&
+                        Double.isFinite(diaDiem.kinhDo) &&
+                        diaDiem.viDo >= -90 &&
+                        diaDiem.viDo <= 90 &&
+                        diaDiem.kinhDo >= -180 &&
+                        diaDiem.kinhDo <= 180) {
+                    TOA_DO[viTri][0] = diaDiem.viDo;
+                    TOA_DO[viTri][1] = diaDiem.kinhDo;
+                }
+
+                if (diaDiem.tenAnh != null &&
+                        !diaDiem.tenAnh.trim().isEmpty()) {
+                    int maAnh = getResources().getIdentifier(
+                            diaDiem.tenAnh,
+                            "drawable",
+                            getPackageName()
+                    );
+                    if (maAnh != 0) {
+                        ANH[viTri] = maAnh;
+                    } else {
+                        Log.w("KIEM_TRA_SQLITE",
+                                "Khong tim thay anh: " + diaDiem.tenAnh);
+                    }
+                }
+
+                Log.d("KIEM_TRA_SQLITE",
+                        "Chi tiet doc SQLite thanh cong, id=" + viTri);
+                return;
+            }
+
+            Log.w("KIEM_TRA_SQLITE",
+                    "Khong tim thay dia diem id=" + viTri);
+            thongBao("Chưa tìm thấy địa điểm trong SQLite. Đang dùng dữ liệu sẵn có.");
+        } catch (Exception e) {
+            Log.e("KIEM_TRA_SQLITE", "Loi doc chi tiet SQLite", e);
+            thongBao("Không đọc được SQLite. Đang dùng dữ liệu sẵn có.");
+        }
     }
 
     // Hiển thị thông báo

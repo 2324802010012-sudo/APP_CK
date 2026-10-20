@@ -1,193 +1,275 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F6F8F1">
-    <!-- PHAN ANH NEN VA NOI DUNG -->
-    <LinearLayout
+    android:background="#FBFCF9">
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
-        <!-- ANH NEN VA SONG -->
-        <FrameLayout
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="3">
+            android:layout_height="wrap_content"
+            android:minHeight="650dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <!-- BA ANH DIA DIEM CHUP THAT -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="305dp"
+                android:background="@drawable/nen_dau_chao_moi"
+                android:clipChildren="false"
+                android:clipToPadding="false">
+
+                <!-- ANH TRAI: BAO TANG -->
+                <FrameLayout
+                    android:layout_width="145dp"
+                    android:layout_height="202dp"
+                    android:layout_gravity="center"
+                    android:translationX="-93dp"
+                    android:translationY="15dp"
+                    android:rotation="-11"
+                    android:padding="4dp"
+                    android:background="@drawable/nen_khung_anh_trang">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/anh_bao_tang_chung_tich"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/nen_anh_bo_goc_moi"
+                        android:clipToOutline="true"
+                        android:contentDescription="Ảnh Bảo tàng Chứng tích Chiến tranh" />
+                </FrameLayout>
+
+                <!-- ANH PHAI: BUU DIEN -->
+                <FrameLayout
+                    android:layout_width="145dp"
+                    android:layout_height="202dp"
+                    android:layout_gravity="center"
+                    android:translationX="93dp"
+                    android:translationY="15dp"
+                    android:rotation="11"
+                    android:padding="4dp"
+                    android:background="@drawable/nen_khung_anh_trang">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/anh_buu_dien_sai_gon"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/nen_anh_bo_goc_moi"
+                        android:clipToOutline="true"
+                        android:contentDescription="Ảnh Bưu điện Trung tâm Sài Gòn" />
+                </FrameLayout>
+
+                <!-- ANH CHINH O GIUA: DINH DOC LAP -->
+                <FrameLayout
+                    android:layout_width="193dp"
+                    android:layout_height="245dp"
+                    android:layout_gravity="center"
+                    android:translationY="12dp"
+                    android:padding="5dp"
+                    android:background="@drawable/nen_khung_anh_trang">
+
+                    <ImageView
+                        android:id="@+id/anhNenChaoMung"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/anh_dinh_doc_lap"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/nen_anh_bo_goc_moi"
+                        android:clipToOutline="true"
+                        android:contentDescription="Ảnh Dinh Độc Lập" />
+                </FrameLayout>
+            </FrameLayout>
+
+            <!-- TEN UNG DUNG -->
+
+            <!-- SONG XANH TRANG TRI: TAI NGUYEN CU -->
             <ImageView
-                android:id="@+id/anhNenChaoMung"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@drawable/nen_chao_mung"
-                android:scaleType="centerCrop"
-                android:contentDescription="Du khách sử dụng ứng dụng du lịch" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/nen_phu_anh_chao" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:orientation="vertical"
-                android:paddingStart="24dp"
-                android:paddingEnd="24dp"
-                android:paddingBottom="72dp"/>
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_gravity="bottom"
+                android:layout_height="70dp"
+                android:layout_marginTop="13dp"
                 android:src="@drawable/song_trang_tri"
                 android:scaleType="fitXY"
                 android:contentDescription="Sóng xanh trang trí" />
 
-        </FrameLayout>
-        <!-- KHU VUC BA CHUC NANG -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp"
-            android:translationY="-20dp">
-            <!-- BAN DO TUONG TAC -->
+            <!-- BA TIEN ICH GIOI THIEU -->
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="4dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:gravity="center"
-                    android:text="⌖"
-                    android:textSize="32sp"
-                    android:textColor="#4F7C5A" />
-                <TextView
-                    android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="3dp"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Bản đồ tương tác"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:textColor="#21362A" />
-                <TextView
-                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:padding="4dp">
+
+                    <FrameLayout
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:background="@drawable/nen_icon_chao_moi">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_ban_do_chao"
+                            android:contentDescription="Bản đồ tương tác" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="9dp"
+                        android:gravity="center"
+                        android:text="Bản đồ tương tác"
+                        android:textColor="#142B25"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center"
+                        android:text="Khám phá di tích\ntrên bản đồ"
+                        android:textColor="#75817A"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center"
-                    android:text="Khám phá điểm đến dễ dàng"
-                    android:textSize="11sp"
-                    android:textColor="#6F776D" />
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:padding="4dp">
+
+                    <FrameLayout
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:background="@drawable/nen_icon_chao_moi">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_thuyet_minh_chao"
+                            android:contentDescription="Thuyết minh giọng nói" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="9dp"
+                        android:gravity="center"
+                        android:text="Thuyết minh"
+                        android:textColor="#142B25"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center"
+                        android:text="Nghe giới thiệu\ntại điểm đến"
+                        android:textColor="#75817A"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:padding="4dp">
+
+                    <FrameLayout
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:background="@drawable/nen_icon_chao_moi">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_lo_trinh_chao"
+                            android:contentDescription="Lộ trình tham quan" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="9dp"
+                        android:gravity="center"
+                        android:text="Lộ trình tham quan"
+                        android:textColor="#142B25"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center"
+                        android:text="Gợi ý hành trình\nphù hợp"
+                        android:textColor="#75817A"
+                        android:textSize="11sp" />
+                </LinearLayout>
             </LinearLayout>
-            <!-- THUYET MINH TU DONG -->
+
+            <!-- NUT BAT DAU VA DANG NHAP -->
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_marginTop="27dp"
                 android:orientation="vertical"
-                android:gravity="center"
-                android:padding="4dp">
-                <TextView
+                android:paddingStart="22dp"
+                android:paddingEnd="22dp"
+                android:paddingBottom="18dp">
+
+                <Button
+                    android:id="@+id/btnBatDau"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:gravity="center"
-                    android:text="♫"
-                    android:textSize="32sp"
-                    android:textColor="#4F7C5A" />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Thuyết minh giọng nói"
-                    android:textSize="12sp"
+                    android:layout_height="56dp"
+                    android:text="Bắt đầu khám phá  →"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#21362A" />
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#147657" />
+
                 <TextView
+                    android:id="@+id/btnDangNhap"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_marginTop="5dp"
                     android:gravity="center"
-                    android:text="Nghe giới thiệu bằng giọng nói"
-                    android:textSize="11sp"
-                    android:textColor="#6F776D" />
-            </LinearLayout>
-            <!-- HANH TRINH THONG MINH -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="4dp">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:gravity="center"
-                    android:text="➤"
-                    android:textSize="32sp"
-                    android:textColor="#4F7C5A" />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Lộ trình tham quan"
-                    android:textSize="12sp"
+                    android:text="Đã có tài khoản? Đăng nhập"
+                    android:textColor="#246B51"
+                    android:textSize="13sp"
                     android:textStyle="bold"
-                    android:textColor="#21362A" />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center"
-                    android:text="Gợi ý lộ trình tham quan"
-                    android:textSize="11sp"
-                    android:textColor="#6F776D" />
+                    android:clickable="true"
+                    android:focusable="true" />
             </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-    <!-- KHU VUC NUT PHIA DUOI -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#F6F8F1"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="12dp"
-        android:translationY="-12dp">
-        <Button
-            android:id="@+id/btnBatDau"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:text="Bắt đầu khám phá →"
-            android:textAllCaps="false"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#4F7C5A" />
-        <TextView
-            android:id="@+id/btnDangNhap"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_marginTop="4dp"
-            android:gravity="center"
-            android:text="Đã có tài khoản? Đăng nhập"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#4F7C5A"
-            android:clickable="true"
-            android:focusable="true" />
-    </LinearLayout>
+    </ScrollView>
 </LinearLayout>

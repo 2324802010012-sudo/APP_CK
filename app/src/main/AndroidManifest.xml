@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- QUYEN TRUY CAP VI TRI CHINH XAC -->
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- QUYEN INTERNET CHO OPENSTREETMAP -->
+    <uses-permission
+        android:name="android.permission.INTERNET" />
+
+    <!-- KIEM TRA TRANG THAI MANG -->
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- QUYEN VI TRI CHINH XAC -->
     <uses-permission
         android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-    <!-- QUYEN TRUY CAP VI TRI GAN DUNG -->
+    <!-- QUYEN VI TRI GAN DUNG -->
     <uses-permission
         android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
@@ -19,17 +29,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.APP_CK">
 
-        <!-- MAN HINH CHAO KHI MO UNG DUNG -->
+        <!-- MAN HINH CHAO MUNG -->
         <activity
             android:name=".WelcomeActivity"
             android:exported="true">
 
             <intent-filter>
+
                 <action
                     android:name="android.intent.action.MAIN" />
 
                 <category
                     android:name="android.intent.category.LAUNCHER" />
+
             </intent-filter>
 
         </activity>
@@ -38,25 +50,42 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+
+        <!-- MAN HINH CHI TIET DIA DIEM -->
         <activity
             android:name=".ChiTietDiaDiemActivity"
             android:exported="false" />
+
+        <!-- MAN HINH THAM QUAN NOI BO -->
         <activity
             android:name=".ThamQuanActivity"
             android:exported="false" />
+
+        <!-- MAN HINH BAN DO OPENSTREETMAP -->
+        <activity
+            android:name=".BanDoActivity"
+            android:exported="false" />
+
+        <!-- MAN HINH DANG NHAP -->
         <activity
             android:name=".DangNhapActivity"
             android:exported="false" />
+
+        <!-- MAN HINH QUEN MAT KHAU -->
         <activity
             android:name=".QuenMatKhauActivity"
             android:exported="false" />
+
+        <!-- MAN HINH DANG KY -->
         <activity
             android:name=".DangKyActivity"
             android:exported="false" />
 
+        <!-- MAN HINH YEU THICH -->
         <activity
             android:name=".YeuThichActivity"
             android:exported="false" />
+
     </application>
 
 </manifest>

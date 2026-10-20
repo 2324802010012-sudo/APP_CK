@@ -5,7 +5,7 @@ import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
-public class YeuThichActivity extends AppCompatActivity {
+public class YeuThichActivity extends BaseActivity {
     private static final String[] TEN={"Dinh Độc Lập","Bảo tàng Chứng tích Chiến tranh","Bưu điện Trung tâm Sài Gòn"};
     private LinearLayout g;
     @Override protected void onCreate(Bundle b) { super.onCreate(b); hienThi(); }

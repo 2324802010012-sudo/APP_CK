@@ -7,7 +7,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class QuenMatKhauActivity extends AppCompatActivity {
+public class QuenMatKhauActivity extends BaseActivity {
     private EditText ten, ma, matKhauMoi, xacNhan;
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);

@@ -36,11 +36,24 @@ android {
 }
 
 dependencies {
+
+    // Thu vien Android
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+
+    // Thu vien ban do OpenStreetMap
+    implementation(
+        "org.osmdroid:osmdroid-android:6.1.20"
+    )
+
+    // Thu vien kiem thu
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+
+    androidTestImplementation(
+        libs.espresso.core
+    )
 }

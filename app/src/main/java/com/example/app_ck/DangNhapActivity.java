@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Locale;
 
-public class DangNhapActivity extends AppCompatActivity {
+public class DangNhapActivity extends BaseActivity {
 
     private EditText ten;
     private EditText matKhau;

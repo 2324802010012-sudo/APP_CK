@@ -7,7 +7,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class DangKyActivity extends AppCompatActivity {
+public class DangKyActivity extends BaseActivity {
     private EditText ten, matKhau, nhapLai;
 
     @Override

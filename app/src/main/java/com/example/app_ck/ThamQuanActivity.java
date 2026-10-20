@@ -19,8 +19,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import java.util.Locale;
-
-public class ThamQuanActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+public class ThamQuanActivity extends BaseActivity {
     private static final String[] TEN_DIA_DIEM = {
             "Dinh Độc Lập", "Bảo tàng Chứng tích Chiến tranh", "Bưu điện Trung tâm Sài Gòn"
     };
@@ -69,8 +70,11 @@ public class ThamQuanActivity extends AppCompatActivity {
     private int viTriDiaDiem;
     private int viTriKhuVuc;
     private int tangDangXem = 0;
-    private final java.util.List<DuLieuDinhDocLap.DiemThamQuan> diemDinh =
-            DuLieuDinhDocLap.layTatCaDiem();
+
+    // 25 MARKER DUOC NAP TU SQLITE
+    private final List<DuLieuDinhDocLap.DiemThamQuan>
+            diemDinh = new ArrayList<>();
+
     private TextView tenKhuVuc, moTaKhuVuc, demKhuVuc, nutTruoc, nutTiep, nutPhat;
     private LinearLayout danhSachKhuVuc;
     private ProgressBar tienTrinh;
@@ -83,6 +87,23 @@ public class ThamQuanActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tham_quan);
 
         viTriDiaDiem = getIntent().getIntExtra("viTriDiaDiem", 0);
+
+        // CHI NAP MARKER NOI BO CHO DINH DOC LAP
+        if (viTriDiaDiem == 0) {
+
+            if (!taiMarkerTuSQLite()) {
+
+                Toast.makeText(
+                        this,
+                        "SQLite chưa có đủ 25 Marker Dinh Độc Lập.",
+                        Toast.LENGTH_LONG
+                ).show();
+
+                finish();
+                return;
+            }
+        }
+
         if (viTriDiaDiem < 0 || viTriDiaDiem >= TEN_DIA_DIEM.length) viTriDiaDiem = 0;
         int chiSoTruyen = getIntent().getIntExtra("viTriKhuVuc", 0);
         if (viTriDiaDiem == 0) {
@@ -167,10 +188,45 @@ public class ThamQuanActivity extends AppCompatActivity {
     }
 
 
+
     private String layMoTaDinh(
             DuLieuDinhDocLap.DiemThamQuan diem
     ) {
-        return NoiDungThuyetMinhDinhDocLap.layNoiDung(diem.id);
+
+        try (TaiKhoanDb db = new TaiKhoanDb(this)) {
+
+            String noiDung =
+                    db.layThuyetMinhTheoId(
+                            diem.id
+                    );
+
+            android.util.Log.d(
+                    "KIEM_TRA_SQLITE",
+                    "Thuyet minh Marker "
+                            + diem.id
+                            + ": "
+                            + (noiDung == null
+                            ? "KHONG CO DU LIEU"
+                            : "DOC THANH CONG")
+            );
+
+            if (noiDung != null &&
+                    !noiDung.trim().isEmpty()) {
+
+                return noiDung;
+            }
+
+        } catch (Exception e) {
+
+            android.util.Log.e(
+                    "ThamQuanActivity",
+                    "Loi doc thuyet minh SQLite",
+                    e
+            );
+        }
+
+        return "Chưa có nội dung thuyết minh "
+                + "cho điểm tham quan này.";
     }
 
 
@@ -361,18 +417,44 @@ public class ThamQuanActivity extends AppCompatActivity {
 
         String noiDung;
 
+
         if (viTriDiaDiem == 0) {
 
-            // Dinh Độc Lập: sử dụng dữ liệu của 25 Marker
+            // LAY MARKER HIEN TAI
             DuLieuDinhDocLap.DiemThamQuan d =
                     diemDinh.get(viTriKhuVuc);
 
-            // Lấy nội dung thuyết minh theo số Marker
-            noiDung =
-                    NoiDungThuyetMinhDinhDocLap.layNoiDung(d.id);
+            // DOC THUYET MINH TU SQLITE
+            try (TaiKhoanDb db = new TaiKhoanDb(this)) {
+
+                noiDung = db.layThuyetMinhTheoId(
+                        d.id
+                );
+
+            } catch (Exception e) {
+
+                android.util.Log.e(
+                        "ThamQuanActivity",
+                        "Loi doc thuyet minh SQLite",
+                        e
+                );
+
+                noiDung = null;
+            }
+
+            if (noiDung == null ||
+                    noiDung.trim().isEmpty()) {
+
+                Toast.makeText(
+                        this,
+                        "Marker chưa có nội dung thuyết minh.",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                return;
+            }
 
         } else {
-
             // Giữ nguyên thuyết minh cho hai địa điểm còn lại
             noiDung =
                     TEN_KHU_VUC[viTriDiaDiem][viTriKhuVuc]
@@ -415,5 +497,64 @@ public class ThamQuanActivity extends AppCompatActivity {
 
         super.onDestroy();
     }
+
+    // NAP 25 MARKER TU CO SO DU LIEU SQLITE
+    private boolean taiMarkerTuSQLite() {
+
+        try (TaiKhoanDb db = new TaiKhoanDb(this)) {
+
+            ArrayList<DuLieuDinhDocLap.DiemThamQuan>
+                    danhSach = db.layDiemDinhDocLap();
+
+            android.util.Log.d(
+                    "KIEM_TRA_SQLITE",
+                    "So Marker doc tu SQLite: "
+                            + danhSach.size()
+            );
+
+            // KIEM TRA DU 25 MARKER
+            if (danhSach.size() != 25) {
+                return false;
+            }
+
+            // KIEM TRA ID, TANG VA TOA DO
+            for (int i = 0; i < danhSach.size(); i++) {
+
+                DuLieuDinhDocLap.DiemThamQuan diem =
+                        danhSach.get(i);
+
+                if (diem.id != i + 1) {
+                    return false;
+                }
+
+                if (diem.tang < 1 || diem.tang > 6) {
+                    return false;
+                }
+
+                if (!diem.coToaDo()) {
+                    return false;
+                }
+            }
+
+            diemDinh.clear();
+            diemDinh.addAll(danhSach);
+            android.util.Log.d(
+                    "KIEM_TRA_SQLITE",
+                    "Da nap Marker SQLite vao so do"
+            );
+            return true;
+
+        } catch (Exception e) {
+
+            android.util.Log.e(
+                    "ThamQuanActivity",
+                    "Khong doc duoc 25 Marker tu SQLite",
+                    e
+            );
+
+            return false;
+        }
+    }
+
 }
 
