@@ -85,6 +85,21 @@
         <activity
             android:name=".YeuThichActivity"
             android:exported="false" />
+        <activity
+            android:name=".BaoTangThamQuanActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".VanMieuThamQuanActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ConDaoThamQuanActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".LangVanHoaThamQuanActivity"
+            android:exported="false" />
 
     </application>
 

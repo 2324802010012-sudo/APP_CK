@@ -1,4 +1,4 @@
-package com.example.app_ck;
+ package com.example.app_ck;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -22,36 +22,12 @@ import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
 public class ThamQuanActivity extends BaseActivity {
-    private static final String[] TEN_DIA_DIEM = {
-            "Dinh Độc Lập", "Bảo tàng Chứng tích Chiến tranh", "Bưu điện Trung tâm Sài Gòn"
-    };
-    private static final int[] ANH_DIA_DIEM = {
-            R.drawable.anh_dinh_doc_lap,
-            R.drawable.anh_bao_tang_chung_tich,
-            R.drawable.anh_buu_dien_sai_gon
-    };
-    private static final String[][] TEN_KHU_VUC = {
-            {"Cổng chính và khuôn viên", "Phòng Khánh tiết", "Phòng họp Hội đồng Nội các", "Khu hầm"},
-            {"Khu trưng bày ngoài trời", "Không gian trưng bày chuyên đề", "Khu tư liệu và hình ảnh"},
-            {"Mặt tiền công trình", "Sảnh chính", "Không gian giao dịch và kiến trúc nội thất"}
-    };
-    private static final String[][] MO_TA = {
-            {
-                    "Khu vực cổng chính và khuôn viên là điểm bắt đầu hành trình khám phá Dinh Độc Lập. Tại đây, du khách có thể quan sát tổng thể kiến trúc công trình và không gian cảnh quan phía trước.",
-                    "Phòng Khánh tiết là không gian được sử dụng cho các hoạt động đón tiếp và nghi lễ quan trọng. Du khách có thể quan sát cách tổ chức không gian, nội thất và phong cách kiến trúc của phòng.",
-                    "Phòng họp Hội đồng Nội các là nơi gắn với các hoạt động hội họp và điều hành trong lịch sử công trình. Không gian này giúp du khách hình dung một phần hoạt động của bộ máy chính quyền thời kỳ trước năm 1975.",
-                    "Khu hầm của Dinh Độc Lập có các không gian phục vụ công tác liên lạc và điều hành trong tình huống khẩn cấp. Đây là một trong những khu vực thu hút sự quan tâm của khách tham quan."
-            },
-            {
-                    "Khu trưng bày ngoài trời giới thiệu một số hiện vật có kích thước lớn và cung cấp bối cảnh lịch sử cho hành trình tham quan bảo tàng.",
-                    "Các không gian trưng bày chuyên đề sử dụng hình ảnh, hiện vật và tư liệu để giới thiệu những chủ đề liên quan đến chiến tranh và tác động đối với con người.",
-                    "Khu tư liệu và hình ảnh giúp du khách tìm hiểu thêm các câu chuyện lịch sử qua nguồn tư liệu được trưng bày tại bảo tàng."
-            },
-            {
-                    "Mặt tiền Bưu điện Trung tâm Sài Gòn gây ấn tượng bởi bố cục cân đối và các chi tiết kiến trúc đặc trưng. Đây là vị trí thích hợp để bắt đầu tìm hiểu về công trình.",
-                    "Sảnh chính có không gian rộng và những chi tiết trang trí nổi bật. Du khách có thể quan sát cấu trúc mái, các quầy giao dịch và cách bố trí nội thất.",
-                    "Không gian bên trong vẫn gắn với hoạt động bưu chính. Du khách có thể khám phá các chi tiết kiến trúc đồng thời tìm hiểu vai trò của công trình trong đời sống đô thị."
-            }
+    // Màn hình này chỉ phụ trách 25 Marker Dinh Độc Lập.
+    // Bảo tàng sử dụng màn hình riêng với 13 Marker.
+
+    private static final String[] TEN_THE_GIOI_THIEU = {
+            "Cổng chính và khuôn viên", "Phòng Khánh tiết",
+            "Phòng họp Hội đồng Nội các", "Khu hầm"
     };
 
     // Thứ tự: Tầng 1, Tầng 2, Tầng 3, Tầng 4, Tầng hầm, Tầng trệt.
@@ -65,9 +41,7 @@ public class ThamQuanActivity extends BaseActivity {
     };
 
     // Số trên sơ đồ (1–25) được lưu dưới dạng chỉ số 0–24.
-    // Với hai địa điểm còn lại, chỉ số vẫn theo danh sách cũ.
 
-    private int viTriDiaDiem;
     private int viTriKhuVuc;
     private int tangDangXem = 0;
 
@@ -84,43 +58,51 @@ public class ThamQuanActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int idDiaDiem = getIntent().getIntExtra("viTriDiaDiem", 0);
+        if (idDiaDiem == 1) {
+            // Bảo tàng Chứng tích Chiến tranh: 13 Marker, 3 tầng.
+            android.content.Intent intent = new android.content.Intent(
+                    this, BaoTangThamQuanActivity.class);
+            if (getIntent().hasExtra("idMarker")) {
+                intent.putExtra("idMarker", getIntent().getIntExtra("idMarker", -1));
+            }
+            intent.putExtra("viTriKhuVuc",
+                    getIntent().getIntExtra("viTriKhuVuc", 0));
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        if (idDiaDiem != 0) {
+            // Không tự chuyển sang Dinh Độc Lập nếu Activity mới chưa có.
+            Toast.makeText(this,
+                    "Sơ đồ tham quan cho địa điểm này đang được bổ sung.",
+                    Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_tham_quan);
 
-        viTriDiaDiem = getIntent().getIntExtra("viTriDiaDiem", 0);
-
-        // CHI NAP MARKER NOI BO CHO DINH DOC LAP
-        if (viTriDiaDiem == 0) {
-
-            if (!taiMarkerTuSQLite()) {
-
-                Toast.makeText(
-                        this,
-                        "SQLite chưa có đủ 25 Marker Dinh Độc Lập.",
-                        Toast.LENGTH_LONG
-                ).show();
-
-                finish();
-                return;
-            }
+        // Chỉ nạp 25 Marker Dinh Độc Lập từ SQLite.
+        if (!taiMarkerTuSQLite()) {
+            Toast.makeText(this, "SQLite chưa có đủ 25 Marker Dinh Độc Lập.",
+                    Toast.LENGTH_LONG).show();
+            finish();
+            return;
         }
 
-        if (viTriDiaDiem < 0 || viTriDiaDiem >= TEN_DIA_DIEM.length) viTriDiaDiem = 0;
         int chiSoTruyen = getIntent().getIntExtra("viTriKhuVuc", 0);
-        if (viTriDiaDiem == 0) {
-            // Chỉ số 4 mục cũ từ ChiTietDiaDiemActivity:
-            // 0: Cổng -> bắt đầu số 1; 1: Khánh tiết -> số 4;
-            // 2: Nội các -> số 1; 3: Khu hầm -> số 17.
-            int[] chuyenDoi = {1, 4, 1, 17};
-            if (chiSoTruyen < 0 || chiSoTruyen >= chuyenDoi.length) chiSoTruyen = 0;
-            viTriKhuVuc = chuyenDoi[chiSoTruyen] - 1;
+        int idMarker = getIntent().getIntExtra("idMarker", -1);
+        if (idMarker >= 1 && idMarker <= diemDinh.size()) {
+            viTriKhuVuc = idMarker - 1;
         } else {
-            viTriKhuVuc = chiSoTruyen;
-            if (viTriKhuVuc < 0 || viTriKhuVuc >= TEN_KHU_VUC[viTriDiaDiem].length)
-                viTriKhuVuc = 0;
+            viTriKhuVuc = timMarkerTuTheGioiThieu(chiSoTruyen);
         }
 
-        ((TextView) findViewById(R.id.tqTenDiaDiem)).setText(TEN_DIA_DIEM[viTriDiaDiem]);
-        ((ImageView) findViewById(R.id.tqAnhDiaDiem)).setImageResource(ANH_DIA_DIEM[viTriDiaDiem]);
+        ((TextView) findViewById(R.id.tqTenDiaDiem)).setText("Dinh Độc Lập");
+        ((ImageView) findViewById(R.id.tqAnhDiaDiem))
+                .setImageResource(R.drawable.anh_dinh_doc_lap);
         tenKhuVuc = findViewById(R.id.tqTenKhuVuc);
         moTaKhuVuc = findViewById(R.id.tqMoTaKhuVuc);
         demKhuVuc = findViewById(R.id.tqDemKhuVuc);
@@ -135,7 +117,7 @@ public class ThamQuanActivity extends BaseActivity {
         nutPhat.setOnClickListener(v -> phatThuyetMinh());
         findViewById(R.id.tqNutDung).setOnClickListener(v -> dungThuyetMinh());
 
-        tangDangXem = viTriDiaDiem == 0 ? diemDinh.get(viTriKhuVuc).tang - 1 : 0;
+        tangDangXem = diemDinh.get(viTriKhuVuc).tang - 1;
         tts = new TextToSpeech(this, trangThai -> {
             if (trangThai == TextToSpeech.SUCCESS && tts != null) {
                 int ketQua = tts.setLanguage(new Locale("vi", "VN"));
@@ -144,6 +126,49 @@ public class ThamQuanActivity extends BaseActivity {
             }
         });
         hienThiKhuVuc();
+    }
+
+    // Tìm đúng Marker theo tên hiện có trong SQLite, tránh ánh xạ sai điểm Nội các.
+    // Chỉ số 0 là "Cổng chính và khuôn viên" (điểm mở đầu tham quan).
+    private int timMarkerTuTheGioiThieu(int chiSoThe) {
+        if (chiSoThe <= 0 || chiSoThe >= TEN_THE_GIOI_THIEU.length) {
+            return 0;
+        }
+
+        String tenCanTim = chuanHoaTen(TEN_THE_GIOI_THIEU[chiSoThe]);
+        for (int i = 0; i < diemDinh.size(); i++) {
+            String tenMarker = chuanHoaTen(diemDinh.get(i).ten);
+            if (tenMarker.equals(tenCanTim)
+                    || tenMarker.contains(tenCanTim)
+                    || tenCanTim.contains(tenMarker)) {
+                return i;
+            }
+        }
+
+        // Có thể một số marker sử dụng tên rút gọn trên sơ đồ.
+        String tuKhoa = chiSoThe == 1 ? "khanh tiet"
+                : chiSoThe == 2 ? "noi cac" : "ham";
+        for (int i = 0; i < diemDinh.size(); i++) {
+            if (chuanHoaTen(diemDinh.get(i).ten).contains(tuKhoa)) {
+                return i;
+            }
+        }
+
+        android.util.Log.w("KIEM_TRA_SQLITE",
+                "Khong thay Marker tuong ung voi: " + TEN_THE_GIOI_THIEU[chiSoThe]);
+        Toast.makeText(this,
+                "Chưa xác định được điểm tương ứng. Đã mở sơ đồ từ điểm đầu tiên.",
+                Toast.LENGTH_SHORT).show();
+        return 0;
+    }
+
+    private String chuanHoaTen(String giaTri) {
+        if (giaTri == null) return "";
+        String s = java.text.Normalizer.normalize(
+                giaTri.toLowerCase(Locale.ROOT), java.text.Normalizer.Form.NFD);
+        return s.replaceAll("\\p{M}+", "")
+                .replace('đ', 'd')
+                .replaceAll("\\s+", " ").trim();
     }
 
     private int dp(int giaTri) {
@@ -159,19 +184,12 @@ public class ThamQuanActivity extends BaseActivity {
     }
 
     private void hienThiKhuVuc() {
-        boolean dinh = viTriDiaDiem == 0;
-        int soDiem = dinh ? diemDinh.size() : TEN_KHU_VUC[viTriDiaDiem].length;
-        if (dinh) {
-            DuLieuDinhDocLap.DiemThamQuan diem = diemDinh.get(viTriKhuVuc);
-            tenKhuVuc.setText(diem.ten);
-            moTaKhuVuc.setText(layMoTaDinh(diem));
-            demKhuVuc.setText("Điểm số " + diem.id + "/25");
-        } else {
-            tenKhuVuc.setText(TEN_KHU_VUC[viTriDiaDiem][viTriKhuVuc]);
-            moTaKhuVuc.setText(MO_TA[viTriDiaDiem][viTriKhuVuc]);
-            demKhuVuc.setText("Điểm " + (viTriKhuVuc + 1) + "/" + soDiem);
-        }
-        // Đây là vị trí đang chọn, không phải % số điểm đã thực sự tham quan.
+        int soDiem = diemDinh.size();
+        DuLieuDinhDocLap.DiemThamQuan diem = diemDinh.get(viTriKhuVuc);
+        tenKhuVuc.setText(diem.ten);
+        moTaKhuVuc.setText(layMoTaDinh(diem));
+        demKhuVuc.setText("Điểm số " + diem.id + "/25");
+
         tienTrinh.setProgress((viTriKhuVuc + 1) * 100 / soDiem);
         nutTruoc.setEnabled(viTriKhuVuc > 0);
         nutTiep.setEnabled(viTriKhuVuc < soDiem - 1);
@@ -179,15 +197,9 @@ public class ThamQuanActivity extends BaseActivity {
         nutTiep.setAlpha(viTriKhuVuc < soDiem - 1 ? 1f : .35f);
         nutPhat.setText("▶  Nghe thuyết minh");
         danhSachKhuVuc.removeAllViews();
-        if (dinh) {
-            taoSoDoDinhDocLap();
-            taoDanhSachDiemDinh();
-        } else {
-            taoDanhSachDiem(TEN_KHU_VUC[viTriDiaDiem]);
-        }
+        taoSoDoDinhDocLap();
+        taoDanhSachDiemDinh();
     }
-
-
 
     private String layMoTaDinh(
             DuLieuDinhDocLap.DiemThamQuan diem
@@ -287,7 +299,25 @@ public class ThamQuanActivity extends BaseActivity {
             lp.bottomMargin = dp(10);
             thanhTang.addView(nutTang, lp);
             nutTang.setOnClickListener(v -> {
-                tangDangXem = tang;
+                // Chon tang moi: dong bo luon Marker dang chon voi tang do.
+                // Neu khong, ten phong va so do se thuoc hai tang khac nhau.
+                if (tangDangXem != tang) {
+                    int diemDauTien = -1;
+                    for (int j = 0; j < diemDinh.size(); j++) {
+                        if (diemDinh.get(j).tang == tang + 1) {
+                            diemDauTien = j;
+                            break;
+                        }
+                    }
+                    if (diemDauTien < 0) {
+                        Toast.makeText(this, "Tầng này chưa có điểm tham quan.",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    dungThuyetMinh();
+                    tangDangXem = tang;
+                    viTriKhuVuc = diemDauTien;
+                }
                 hienThiKhuVuc();
             });
         }
@@ -311,7 +341,7 @@ public class ThamQuanActivity extends BaseActivity {
         SoDoAnhView() {
             super(ThamQuanActivity.this);
             setImageResource(ANH_TANG[tangDangXem]);
-            setScaleType(ImageView.ScaleType.FIT_XY);
+            setScaleType(ScaleType.FIT_XY);
             setBackgroundColor(Color.parseColor("#621017"));
             setClickable(true);
             setContentDescription("Sơ đồ " + TEN_TANG[tangDangXem] + " với các marker tương tác");
@@ -372,37 +402,13 @@ public class ThamQuanActivity extends BaseActivity {
         }
     }
 
-    private void taoDanhSachDiem(String[] ds) {
-        TextView tieuDe = taoNhan("Các điểm tham quan", 17, true);
-        tieuDe.setPadding(dp(4), dp(8), dp(4), dp(12));
-        danhSachKhuVuc.addView(tieuDe);
-
-        for (int i = 0; i < ds.length; i++) {
-            final int chiSo = i;
-            boolean dangChon = i == viTriKhuVuc;
-            TextView the = taoNhan((i + 1) + ".  " + ds[i], 14, dangChon);
-            the.setPadding(dp(14), dp(16), dp(14), dp(16));
-            the.setGravity(Gravity.CENTER_VERTICAL);
-            the.setTextColor(Color.parseColor(dangChon ? "#FFFFFF" : "#24382D"));
-            the.setBackground(nen(
-                    Color.parseColor(dangChon ? "#4F7C5A" : "#EEF4EA"),
-                    Color.parseColor(dangChon ? "#4F7C5A" : "#E6EDE5")));
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
-            lp.bottomMargin = dp(8);
-            danhSachKhuVuc.addView(the, lp);
-            the.setOnClickListener(v -> chuyenKhuVuc(chiSo));
-        }
-    }
-
     private void chuyenKhuVuc(int moi) {
-        int soDiem = viTriDiaDiem == 0 ? diemDinh.size() : TEN_KHU_VUC[viTriDiaDiem].length;
-        if (moi < 0 || moi >= soDiem) return;
+        if (moi < 0 || moi >= diemDinh.size()) return;
         dungThuyetMinh();
         viTriKhuVuc = moi;
-        if (viTriDiaDiem == 0) tangDangXem = diemDinh.get(moi).tang - 1;
+        tangDangXem = diemDinh.get(moi).tang - 1;
         hienThiKhuVuc();
     }
-
 
     private void phatThuyetMinh() {
 
@@ -416,50 +422,18 @@ public class ThamQuanActivity extends BaseActivity {
         }
 
         String noiDung;
-
-
-        if (viTriDiaDiem == 0) {
-
-            // LAY MARKER HIEN TAI
-            DuLieuDinhDocLap.DiemThamQuan d =
-                    diemDinh.get(viTriKhuVuc);
-
-            // DOC THUYET MINH TU SQLITE
-            try (TaiKhoanDb db = new TaiKhoanDb(this)) {
-
-                noiDung = db.layThuyetMinhTheoId(
-                        d.id
-                );
-
-            } catch (Exception e) {
-
-                android.util.Log.e(
-                        "ThamQuanActivity",
-                        "Loi doc thuyet minh SQLite",
-                        e
-                );
-
-                noiDung = null;
-            }
-
-            if (noiDung == null ||
-                    noiDung.trim().isEmpty()) {
-
-                Toast.makeText(
-                        this,
-                        "Marker chưa có nội dung thuyết minh.",
-                        Toast.LENGTH_SHORT
-                ).show();
-
-                return;
-            }
-
-        } else {
-            // Giữ nguyên thuyết minh cho hai địa điểm còn lại
-            noiDung =
-                    TEN_KHU_VUC[viTriDiaDiem][viTriKhuVuc]
-                            + ". "
-                            + MO_TA[viTriDiaDiem][viTriKhuVuc];
+        DuLieuDinhDocLap.DiemThamQuan d = diemDinh.get(viTriKhuVuc);
+        try (TaiKhoanDb db = new TaiKhoanDb(this)) {
+            noiDung = db.layThuyetMinhTheoId(d.id);
+        } catch (Exception e) {
+            android.util.Log.e("ThamQuanActivity",
+                    "Lỗi đọc thuyết minh SQLite", e);
+            noiDung = null;
+        }
+        if (noiDung == null || noiDung.trim().isEmpty()) {
+            Toast.makeText(this, "Marker chưa có nội dung thuyết minh.",
+                    Toast.LENGTH_SHORT).show();
+            return;
         }
 
         // Phát giọng nói tiếng Việt
@@ -467,7 +441,7 @@ public class ThamQuanActivity extends BaseActivity {
                 noiDung,
                 TextToSpeech.QUEUE_FLUSH,
                 null,
-                "khu_vuc_" + viTriDiaDiem + "_" + viTriKhuVuc
+                "dinh_doc_lap_" + viTriKhuVuc
         );
     }
 
@@ -557,4 +531,3 @@ public class ThamQuanActivity extends BaseActivity {
     }
 
 }
-

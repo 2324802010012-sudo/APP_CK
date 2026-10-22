@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F8FAF7">
-
     <ScrollView
         android:id="@+id/vungCuonTrangChu"
         android:layout_width="match_parent"
@@ -17,18 +17,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="28dp">
-
             <!-- PHAN DAU TRANG: ANH, MENU VA TIM KIEM -->
-
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="278dp"
                 android:clipChildren="false"
                 android:clipToPadding="false">
-
-
                 <!-- KHU VUC ANH NEN CAO 322DP -->
-
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="250dp"
@@ -41,14 +36,11 @@
                         android:layout_height="match_parent"
                         android:src="@drawable/anh_dinh_doc_lap"
                         android:scaleType="centerCrop"
-                        android:contentDescription="Ảnh Dinh Độc Lập" />
-
+                        android:contentDescription="Ảnh Dinh Độc Lập"/>
                     <View
-
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/ui_header_photo_overlay" />
-
+                        android:background="@drawable/ui_header_photo_overlay"/>
                     <!-- NOI DUNG NAM TREN ANH -->
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -57,14 +49,12 @@
                         android:paddingStart="22dp"
                         android:paddingEnd="22dp"
                         android:paddingTop="28dp">
-
                         <!-- NUT MENU GOC PHAI, KHONG DO BONG -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="48dp"
                             android:orientation="horizontal"
                             android:gravity="end|center_vertical">
-
                             <TextView
                                 android:id="@+id/nutTaiKhoan"
                                 android:layout_width="48dp"
@@ -76,11 +66,9 @@
                                 android:background="@drawable/ui_header_menu_circle"
                                 android:clickable="true"
                                 android:focusable="true"
-                                android:contentDescription="Mở menu tài khoản" />
+                                android:contentDescription="Mở menu tài khoản"/>
                         </LinearLayout>
-
                     </LinearLayout>
-
                     <!-- CHU THICH TRUOC VI TRI THANH TIM KIEM -->
                     <TextView
                         android:layout_width="wrap_content"
@@ -95,9 +83,8 @@
                         android:shadowColor="#99000000"
                         android:shadowDx="0"
                         android:shadowDy="1"
-                        android:shadowRadius="2" />
+                        android:shadowRadius="2"/>
                 </FrameLayout>
-
                 <!-- THANH TIM KIEM CAT NGANG MEP DUOI ANH -->
                 <!-- Anh cao 322dp, thanh cao 56dp, nen duoi 28dp -->
                 <!-- Tam thanh nam tai dung mep anh 322dp -->
@@ -112,13 +99,11 @@
                     android:paddingStart="14dp"
                     android:paddingEnd="8dp"
                     android:background="@drawable/ui_search_box">
-
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ui_ic_search"
-                        android:contentDescription="Tìm kiếm" />
-
+                        android:contentDescription="Tìm kiếm"/>
                     <EditText
                         android:id="@+id/oTimKiem"
                         android:layout_width="0dp"
@@ -132,8 +117,7 @@
                         android:textSize="13sp"
                         android:singleLine="true"
                         android:inputType="text"
-                        android:imeOptions="actionSearch" />
-
+                        android:imeOptions="actionSearch"/>
                     <TextView
                         android:id="@+id/nutTimKiem"
                         android:layout_width="40dp"
@@ -145,266 +129,684 @@
                         android:background="@drawable/ui_search_action"
                         android:clickable="true"
                         android:focusable="true"
-                        android:contentDescription="Tìm kiếm địa điểm" />
+                        android:contentDescription="Tìm kiếm địa điểm"/>
                 </LinearLayout>
             </FrameLayout>
-
-            <!-- Tiện ích: giữ nguyên IDs, thay icon hoạt hình thành vector -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:baselineAligned="false"
-                android:layout_marginTop="8dp" android:paddingStart="14dp" android:paddingEnd="14dp">
-                <LinearLayout android:id="@+id/nutThuyetMinh" android:layout_width="0dp"
-                    android:layout_height="96dp" android:layout_weight="1"
-                    android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true">
-                    <FrameLayout android:layout_width="56dp" android:layout_height="56dp" android:background="@drawable/ui_feature_bg">
-                        <ImageView android:layout_width="25dp" android:layout_height="25dp" android:layout_gravity="center"
-                            android:src="@drawable/ui_ic_audio" android:contentDescription="Thuyết minh"/>
+            <!-- THANH CHUC NANG NHANH: 3 MUC TRONG MOT KHUNG -->
+            <LinearLayout
+                android:id="@+id/thanhChucNang"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:baselineAligned="false"
+                android:padding="8dp"
+                android:elevation="4dp"
+                android:background="@drawable/nen_thanh_chuc_nang">
+                <!-- THUYET MINH: GIU NGUYEN ID JAVA -->
+                <LinearLayout
+                    android:id="@+id/nutThuyetMinh"
+                    android:layout_width="0dp"
+                    android:layout_height="86dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+                    <FrameLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/ui_feature_bg">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ui_ic_audio"
+                            android:contentDescription="Thuyết minh"/>
                     </FrameLayout>
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp" android:gravity="center" android:text="Thuyết minh"
-                        android:textColor="#35463D" android:textSize="11sp" android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="7dp"
+                        android:gravity="center"
+                        android:text="Thuyết minh"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="#35463D"/>
                 </LinearLayout>
-                <LinearLayout android:id="@+id/nutBanDo" android:layout_width="0dp"
-                    android:layout_height="96dp" android:layout_weight="1"
-                    android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true">
-                    <FrameLayout android:layout_width="56dp" android:layout_height="56dp" android:background="@drawable/ui_feature_bg">
-                        <ImageView android:layout_width="25dp" android:layout_height="25dp" android:layout_gravity="center"
-                            android:src="@drawable/ui_ic_map" android:contentDescription="Bản đồ"/>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="40dp"
+                    android:background="#E6EEE8"/>
+                <!-- BAN DO: GIU NGUYEN ID JAVA -->
+                <LinearLayout
+                    android:id="@+id/nutBanDo"
+                    android:layout_width="0dp"
+                    android:layout_height="86dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+                    <FrameLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/ui_feature_bg">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ui_ic_map"
+                            android:contentDescription="Bản đồ"/>
                     </FrameLayout>
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp" android:gravity="center" android:text="Bản đồ"
-                        android:textColor="#35463D" android:textSize="11sp" android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="7dp"
+                        android:gravity="center"
+                        android:text="Bản đồ"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="#35463D"/>
                 </LinearLayout>
-                <LinearLayout android:id="@+id/nutLoTrinh" android:layout_width="0dp"
-                    android:layout_height="96dp" android:layout_weight="1"
-                    android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true">
-                    <FrameLayout android:layout_width="56dp" android:layout_height="56dp" android:background="@drawable/ui_feature_bg">
-                        <ImageView android:layout_width="25dp" android:layout_height="25dp" android:layout_gravity="center"
-                            android:src="@drawable/ui_ic_route" android:contentDescription="Lộ trình"/>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="40dp"
+                    android:background="#E6EEE8"/>
+                <!-- YEU THICH: GIU NGUYEN ID JAVA -->
+                <LinearLayout
+                    android:id="@+id/nutYeuThich"
+                    android:layout_width="0dp"
+                    android:layout_height="86dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+                    <FrameLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/ui_feature_bg">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ui_ic_heart"
+                            android:contentDescription="Yêu thích"/>
                     </FrameLayout>
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp" android:gravity="center" android:text="Lộ trình"
-                        android:textColor="#35463D" android:textSize="11sp" android:textStyle="bold"/>
-                </LinearLayout>
-                <LinearLayout android:id="@+id/nutYeuThich" android:layout_width="0dp"
-                    android:layout_height="96dp" android:layout_weight="1"
-                    android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true">
-                    <FrameLayout android:layout_width="56dp" android:layout_height="56dp" android:background="@drawable/ui_feature_bg">
-                        <ImageView android:layout_width="25dp" android:layout_height="25dp" android:layout_gravity="center"
-                            android:src="@drawable/ui_ic_heart" android:contentDescription="Yêu thích"/>
-                    </FrameLayout>
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp" android:gravity="center" android:text="Yêu thích"
-                        android:textColor="#35463D" android:textSize="11sp" android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="7dp"
+                        android:gravity="center"
+                        android:text="Yêu thích"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="#35463D"/>
                 </LinearLayout>
             </LinearLayout>
-
             <!-- Danh mục: giữ id cho Java lọc hiện tại -->
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginStart="20dp" android:layout_marginTop="22dp"
-                android:text="Danh mục du lịch" android:textColor="#182C24" android:textSize="19sp" android:textStyle="bold"/>
-            <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" android:scrollbars="none">
-                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:paddingStart="20dp" android:paddingEnd="20dp">
-                    <TextView android:id="@+id/danhMucTatCa" android:layout_width="wrap_content"
-                        android:layout_height="42dp" android:layout_marginEnd="8dp"
-                        android:gravity="center" android:paddingStart="17dp" android:paddingEnd="17dp"
-                        android:text="Tất cả" android:textSize="12sp"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="22dp"
+                android:text="Danh mục du lịch"
+                android:textColor="#182C24"
+                android:textSize="19sp"
+                android:textStyle="bold"/>
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp">
+                    <TextView
+                        android:id="@+id/danhMucTatCa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center"
+                        android:paddingStart="17dp"
+                        android:paddingEnd="17dp"
+                        android:text="Tất cả"
+                        android:textSize="12sp"
                         android:textColor="#FFFFFF"
                         android:background="@drawable/nen_danh_muc_chon"
-                        android:clickable="true" android:focusable="true"/>
-                    <TextView android:id="@+id/danhMucVanHoa" android:layout_width="wrap_content"
-                        android:layout_height="42dp" android:layout_marginEnd="8dp"
-                        android:gravity="center" android:paddingStart="17dp" android:paddingEnd="17dp"
-                        android:text="Văn hóa – lịch sử" android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true"/>
+                    <TextView
+                        android:id="@+id/danhMucVanHoa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center"
+                        android:paddingStart="17dp"
+                        android:paddingEnd="17dp"
+                        android:text="Văn hóa – lịch sử"
+                        android:textSize="12sp"
                         android:textColor="#42614F"
                         android:background="@drawable/nen_danh_muc_thuong"
-                        android:clickable="true" android:focusable="true"/>
-                    <TextView android:id="@+id/danhMucThienNhien" android:layout_width="wrap_content"
-                        android:layout_height="42dp" android:layout_marginEnd="8dp"
-                        android:gravity="center" android:paddingStart="17dp" android:paddingEnd="17dp"
-                        android:text="Bảo tàng" android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true"/>
+                    <TextView
+                        android:id="@+id/danhMucThienNhien"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center"
+                        android:paddingStart="17dp"
+                        android:paddingEnd="17dp"
+                        android:text="Bảo tàng"
+                        android:textSize="12sp"
                         android:textColor="#42614F"
                         android:background="@drawable/nen_danh_muc_thuong"
-                        android:clickable="true" android:focusable="true"/>
-                    <TextView android:id="@+id/danhMucTamLinh" android:layout_width="wrap_content"
-                        android:layout_height="42dp" android:layout_marginEnd="8dp"
-                        android:gravity="center" android:paddingStart="17dp" android:paddingEnd="17dp"
-                        android:text="Kiến trúc" android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true"/>
+                    <TextView
+                        android:id="@+id/danhMucTamLinh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center"
+                        android:paddingStart="17dp"
+                        android:paddingEnd="17dp"
+                        android:text="Kiến trúc"
+                        android:textSize="12sp"
                         android:textColor="#42614F"
                         android:background="@drawable/nen_danh_muc_thuong"
-                        android:clickable="true" android:focusable="true"/>
-                    <TextView android:id="@+id/danhMucSinhThai" android:layout_width="wrap_content"
-                        android:layout_height="42dp" android:layout_marginEnd="8dp"
-                        android:gravity="center" android:paddingStart="17dp" android:paddingEnd="17dp"
-                        android:text="Lịch sử" android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true"/>
+                    <TextView
+                        android:id="@+id/danhMucSinhThai"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center"
+                        android:paddingStart="17dp"
+                        android:paddingEnd="17dp"
+                        android:text="Lịch sử"
+                        android:textSize="12sp"
                         android:textColor="#42614F"
                         android:background="@drawable/nen_danh_muc_thuong"
-                        android:clickable="true" android:focusable="true"/>
+                        android:clickable="true"
+                        android:focusable="true"/>
                 </LinearLayout>
             </HorizontalScrollView>
-
             <!-- Điểm đến thực tế -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:gravity="center_vertical"
-                android:layout_marginStart="20dp" android:layout_marginEnd="20dp" android:layout_marginTop="25dp">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:text="Điểm đến nổi bật"
-                    android:textColor="#182C24" android:textSize="19sp" android:textStyle="bold"/>
-                <TextView android:id="@+id/nutXemTatCa" android:layout_width="wrap_content"
-                    android:layout_height="44dp" android:gravity="center" android:text="Xem tất cả  ›"
-                    android:textSize="12sp" android:textColor="#28744A" android:clickable="true" android:focusable="true"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="25dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Điểm đến nổi bật"
+                    android:textColor="#182C24"
+                    android:textSize="19sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:id="@+id/nutXemTatCa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:gravity="center"
+                    android:text="Xem tất cả  ›"
+                    android:textSize="12sp"
+                    android:textColor="#28744A"
+                    android:clickable="true"
+                    android:focusable="true"/>
             </LinearLayout>
-            <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:scrollbars="none">
-                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:paddingStart="20dp" android:paddingEnd="20dp" android:paddingBottom="6dp">
-                    <LinearLayout android:id="@+id/diaDiemDinhDocLap" android:layout_width="205dp" android:layout_height="wrap_content"
-                        android:layout_marginEnd="12dp" android:orientation="vertical" android:padding="7dp"
-                        android:background="@drawable/ui_card" android:clickable="true" android:focusable="true">
-                        <ImageView android:id="@+id/anhTheDinhDocLap" android:layout_width="match_parent" android:layout_height="125dp"
-                            android:src="@drawable/anh_dinh_doc_lap" android:scaleType="centerCrop" android:contentDescription="Ảnh Dinh Độc Lập"/>
-                        <TextView android:id="@+id/tenTheDinhDocLap" android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp" android:layout_marginTop="10dp" android:maxLines="2"
-                            android:ellipsize="end" android:text="Dinh Độc Lập" android:textSize="14sp"
-                            android:textStyle="bold" android:textColor="#20382A"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp" android:layout_marginTop="5dp"
-                            android:layout_marginBottom="9dp" android:text="Lịch sử · Quận 1" android:textSize="11sp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="6dp">
+                    <LinearLayout
+                        android:id="@+id/diaDiemDinhDocLap"
+                        android:layout_width="205dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:orientation="vertical"
+                        android:padding="7dp"
+                        android:background="@drawable/ui_card"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <ImageView
+                            android:id="@+id/anhTheDinhDocLap"
+                            android:layout_width="match_parent"
+                            android:layout_height="125dp"
+                            android:src="@drawable/anh_dinh_doc_lap"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Ảnh Dinh Độc Lập"/>
+                        <TextView
+                            android:id="@+id/tenTheDinhDocLap"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="10dp"
+                            android:maxLines="2"
+                            android:ellipsize="end"
+                            android:text="Dinh Độc Lập"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#20382A"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="9dp"
+                            android:text="Lịch sử · Quận 1"
+                            android:textSize="11sp"
                             android:textColor="#788B7E"/>
                     </LinearLayout>
-                    <LinearLayout android:id="@+id/diaDiemBaoTang" android:layout_width="205dp" android:layout_height="wrap_content"
-                        android:layout_marginEnd="12dp" android:orientation="vertical" android:padding="7dp"
-                        android:background="@drawable/ui_card" android:clickable="true" android:focusable="true">
-                        <ImageView android:id="@+id/anhTheBaoTang" android:layout_width="match_parent" android:layout_height="125dp"
-                            android:src="@drawable/anh_bao_tang_chung_tich" android:scaleType="centerCrop" android:contentDescription="Ảnh Bảo tàng Chứng tích Chiến tranh"/>
-                        <TextView android:id="@+id/tenTheBaoTang" android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp" android:layout_marginTop="10dp" android:maxLines="2"
-                            android:ellipsize="end" android:text="Bảo tàng Chứng tích Chiến tranh" android:textSize="14sp"
-                            android:textStyle="bold" android:textColor="#20382A"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp" android:layout_marginTop="5dp"
-                            android:layout_marginBottom="9dp" android:text="Bảo tàng · Quận 3" android:textSize="11sp"
+                    <LinearLayout
+                        android:id="@+id/diaDiemBaoTang"
+                        android:layout_width="205dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:orientation="vertical"
+                        android:padding="7dp"
+                        android:background="@drawable/ui_card"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <ImageView
+                            android:id="@+id/anhTheBaoTang"
+                            android:layout_width="match_parent"
+                            android:layout_height="125dp"
+                            android:src="@drawable/anh_bao_tang_chung_tich"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Ảnh Bảo tàng Chứng tích Chiến tranh"/>
+                        <TextView
+                            android:id="@+id/tenTheBaoTang"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="10dp"
+                            android:maxLines="2"
+                            android:ellipsize="end"
+                            android:text="Bảo tàng Chứng tích Chiến tranh"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#20382A"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="9dp"
+                            android:text="Bảo tàng · Quận 3"
+                            android:textSize="11sp"
                             android:textColor="#788B7E"/>
                     </LinearLayout>
-                    <LinearLayout android:id="@+id/diaDiemBuuDien" android:layout_width="205dp" android:layout_height="wrap_content"
-                        android:layout_marginEnd="12dp" android:orientation="vertical" android:padding="7dp"
-                        android:background="@drawable/ui_card" android:clickable="true" android:focusable="true">
-                        <ImageView android:id="@+id/anhTheBuuDien" android:layout_width="match_parent" android:layout_height="125dp"
-                            android:src="@drawable/anh_buu_dien_sai_gon" android:scaleType="centerCrop" android:contentDescription="Ảnh Bưu điện Trung tâm Sài Gòn"/>
-                        <TextView android:id="@+id/tenTheBuuDien" android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp" android:layout_marginTop="10dp" android:maxLines="2"
-                            android:ellipsize="end" android:text="Bưu điện Trung tâm Sài Gòn" android:textSize="14sp"
-                            android:textStyle="bold" android:textColor="#20382A"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp" android:layout_marginTop="5dp"
-                            android:layout_marginBottom="9dp" android:text="Kiến trúc · Quận 1" android:textSize="11sp"
+                    <LinearLayout
+                        android:id="@+id/diaDiemLangVanHoa"
+                        android:layout_width="205dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:orientation="vertical"
+                        android:padding="7dp"
+                        android:background="@drawable/ui_card"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <ImageView
+                            android:id="@+id/anhTheLangVanHoa"
+                            android:layout_width="match_parent"
+                            android:layout_height="125dp"
+                            android:src="@android:drawable/ic_menu_gallery"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Ảnh minh họa Làng Văn hóa – Du lịch các dân tộc Việt Nam"/>
+                        <TextView
+                            android:id="@+id/tenTheLangVanHoa"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="10dp"
+                            android:maxLines="2"
+                            android:ellipsize="end"
+                            android:text="Làng Văn hóa – Du lịch các dân tộc Việt Nam"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#20382A"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="9dp"
+                            android:text="Văn hóa · Hà Nội"
+                            android:textSize="11sp"
+                            android:textColor="#788B7E"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/diaDiemConDao"
+                        android:layout_width="205dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:orientation="vertical"
+                        android:padding="7dp"
+                        android:background="@drawable/ui_card"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <ImageView
+                            android:id="@+id/anhTheConDao"
+                            android:layout_width="match_parent"
+                            android:layout_height="125dp"
+                            android:src="@android:drawable/ic_menu_gallery"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Ảnh minh họa Hệ thống Nhà tù Côn Đảo"/>
+                        <TextView
+                            android:id="@+id/tenTheConDao"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="10dp"
+                            android:maxLines="2"
+                            android:ellipsize="end"
+                            android:text="Hệ thống Nhà tù Côn Đảo"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#20382A"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="9dp"
+                            android:text="Lịch sử · Côn Đảo"
+                            android:textSize="11sp"
+                            android:textColor="#788B7E"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/diaDiemVanMieu"
+                        android:layout_width="205dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:orientation="vertical"
+                        android:padding="7dp"
+                        android:background="@drawable/ui_card"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <ImageView
+                            android:id="@+id/anhTheVanMieu"
+                            android:layout_width="match_parent"
+                            android:layout_height="125dp"
+                            android:src="@android:drawable/ic_menu_gallery"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Ảnh minh họa Văn Miếu – Quốc Tử Giám"/>
+                        <TextView
+                            android:id="@+id/tenTheVanMieu"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="10dp"
+                            android:maxLines="2"
+                            android:ellipsize="end"
+                            android:text="Văn Miếu – Quốc Tử Giám"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#20382A"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="9dp"
+                            android:text="Văn hóa · Hà Nội"
+                            android:textSize="11sp"
                             android:textColor="#788B7E"/>
                     </LinearLayout>
                 </LinearLayout>
             </HorizontalScrollView>
-
             <!-- Gợi ý: dùng lại ảnh thật trong project -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="horizontal" android:gravity="center_vertical"
-                android:layout_marginStart="20dp" android:layout_marginEnd="20dp" android:layout_marginTop="25dp">
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:text="Gợi ý dành cho bạn"
-                    android:textSize="19sp" android:textStyle="bold" android:textColor="#182C24"/>
-                <TextView android:id="@+id/nutXemGoiY" android:layout_width="wrap_content" android:layout_height="44dp"
-                    android:gravity="center" android:text="Xem tất cả  ›" android:textSize="12sp"
-                    android:textColor="#28744A" android:clickable="true" android:focusable="true"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="25dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Gợi ý dành cho bạn"
+                    android:textSize="19sp"
+                    android:textStyle="bold"
+                    android:textColor="#182C24"/>
+                <TextView
+                    android:id="@+id/nutXemGoiY"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:gravity="center"
+                    android:text="Xem tất cả  ›"
+                    android:textSize="12sp"
+                    android:textColor="#28744A"
+                    android:clickable="true"
+                    android:focusable="true"/>
             </LinearLayout>
-            <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content"
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:scrollbars="none">
-                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:paddingStart="20dp" android:paddingEnd="20dp" android:paddingBottom="6dp">
-                    <LinearLayout android:id="@+id/goiYDinhDocLap" android:layout_width="172dp" android:layout_height="wrap_content"
-                        android:layout_marginEnd="12dp" android:orientation="vertical" android:padding="7dp"
-                        android:background="@drawable/ui_card" android:clickable="true" android:focusable="true">
-                        <ImageView android:id="@+id/anhGoiYDinhDocLap" android:layout_width="match_parent" android:layout_height="104dp"
-                            android:src="@drawable/anh_dinh_doc_lap" android:scaleType="centerCrop" android:contentDescription="Ảnh Dinh Độc Lập"/>
-                        <TextView android:id="@+id/tenGoiYDinhDocLap" android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp" android:layout_marginTop="10dp" android:maxLines="2"
-                            android:ellipsize="end" android:text="Dinh Độc Lập" android:textSize="14sp"
-                            android:textStyle="bold" android:textColor="#20382A"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp" android:layout_marginTop="5dp"
-                            android:layout_marginBottom="9dp" android:text="Khám phá kiến trúc" android:textSize="11sp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="6dp">
+                    <LinearLayout
+                        android:id="@+id/goiYDinhDocLap"
+                        android:layout_width="172dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:orientation="vertical"
+                        android:padding="7dp"
+                        android:background="@drawable/ui_card"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <ImageView
+                            android:id="@+id/anhGoiYDinhDocLap"
+                            android:layout_width="match_parent"
+                            android:layout_height="104dp"
+                            android:src="@drawable/anh_dinh_doc_lap"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Ảnh Dinh Độc Lập"/>
+                        <TextView
+                            android:id="@+id/tenGoiYDinhDocLap"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="10dp"
+                            android:maxLines="2"
+                            android:ellipsize="end"
+                            android:text="Dinh Độc Lập"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#20382A"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="9dp"
+                            android:text="Khám phá kiến trúc"
+                            android:textSize="11sp"
                             android:textColor="#788B7E"/>
                     </LinearLayout>
-                    <LinearLayout android:id="@+id/goiYBaoTang" android:layout_width="172dp" android:layout_height="wrap_content"
-                        android:layout_marginEnd="12dp" android:orientation="vertical" android:padding="7dp"
-                        android:background="@drawable/ui_card" android:clickable="true" android:focusable="true">
-                        <ImageView android:id="@+id/anhGoiYBaoTang" android:layout_width="match_parent" android:layout_height="104dp"
-                            android:src="@drawable/anh_bao_tang_chung_tich" android:scaleType="centerCrop" android:contentDescription="Ảnh Bảo tàng Chứng tích Chiến tranh"/>
-                        <TextView android:id="@+id/tenGoiYBaoTang" android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp" android:layout_marginTop="10dp" android:maxLines="2"
-                            android:ellipsize="end" android:text="Bảo tàng Chứng tích Chiến tranh" android:textSize="14sp"
-                            android:textStyle="bold" android:textColor="#20382A"/>
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp" android:layout_marginTop="5dp"
-                            android:layout_marginBottom="9dp" android:text="Tìm hiểu lịch sử" android:textSize="11sp"
+                    <LinearLayout
+                        android:id="@+id/goiYBaoTang"
+                        android:layout_width="172dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:orientation="vertical"
+                        android:padding="7dp"
+                        android:background="@drawable/ui_card"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <ImageView
+                            android:id="@+id/anhGoiYBaoTang"
+                            android:layout_width="match_parent"
+                            android:layout_height="104dp"
+                            android:src="@drawable/anh_bao_tang_chung_tich"
+                            android:scaleType="centerCrop"
+                            android:contentDescription="Ảnh Bảo tàng Chứng tích Chiến tranh"/>
+                        <TextView
+                            android:id="@+id/tenGoiYBaoTang"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="10dp"
+                            android:maxLines="2"
+                            android:ellipsize="end"
+                            android:text="Bảo tàng Chứng tích Chiến tranh"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#20382A"/>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="9dp"
+                            android:text="Tìm hiểu lịch sử"
+                            android:textSize="11sp"
                             android:textColor="#788B7E"/>
                     </LinearLayout>
                 </LinearLayout>
             </HorizontalScrollView>
-
             <!-- Địa điểm gần tôi: giữ nguyên id cho GPS/Java -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="vertical" android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp" android:layout_marginTop="25dp">
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="Khám phá quanh bạn" android:textSize="19sp" android:textStyle="bold"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="25dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Khám phá quanh bạn"
+                    android:textSize="19sp"
+                    android:textStyle="bold"
                     android:textColor="#182C24"/>
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="13dp" android:padding="18dp"
-                    android:orientation="vertical" android:background="@drawable/ui_card">
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:text="Điểm đến gần vị trí của bạn" android:textSize="15sp"
-                        android:textStyle="bold" android:textColor="#254B33"/>
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp" android:text="Tìm các địa điểm du lịch gần nhất bằng vị trí thiết bị."
-                        android:textColor="#788B7E" android:textSize="12sp"/>
-                    <Button android:id="@+id/nutTimGanToi" android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp" android:text="Tìm địa điểm gần tôi"
-                        android:textAllCaps="false" android:textColor="#FFFFFF" android:backgroundTint="#26734A"/>
-                    <TextView android:id="@+id/thongBaoViTri" android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:layout_marginTop="7dp"
-                        android:text="Chưa xác định vị trí hiện tại" android:textColor="#738377" android:textSize="12sp"/>
-                    <LinearLayout android:id="@+id/danhSachGanToi" android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="9dp"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="13dp"
+                    android:padding="18dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/ui_card">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Điểm đến gần vị trí của bạn"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#254B33"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Tìm các địa điểm du lịch gần nhất bằng vị trí thiết bị."
+                        android:textColor="#788B7E"
+                        android:textSize="12sp"/>
+                    <Button
+                        android:id="@+id/nutTimGanToi"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Tìm địa điểm gần tôi"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="#26734A"/>
+                    <TextView
+                        android:id="@+id/thongBaoViTri"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="7dp"
+                        android:text="Chưa xác định vị trí hiện tại"
+                        android:textColor="#738377"
+                        android:textSize="12sp"/>
+                    <LinearLayout
+                        android:id="@+id/danhSachGanToi"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="9dp"/>
                 </LinearLayout>
             </LinearLayout>
-
-            <LinearLayout android:id="@+id/nutTraiNghiem" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:layout_marginStart="20dp" android:layout_marginEnd="20dp"
-                android:layout_marginTop="16dp" android:padding="17dp"
-                android:orientation="horizontal" android:gravity="center_vertical"
-                android:background="@drawable/ui_card" android:clickable="true" android:focusable="true">
-                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                    android:layout_weight="1" android:orientation="vertical">
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:text="Lắng nghe câu chuyện" android:textSize="16sp" android:textStyle="bold"
+            <LinearLayout
+                android:id="@+id/nutTraiNghiem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="16dp"
+                android:padding="17dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/ui_card"
+                android:clickable="true"
+                android:focusable="true">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Lắng nghe câu chuyện"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
                         android:textColor="#254B33"/>
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp" android:text="Khám phá lịch sử và văn hóa qua thuyết minh."
-                        android:textSize="12sp" android:textColor="#788B7E"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Khám phá lịch sử và văn hóa qua thuyết minh."
+                        android:textSize="12sp"
+                        android:textColor="#788B7E"/>
                 </LinearLayout>
-                <ImageView android:layout_width="30dp" android:layout_height="30dp"
-                    android:src="@drawable/ui_ic_audio" android:contentDescription="Nghe thuyết minh"/>
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ui_ic_audio"
+                    android:contentDescription="Nghe thuyết minh"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
-
     <!-- THANH DIEU HUONG CO DINH DUOI CUNG -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="96dp"
         android:clipChildren="false"
         android:clipToPadding="false">
-
         <!-- THANH NEN: CAC MUC CAN DEU NHAU -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -416,7 +818,6 @@
             android:paddingEnd="6dp"
             android:background="@drawable/nen_thanh_dieu_huong"
             android:baselineAligned="false">
-
             <!-- KHAM PHA -->
             <LinearLayout
                 android:id="@+id/navKhamPha"
@@ -444,9 +845,7 @@
                     android:textSize="10sp"
                     android:textColor="#6F806F"/>
             </LinearLayout>
-
             <!-- YEU THICH -->
-
             <!-- YEU THICH -->
             <LinearLayout
                 android:id="@+id/navYeuThich"
@@ -459,7 +858,6 @@
                 android:paddingBottom="4dp"
                 android:clickable="true"
                 android:focusable="true">
-
                 <TextView
                     android:layout_width="28dp"
                     android:layout_height="28dp"
@@ -468,7 +866,6 @@
                     android:textSize="25sp"
                     android:textColor="#6F806F"
                     android:includeFontPadding="false"/>
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -484,7 +881,6 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"/>
-
             <!-- CA NHAN -->
             <LinearLayout
                 android:id="@+id/navCaNhan"
@@ -512,7 +908,6 @@
                     android:textSize="10sp"
                     android:textColor="#6F806F"/>
             </LinearLayout>
-
             <!-- GOI Y -->
             <LinearLayout
                 android:id="@+id/navGoiY"
@@ -541,7 +936,6 @@
                     android:textColor="#6F806F"/>
             </LinearLayout>
         </LinearLayout>
-
         <!-- TRANG CHU: NUT NOI VA CHU NAM RIENG -->
         <LinearLayout
             android:id="@+id/navTrangChu"

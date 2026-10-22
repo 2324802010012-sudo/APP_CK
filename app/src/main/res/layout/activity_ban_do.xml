@@ -5,13 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F6F8F1">
-
     <!-- BAN DO THUC TE -->
     <org.osmdroid.views.MapView
         android:id="@+id/banDoTuongTac"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
     <!-- THANH PHIA TREN -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,13 +20,11 @@
         android:padding="12dp"
         android:elevation="6dp"
         android:background="@drawable/ui_search_box">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
-
             <TextView
                 android:id="@+id/nutQuayLaiBanDo"
                 android:layout_width="42dp"
@@ -40,13 +36,11 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:contentDescription="Quay lại" />
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -54,25 +48,21 @@
                     android:textColor="#24382D"
                     android:textSize="18sp"
                     android:textStyle="bold" />
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Khám phá TP. Hồ Chí Minh"
                     android:textColor="#708074"
                     android:textSize="11sp" />
-
             </LinearLayout>
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3 điểm"
+                android:text="2 điểm"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="#4F7C5A"
                 android:padding="6dp" />
-
         </LinearLayout>
 
         <!-- THANH TIM KIEM -->
@@ -126,12 +116,34 @@
                     android:textSize="11sp"
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#4F7C5A" />
-
                 <Button
-                    android:id="@+id/nutChonBuuDien"
+                    android:id="@+id/nutChonLangVanHoa"
                     android:layout_width="wrap_content"
                     android:layout_height="44dp"
-                    android:text="Bưu điện Sài Gòn"
+                    android:layout_marginEnd="6dp"
+                    android:text="Làng Văn hóa các dân tộc"
+                    android:textAllCaps="false"
+                    android:textSize="11sp"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#4F7C5A" />
+
+                <Button
+                    android:id="@+id/nutChonConDao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:layout_marginEnd="6dp"
+                    android:text="Nhà tù Côn Đảo"
+                    android:textAllCaps="false"
+                    android:textSize="11sp"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#4F7C5A" />
+
+                <Button
+                    android:id="@+id/nutChonVanMieu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:layout_marginEnd="6dp"
+                    android:text="Văn Miếu – Quốc Tử Giám"
                     android:textAllCaps="false"
                     android:textSize="11sp"
                     android:textColor="#FFFFFF"

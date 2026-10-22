@@ -1,6 +1,5 @@
 package com.example.app_ck;
-import android.widget.EditText;
-import android.view.inputmethod.EditorInfo;
+
 import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -8,11 +7,18 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.View;
-import android.view.WindowManager;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -25,38 +31,53 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
-import android.widget.ImageView;
+
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class BanDoActivity extends AppCompatActivity {
 
+    // =====================================================
+    // 1. KHAI BÁO DỮ LIỆU
+    // =====================================================
+
     private static final int YEU_CAU_VI_TRI = 101;
+    private static final int SO_DIA_DIEM = 5;
 
-    // DANH SACH DIA DIEM DU LICH
-
-    // DU LIEU DIA DIEM DOC TU SQLITE
+    // ID phải trùng với SQLite.
     private final String[] TEN_DIA_DIEM =
-            new String[3];
+            new String[SO_DIA_DIEM];
 
     private final String[] DIA_CHI =
-            new String[3];
+            new String[SO_DIA_DIEM];
 
     private final double[][] TOA_DO =
-            new double[3][2];
+            new double[SO_DIA_DIEM][2];
 
     private final String[] TEN_ANH =
-            new String[3];
+            new String[SO_DIA_DIEM];
+
+    private final boolean[] CO_TOA_DO =
+            new boolean[SO_DIA_DIEM];
+
+    // Ảnh dự phòng cho địa điểm chưa có ảnh.
+    private final int[] ANH_DIA_DIEM = {
+            R.drawable.anh_dinh_doc_lap,
+            R.drawable.anh_bao_tang_chung_tich,
+            android.R.drawable.ic_menu_gallery,
+            android.R.drawable.ic_menu_gallery,
+            android.R.drawable.ic_menu_gallery
+    };
+
+    // =====================================================
+    // 2. KHAI BÁO GIAO DIỆN
+    // =====================================================
+
     private MapView banDo;
     private TaiKhoanDb dbKiemTra;
 
     private ImageView anhDiaDiemBanDo;
-
-    private static final int[] ANH_DIA_DIEM = {
-            R.drawable.anh_dinh_doc_lap,
-            R.drawable.anh_bao_tang_chung_tich,
-            R.drawable.anh_buu_dien_sai_gon
-    };
 
     private TextView tenDiaDiem;
     private TextView diaChiDiaDiem;
@@ -69,14 +90,18 @@ public class BanDoActivity extends AppCompatActivity {
 
     private boolean daBatDinhVi = false;
 
-    // -1 NGHIA LA CHUA CHON DIA DIEM
+    // Chưa chọn Marker.
     private int viTriDaChon = -1;
+
+    // =====================================================
+    // 3. KHỞI TẠO ACTIVITY
+    // =====================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // KHOI TAO CAU HINH OPENSTREETMAP
+        // Cấu hình osmdroid.
         Configuration.getInstance().load(
                 getApplicationContext(),
                 getSharedPreferences(
@@ -91,22 +116,51 @@ public class BanDoActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_ban_do);
 
-        dbKiemTra = new TaiKhoanDb(this);
-
-// Mo va giu ket noi SQLite khi man hinh ban do dang mo
-        dbKiemTra.getReadableDatabase();
-
-
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         );
-        anhDiaDiemBanDo = findViewById(
-                R.id.anhDiaDiemBanDo
-        );
-        // ANH XA GIAO DIEN
+
+        // Giữ kết nối SQLite cho Database Inspector.
+        dbKiemTra = new TaiKhoanDb(this);
+        dbKiemTra.getReadableDatabase();
+
+        anhXaGiaoDien();
+
+        caiDatSuKien();
+
+        // Đọc đủ 5 địa điểm từ SQLite.
+        if (!taiDiaDiemTuSQLite()) {
+
+            thongBao(
+                    "SQLite chưa có đủ 5 địa điểm du lịch."
+            );
+
+            finish();
+            return;
+        }
+
+        khoiTaoBanDo();
+
+        themCacMarker();
+
+        caiDatNutChonNhanh();
+
+        caiDatTimKiem();
+    }
+
+    // =====================================================
+    // 4. ÁNH XẠ GIAO DIỆN
+    // =====================================================
+
+    private void anhXaGiaoDien() {
+
         banDo = findViewById(
                 R.id.banDoTuongTac
+        );
+
+        anhDiaDiemBanDo = findViewById(
+                R.id.anhDiaDiemBanDo
         );
 
         tenDiaDiem = findViewById(
@@ -129,98 +183,195 @@ public class BanDoActivity extends AppCompatActivity {
                 R.id.nutViTriCuaToi
         );
 
-        // NUT QUAY LAI
+        // Ban đầu chưa chọn địa điểm.
+        nutXemChiTiet.setEnabled(false);
+        nutChiDuong.setEnabled(false);
+
+        // Đặt nút GPS phía trên thẻ thông tin.
+        View khungThongTin =
+                findViewById(R.id.khungThongTinBanDo);
+
+        if (khungThongTin == null) {
+            return;
+        }
+
+        khungThongTin.addOnLayoutChangeListener(
+                (v, left, top, right, bottom,
+                 oldLeft, oldTop, oldRight, oldBottom) -> {
+
+                    ViewGroup.LayoutParams thamSoGoc =
+                            nutViTriCuaToi.getLayoutParams();
+
+                    if (!(thamSoGoc
+                            instanceof FrameLayout.LayoutParams)) {
+                        return;
+                    }
+
+                    if (!(v.getLayoutParams()
+                            instanceof ViewGroup.MarginLayoutParams)) {
+                        return;
+                    }
+
+                    FrameLayout.LayoutParams thamSo =
+                            (FrameLayout.LayoutParams) thamSoGoc;
+
+                    ViewGroup.MarginLayoutParams thamSoKhung =
+                            (ViewGroup.MarginLayoutParams)
+                                    v.getLayoutParams();
+
+                    int khoangCachCan =
+                            v.getHeight()
+                                    + thamSoKhung.bottomMargin
+                                    + dp(12);
+
+                    if (thamSo.bottomMargin != khoangCachCan) {
+
+                        thamSo.bottomMargin = khoangCachCan;
+
+                        nutViTriCuaToi.setLayoutParams(
+                                thamSo
+                        );
+                    }
+                }
+        );
+    }
+
+    private int dp(int giaTri) {
+
+        return (int) (
+                giaTri
+                        * getResources()
+                        .getDisplayMetrics()
+                        .density
+                        + 0.5f
+        );
+    }
+
+    // =====================================================
+    // 5. XỬ LÝ CÁC NÚT
+    // =====================================================
+
+    private void caiDatSuKien() {
+
         findViewById(R.id.nutQuayLaiBanDo)
                 .setOnClickListener(
                         v -> finish()
                 );
 
-        // NUT XEM CHI TIET
         nutXemChiTiet.setOnClickListener(
                 v -> moChiTietDiaDiem()
         );
 
-        // NUT CHI DUONG
         nutChiDuong.setOnClickListener(
                 v -> moChiDuong()
         );
 
-        // NUT VI TRI CUA TOI
         nutViTriCuaToi.setOnClickListener(
                 v -> kiemTraQuyenViTri()
         );
 
-        // DOC DU LIEU TU SQLITE
-        if (!taiDiaDiemTuSQLite()) {
-
-            thongBao(
-                    "Không đọc được dữ liệu địa điểm từ SQLite."
-            );
-
-            finish();
-            return;
-        }
-
-        // KHOI TAO BAN DO
-        khoiTaoBanDo();
-
-        // THEM 3 MARKER TU SQLITE
-        themCacMarker();
-
-// CHON NHANH DINH DOC LAP
-        findViewById(R.id.nutChonDinhDocLap)
-                .setOnClickListener(
-                        v -> chonVaDiChuyen(0)
-                );
-
-// CHON NHANH BAO TANG
-        findViewById(R.id.nutChonBaoTang)
-                .setOnClickListener(
-                        v -> chonVaDiChuyen(1)
-                );
-
-// CHON NHANH BUU DIEN
-        findViewById(R.id.nutChonBuuDien)
-                .setOnClickListener(
-                        v -> chonVaDiChuyen(2)
-                );
-
-// NUT PHONG TO
         findViewById(R.id.nutPhongToBanDo)
-                .setOnClickListener(v -> {
-                    banDo.getController().zoomIn();
-                });
+                .setOnClickListener(v ->
+                        banDo.getController().zoomIn()
+                );
 
-// NUT THU NHO
         findViewById(R.id.nutThuNhoBanDo)
-                .setOnClickListener(v -> {
-                    banDo.getController().zoomOut();
-                });
-
-// TIM KIEM DIA DIEM
-        EditText oTimKiem = findViewById(
-                R.id.oTimKiemBanDo
-        );
-
-        oTimKiem.setOnEditorActionListener(
-                (v, actionId, event) -> {
-
-                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-
-                        timKiemDiaDiem(
-                                oTimKiem.getText().toString()
-                        );
-
-                        return true;
-                    }
-
-                    return false;
-                }
-        );
-
+                .setOnClickListener(v ->
+                        banDo.getController().zoomOut()
+                );
     }
 
-    // THIET LAP BAN DO OSM
+    // =====================================================
+    // 6. ĐỌC 5 ĐỊA ĐIỂM TỪ SQLITE
+    // =====================================================
+
+    private boolean taiDiaDiemTuSQLite() {
+
+        try {
+
+            ArrayList<DiaDiem> danhSach =
+                    dbKiemTra.danhSachDiaDiem();
+
+            boolean[] daCoDiaDiem =
+                    new boolean[SO_DIA_DIEM];
+
+            for (DiaDiem diaDiem : danhSach) {
+
+                int id = diaDiem.id;
+
+                if (id < 0 || id >= SO_DIA_DIEM) {
+                    continue;
+                }
+
+                TEN_DIA_DIEM[id] = diaDiem.ten;
+
+                DIA_CHI[id] = diaDiem.diaChi;
+
+                TEN_ANH[id] = diaDiem.tenAnh;
+
+                if (Double.isFinite(diaDiem.viDo)
+                        && Double.isFinite(diaDiem.kinhDo)
+                        && diaDiem.viDo >= -90
+                        && diaDiem.viDo <= 90
+                        && diaDiem.kinhDo >= -180
+                        && diaDiem.kinhDo <= 180
+                        && !(diaDiem.viDo == 0
+                        && diaDiem.kinhDo == 0)) {
+
+                    TOA_DO[id][0] = diaDiem.viDo;
+                    TOA_DO[id][1] = diaDiem.kinhDo;
+
+                    CO_TOA_DO[id] = true;
+                }
+
+                // Tìm ảnh có tên tương ứng trong drawable.
+                if (diaDiem.tenAnh != null
+                        && !diaDiem.tenAnh.trim().isEmpty()) {
+
+                    int maAnh = getResources().getIdentifier(
+                            diaDiem.tenAnh,
+                            "drawable",
+                            getPackageName()
+                    );
+
+                    if (maAnh != 0) {
+                        ANH_DIA_DIEM[id] = maAnh;
+                    }
+                }
+
+                daCoDiaDiem[id] = true;
+            }
+
+            for (int i = 0; i < SO_DIA_DIEM; i++) {
+
+                if (!daCoDiaDiem[i]) {
+                    return false;
+                }
+
+                if (TEN_DIA_DIEM[i] == null
+                        || TEN_DIA_DIEM[i].trim().isEmpty()) {
+                    return false;
+                }
+            }
+
+            return true;
+
+        } catch (Exception e) {
+
+            android.util.Log.e(
+                    "BanDoActivity",
+                    "Không đọc được dữ liệu SQLite",
+                    e
+            );
+
+            return false;
+        }
+    }
+
+    // =====================================================
+    // 7. KHỞI TẠO OPENSTREETMAP
+    // =====================================================
+
     private void khoiTaoBanDo() {
 
         XYTileSource nguonBanDo = new XYTileSource(
@@ -239,15 +390,17 @@ public class BanDoActivity extends AppCompatActivity {
         banDo.setMultiTouchControls(true);
         banDo.setBuiltInZoomControls(false);
 
-        banDo.setMinZoomLevel(12.0);
+        // Cho phép xem cả miền Bắc và miền Nam.
+        banDo.setMinZoomLevel(4.0);
         banDo.setMaxZoomLevel(19.0);
 
+        // Ban đầu hiển thị bản đồ Việt Nam.
         GeoPoint trungTam = new GeoPoint(
-                10.7790,
-                106.6960
+                15.5,
+                107.5
         );
 
-        banDo.getController().setZoom(15.5);
+        banDo.getController().setZoom(5.5);
 
         banDo.getController().setCenter(
                 trungTam
@@ -256,10 +409,17 @@ public class BanDoActivity extends AppCompatActivity {
         banDo.invalidate();
     }
 
-    // THEM CAC MARKER DIA DIEM
+    // =====================================================
+    // 8. HIỂN THỊ MARKER
+    // =====================================================
+
     private void themCacMarker() {
 
-        for (int i = 0; i < TEN_DIA_DIEM.length; i++) {
+        for (int i = 0; i < SO_DIA_DIEM; i++) {
+
+            if (!CO_TOA_DO[i]) {
+                continue;
+            }
 
             final int chiSo = i;
 
@@ -282,7 +442,9 @@ public class BanDoActivity extends AppCompatActivity {
             );
 
             marker.setSnippet(
-                    DIA_CHI[i]
+                    DIA_CHI[i] == null
+                            ? ""
+                            : DIA_CHI[i]
             );
 
             marker.setOnMarkerClickListener(
@@ -304,36 +466,213 @@ public class BanDoActivity extends AppCompatActivity {
         banDo.invalidate();
     }
 
-    // CAP NHAT THONG TIN KHI CHON MARKER
+    // =====================================================
+    // 9. CHỌN ĐỊA ĐIỂM
+    // =====================================================
 
     private void chonDiaDiem(int chiSo) {
 
-        if (chiSo < 0 ||
-                chiSo >= TEN_DIA_DIEM.length) {
+        if (chiSo < 0 || chiSo >= SO_DIA_DIEM) {
             return;
         }
 
         viTriDaChon = chiSo;
 
-        // CAP NHAT ANH DIA DIEM
         anhDiaDiemBanDo.setImageResource(
                 ANH_DIA_DIEM[chiSo]
         );
 
-        // CAP NHAT TEN DIA DIEM
         tenDiaDiem.setText(
                 TEN_DIA_DIEM[chiSo]
         );
 
-        // GIU NGUYEN TINH KHOANG CACH GPS
         capNhatKhoangCach();
 
-        // BAT NUT CHUC NANG
         nutXemChiTiet.setEnabled(true);
+
         nutChiDuong.setEnabled(true);
     }
 
-    // KIEM TRA QUYEN TRUY CAP VI TRI
+    private void chonVaDiChuyen(int chiSo) {
+
+        if (chiSo < 0 || chiSo >= SO_DIA_DIEM) {
+            return;
+        }
+
+        chonDiaDiem(chiSo);
+
+        if (!CO_TOA_DO[chiSo]) {
+
+            thongBao(
+                    "Địa điểm chưa có tọa độ GPS hợp lệ."
+            );
+
+            return;
+        }
+
+        GeoPoint diemDen = new GeoPoint(
+                TOA_DO[chiSo][0],
+                TOA_DO[chiSo][1]
+        );
+
+        banDo.getController().setZoom(17.0);
+
+        banDo.getController().animateTo(
+                diemDen
+        );
+    }
+
+    // =====================================================
+    // 10. NÚT CHỌN NHANH
+    // =====================================================
+
+    private void caiDatNutChonNhanh() {
+
+        // Hai nút cũ đã có trong XML.
+        ganNutChonNhanh(
+                R.id.nutChonDinhDocLap,
+                0
+        );
+
+        ganNutChonNhanh(
+                R.id.nutChonBaoTang,
+                1
+        );
+
+        // Tìm nút mới theo tên để tránh lỗi
+        // khi XML chưa khai báo ba ID này.
+        ganNutChonNhanhTheoTen(
+                "nutChonLangVanHoa",
+                2
+        );
+
+        ganNutChonNhanhTheoTen(
+                "nutChonConDao",
+                3
+        );
+
+        ganNutChonNhanhTheoTen(
+                "nutChonVanMieu",
+                4
+        );
+    }
+
+    private void ganNutChonNhanh(
+            int idNut,
+            int chiSoDiaDiem
+    ) {
+
+        View nut = findViewById(idNut);
+
+        if (nut != null) {
+
+            nut.setOnClickListener(
+                    v -> chonVaDiChuyen(chiSoDiaDiem)
+            );
+        }
+    }
+
+    private void ganNutChonNhanhTheoTen(
+            String tenId,
+            int chiSoDiaDiem
+    ) {
+
+        int idNut = getResources().getIdentifier(
+                tenId,
+                "id",
+                getPackageName()
+        );
+
+        if (idNut == 0) {
+            return;
+        }
+
+        ganNutChonNhanh(
+                idNut,
+                chiSoDiaDiem
+        );
+    }
+
+    // =====================================================
+    // 11. TÌM KIẾM ĐỊA ĐIỂM
+    // =====================================================
+
+    private void caiDatTimKiem() {
+
+        EditText oTimKiem = findViewById(
+                R.id.oTimKiemBanDo
+        );
+
+        oTimKiem.setOnEditorActionListener(
+                (v, actionId, event) -> {
+
+                    if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+
+                        timKiemDiaDiem(
+                                oTimKiem.getText().toString()
+                        );
+
+                        return true;
+                    }
+
+                    return false;
+                }
+        );
+    }
+
+    private String chuanHoa(String noiDung) {
+
+        if (noiDung == null) {
+            return "";
+        }
+
+        String chuoi = Normalizer.normalize(
+                noiDung.toLowerCase(Locale.ROOT),
+                Normalizer.Form.NFD
+        );
+
+        chuoi = chuoi.replaceAll("\\p{M}+", "");
+
+        return chuoi.replace('đ', 'd')
+                .trim()
+                .replaceAll("\\s+", " ");
+    }
+
+    private void timKiemDiaDiem(String tuKhoa) {
+
+        String noiDung = chuanHoa(tuKhoa);
+
+        if (noiDung.isEmpty()) {
+
+            thongBao(
+                    "Vui lòng nhập tên địa điểm."
+            );
+
+            return;
+        }
+
+        for (int i = 0; i < SO_DIA_DIEM; i++) {
+
+            String ten = chuanHoa(
+                    TEN_DIA_DIEM[i]
+            );
+
+            if (ten.contains(noiDung)) {
+
+                chonVaDiChuyen(i);
+                return;
+            }
+        }
+
+        thongBao(
+                "Không tìm thấy địa điểm phù hợp."
+        );
+    }
+
+    // =====================================================
+    // 12. KIỂM TRA QUYỀN GPS
+    // =====================================================
+
     private boolean daCoQuyenViTri() {
 
         boolean quyenChinhXac =
@@ -354,6 +693,7 @@ public class BanDoActivity extends AppCompatActivity {
     private void kiemTraQuyenViTri() {
 
         if (daCoQuyenViTri()) {
+
             batDinhVi();
             return;
         }
@@ -368,13 +708,13 @@ public class BanDoActivity extends AppCompatActivity {
         );
     }
 
-    // KET QUA CAP QUYEN GPS
     @Override
     public void onRequestPermissionsResult(
             int requestCode,
             @NonNull String[] permissions,
             @NonNull int[] grantResults
     ) {
+
         super.onRequestPermissionsResult(
                 requestCode,
                 permissions,
@@ -386,15 +726,21 @@ public class BanDoActivity extends AppCompatActivity {
         }
 
         if (daCoQuyenViTri()) {
+
             batDinhVi();
+
         } else {
+
             thongBao(
                     "Cần cấp quyền vị trí để sử dụng GPS."
             );
         }
     }
 
-    // BAT DINH VI VA HIEN THI TREN BAN DO
+    // =====================================================
+    // 13. BẬT ĐỊNH VỊ
+    // =====================================================
+
     private void batDinhVi() {
 
         if (!daCoQuyenViTri()) {
@@ -414,22 +760,24 @@ public class BanDoActivity extends AppCompatActivity {
             banDo.getOverlays().add(lopViTri);
         }
 
-        daBatDinhVi = true;
-
-        // BAT CAP NHAT VI TRI
-        boolean dangLayViTri = lopViTri.enableMyLocation();
+        boolean dangLayViTri =
+                lopViTri.enableMyLocation();
 
         if (!dangLayViTri) {
+
             thongBao(
-                    "Không thể khởi động định vị. Hãy kiểm tra GPS."
+                    "Không thể khởi động định vị. " +
+                            "Hãy kiểm tra GPS."
             );
+
             return;
         }
+
+        daBatDinhVi = true;
 
         GeoPoint viTriHienTai =
                 lopViTri.getMyLocation();
 
-        // NEU DA CO VI TRI THI DI CHUYEN NGAY
         if (viTriHienTai != null) {
 
             diChuyenDenViTri(
@@ -443,30 +791,35 @@ public class BanDoActivity extends AppCompatActivity {
                 "Đang xác định vị trí của bạn..."
         );
 
-        // CHO DU LIEU VI TRI DAU TIEN
-        lopViTri.runOnFirstFix(() -> {
+        lopViTri.runOnFirstFix(() ->
 
-            runOnUiThread(() -> {
+                runOnUiThread(() -> {
 
-                if (isFinishing() || isDestroyed()) {
-                    return;
-                }
+                    if (isFinishing() || isDestroyed()) {
+                        return;
+                    }
 
-                if (lopViTri == null) {
-                    return;
-                }
+                    if (lopViTri == null) {
+                        return;
+                    }
 
-                GeoPoint viTriMoi =
-                        lopViTri.getMyLocation();
+                    GeoPoint viTriMoi =
+                            lopViTri.getMyLocation();
 
-                if (viTriMoi != null) {
-                    diChuyenDenViTri(viTriMoi);
-                }
-            });
-        });
+                    if (viTriMoi != null) {
+
+                        diChuyenDenViTri(
+                                viTriMoi
+                        );
+                    }
+                })
+        );
     }
 
-    // DI CHUYEN BAN DO DEN VI TRI GPS
+    // =====================================================
+    // 14. HIỂN THỊ VỊ TRÍ VÀ KHOẢNG CÁCH
+    // =====================================================
+
     private void diChuyenDenViTri(
             GeoPoint viTri
     ) {
@@ -480,18 +833,26 @@ public class BanDoActivity extends AppCompatActivity {
         capNhatKhoangCach();
     }
 
-    // TINH KHOANG CACH TU GPS DEN DIA DIEM
     private void capNhatKhoangCach() {
 
         if (viTriDaChon < 0) {
             return;
         }
 
-        String noiDung =
-                "⌖  " + DIA_CHI[viTriDaChon];
+        String diaChi =
+                DIA_CHI[viTriDaChon] == null
+                        ? ""
+                        : DIA_CHI[viTriDaChon];
 
-        if (lopViTri == null ||
-                !daBatDinhVi) {
+        String noiDung = "⌖  " + diaChi;
+
+        if (!CO_TOA_DO[viTriDaChon]) {
+
+            diaChiDiaDiem.setText(noiDung);
+            return;
+        }
+
+        if (lopViTri == null || !daBatDinhVi) {
 
             diaChiDiaDiem.setText(noiDung);
             return;
@@ -544,7 +905,10 @@ public class BanDoActivity extends AppCompatActivity {
         );
     }
 
-    // MO MAN HINH CHI TIET DIA DIEM
+    // =====================================================
+    // 15. MỞ CHI TIẾT ĐỊA ĐIỂM
+    // =====================================================
+
     private void moChiTietDiaDiem() {
 
         if (viTriDaChon < 0) {
@@ -569,7 +933,10 @@ public class BanDoActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    // MO CHI DUONG
+    // =====================================================
+    // 16. CHỈ ĐƯỜNG GOOGLE MAPS
+    // =====================================================
+
     private void moChiDuong() {
 
         if (viTriDaChon < 0) {
@@ -581,15 +948,29 @@ public class BanDoActivity extends AppCompatActivity {
             return;
         }
 
-        String toaDo =
-                TOA_DO[viTriDaChon][0]
-                        + ","
-                        + TOA_DO[viTriDaChon][1];
+        String dichDen;
+
+        if (CO_TOA_DO[viTriDaChon]) {
+
+            dichDen =
+                    TOA_DO[viTriDaChon][0]
+                            + ","
+                            + TOA_DO[viTriDaChon][1];
+
+        } else {
+
+            // Tìm theo tên nếu chưa có tọa độ.
+            dichDen = Uri.encode(
+                    TEN_DIA_DIEM[viTriDaChon]
+                            + ", "
+                            + DIA_CHI[viTriDaChon]
+            );
+        }
 
         Uri duongDan = Uri.parse(
                 "https://www.google.com/maps/dir/"
                         + "?api=1&destination="
-                        + toaDo
+                        + dichDen
                         + "&travelmode=driving"
         );
 
@@ -599,6 +980,7 @@ public class BanDoActivity extends AppCompatActivity {
         );
 
         try {
+
             startActivity(intent);
 
         } catch (ActivityNotFoundException e) {
@@ -609,7 +991,10 @@ public class BanDoActivity extends AppCompatActivity {
         }
     }
 
-    // THONG BAO NGAN
+    // =====================================================
+    // 17. THÔNG BÁO
+    // =====================================================
+
     private void thongBao(String noiDung) {
 
         Toast.makeText(
@@ -619,7 +1004,10 @@ public class BanDoActivity extends AppCompatActivity {
         ).show();
     }
 
-    // QUAN LY VONG DOI MAPVIEW
+    // =====================================================
+    // 18. VÒNG ĐỜI BẢN ĐỒ
+    // =====================================================
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -628,9 +1016,9 @@ public class BanDoActivity extends AppCompatActivity {
             banDo.onResume();
         }
 
-        if (daBatDinhVi &&
-                lopViTri != null &&
-                daCoQuyenViTri()) {
+        if (daBatDinhVi
+                && lopViTri != null
+                && daCoQuyenViTri()) {
 
             lopViTri.enableMyLocation();
         }
@@ -653,135 +1041,24 @@ public class BanDoActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
 
-
-        if (dbKiemTra != null) {
-            dbKiemTra.close();
-            dbKiemTra = null;
-        }
-
         if (lopViTri != null) {
+
             lopViTri.disableMyLocation();
             lopViTri = null;
         }
 
         if (banDo != null) {
+
             banDo.onDetach();
             banDo = null;
         }
 
+        if (dbKiemTra != null) {
+
+            dbKiemTra.close();
+            dbKiemTra = null;
+        }
+
         super.onDestroy();
     }
-
-    // CHON DIA DIEM VA DI CHUYEN BAN DO
-    private void chonVaDiChuyen(int chiSo) {
-
-        if (chiSo < 0 ||
-                chiSo >= TEN_DIA_DIEM.length) {
-            return;
-        }
-
-        // CAP NHAT THE THONG TIN
-        chonDiaDiem(chiSo);
-
-        // LAY TOA DO DIA DIEM
-        GeoPoint diemDen = new GeoPoint(
-                TOA_DO[chiSo][0],
-                TOA_DO[chiSo][1]
-        );
-
-        // PHONG TO KHU VUC DU LICH
-        banDo.getController().setZoom(17.0);
-
-        // DI CHUYEN DEN DIA DIEM
-        banDo.getController().animateTo(
-                diemDen
-        );
-    }
-
-    // TIM KIEM TRONG 3 DIA DIEM HIEN CO
-    private void timKiemDiaDiem(String tuKhoa) {
-
-        String noiDung = tuKhoa
-                .trim()
-                .toLowerCase(
-                        Locale.forLanguageTag("vi-VN")
-                );
-
-        if (noiDung.isEmpty()) {
-
-            thongBao(
-                    "Vui lòng nhập tên địa điểm."
-            );
-
-            return;
-        }
-
-        for (int i = 0; i < TEN_DIA_DIEM.length; i++) {
-
-            String ten = TEN_DIA_DIEM[i]
-                    .toLowerCase(
-                            Locale.forLanguageTag("vi-VN")
-                    );
-
-            if (ten.contains(noiDung)) {
-
-                chonVaDiChuyen(i);
-
-                return;
-            }
-        }
-
-        thongBao(
-                "Không tìm thấy địa điểm phù hợp."
-        );
-    }
-
-    // LAY 3 DIA DIEM TU SQLITE
-    private boolean taiDiaDiemTuSQLite() {
-
-        try (TaiKhoanDb db = new TaiKhoanDb(this)) {
-
-            ArrayList<DiaDiem> danhSach =
-                    db.danhSachDiaDiem();
-
-            boolean[] daCoDiaDiem =
-                    new boolean[3];
-
-            for (DiaDiem diaDiem : danhSach) {
-
-                int id = diaDiem.id;
-
-                if (id < 0 || id >= 3) {
-                    continue;
-                }
-
-                TEN_DIA_DIEM[id] = diaDiem.ten;
-
-                DIA_CHI[id] = diaDiem.diaChi;
-
-                TOA_DO[id][0] = diaDiem.viDo;
-                TOA_DO[id][1] = diaDiem.kinhDo;
-
-                TEN_ANH[id] = diaDiem.tenAnh;
-
-                daCoDiaDiem[id] = true;
-            }
-
-            return daCoDiaDiem[0]
-                    && daCoDiaDiem[1]
-                    && daCoDiaDiem[2];
-
-        } catch (Exception e) {
-
-            android.util.Log.e(
-                    "BanDoActivity",
-                    "Loi doc du lieu tu SQLite",
-                    e
-            );
-
-            return false;
-        }
-    }
-
 }
-

@@ -19,7 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.speech.tts.TextToSpeech;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
@@ -32,13 +32,17 @@ import java.util.Collections;
 import java.util.Locale;
 
 public class MainActivity extends BaseActivity {
+    private TextToSpeech ttsTrangChu;
+    private boolean sanSangThuyetMinh = false;
     private TaiKhoanDb dbKiemTra;
     private EditText oTimKiem;
     private ScrollView vungCuonTrangChu;
 
     private View diaDiemDinhDocLap;
     private View diaDiemBaoTang;
-    private View diaDiemBuuDien;
+    private View diaDiemLangVanHoa;
+    private View diaDiemConDao;
+    private View diaDiemVanMieu;
 
     private TextView thongBaoViTri;
     private LinearLayout danhSachGanToi;
@@ -99,6 +103,9 @@ public class MainActivity extends BaseActivity {
         }
 // CAP NHAT ANH VA TEN CUA 5 THE TU SQLITE
         capNhatTheDiaDiemTuSQLite();
+
+        khoiTaoThuyetMinh();
+
         // KHOI TAO CAC CHUC NANG TRANG CHU
         xuLyTimKiem();
         xuLyChucNang();
@@ -140,8 +147,10 @@ public class MainActivity extends BaseActivity {
         diaDiemBaoTang =
                 findViewById(R.id.diaDiemBaoTang);
 
-        diaDiemBuuDien =
-                findViewById(R.id.diaDiemBuuDien);
+        diaDiemLangVanHoa =
+                findViewById(R.id.diaDiemLangVanHoa);
+        diaDiemConDao = findViewById(R.id.diaDiemConDao);
+        diaDiemVanMieu = findViewById(R.id.diaDiemVanMieu);
     }
 
 
@@ -185,15 +194,15 @@ public class MainActivity extends BaseActivity {
 
     // TEN DIA DIEM DOC TU SQLITE
     private final String[] TEN =
-            new String[3];
+            new String[5];
 
     // TOA DO DIA DIEM DOC TU SQLITE
     private final double[][] TOA_DO =
-            new double[3][2];
+            new double[5][2];
 
     // LUU DOI TUONG DIA DIEM DOC TU SQLITE
     private final DiaDiem[] duLieuDiaDiem =
-            new DiaDiem[3];
+            new DiaDiem[5];
     private void thucHienTimKiem() {
         String tuKhoa = chuanHoa(oTimKiem.getText().toString());
         if (tuKhoa.isEmpty()) {
@@ -202,7 +211,7 @@ public class MainActivity extends BaseActivity {
         }
         ArrayList<Integer> ketQua = new ArrayList<>();
         for (int i = 0; i < TEN.length; i++) {
-            if (chuanHoa(TEN[i] + " TP. Hồ Chí Minh Sai Gon").contains(tuKhoa)) ketQua.add(i);
+            if (chuanHoa(TEN[i] + " " + (duLieuDiaDiem[i] != null ? duLieuDiaDiem[i].diaChi : "")).contains(tuKhoa)) ketQua.add(i);
         }
         InputMethodManager banPhim = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         if (banPhim != null) banPhim.hideSoftInputFromWindow(oTimKiem.getWindowToken(), 0);
@@ -244,19 +253,10 @@ public class MainActivity extends BaseActivity {
                     startActivity(intent);
                 }
         );
-
-
-        ganSuKien(R.id.nutThuyetMinh, () ->
-                hienThongBao(
-                        "Chức năng thuyết minh đang được xây dựng"
-                ));
-
-        ganSuKien(R.id.nutLoTrinh, () ->
-                hienThongBao(
-                        "Vui lòng chọn địa điểm để xem lộ trình"
-                ));
-
-
+        ganSuKien(
+                R.id.nutThuyetMinh,
+                this::hienThiDanhSachThuyetMinh
+        );
         ganSuKien(
                 R.id.nutYeuThich,
                 () -> {
@@ -273,17 +273,16 @@ public class MainActivity extends BaseActivity {
         ganSuKien(R.id.nutXemTatCa, () ->
                 hienThiDanhSachDiaDiem());
 
-        ganSuKien(R.id.nutTraiNghiem, () ->
-                hienThongBao(
-                        "Khám phá thuyết minh bằng giọng nói"
-                ));
+        ganSuKien(R.id.nutTraiNghiem, this::hienThiDanhSachThuyetMinh);
     }
 
     // XU LY CHON DIA DIEM NOI BAT
     private void xuLyDiaDiem() {
         ganSuKien(R.id.diaDiemDinhDocLap, () -> moChiTiet(0));
         ganSuKien(R.id.diaDiemBaoTang, () -> moChiTiet(1));
-        ganSuKien(R.id.diaDiemBuuDien, () -> moChiTiet(2));
+        ganSuKien(R.id.diaDiemLangVanHoa, () -> moChiTiet(2));
+        ganSuKien(R.id.diaDiemConDao, () -> moChiTiet(3));
+        ganSuKien(R.id.diaDiemVanMieu, () -> moChiTiet(4));
     }
 
     // XU LY THANH DIEU HUONG
@@ -455,13 +454,15 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    // LOC 3 THE DIA DIEM THEO DANH MUC DUOC LUU TRONG SQLITE
+    // LOC 5 THE DIA DIEM THEO DANH MUC DUOC LUU TRONG SQLITE
     private void locDiaDiemTheoDanhMuc(String danhMuc) {
 
         View[] cacThe = {
                 diaDiemDinhDocLap,
                 diaDiemBaoTang,
-                diaDiemBuuDien
+                diaDiemLangVanHoa,
+                diaDiemConDao,
+                diaDiemVanMieu
         };
 
         boolean[] hienThi = new boolean[cacThe.length];
@@ -734,14 +735,14 @@ public class MainActivity extends BaseActivity {
                     db.danhSachDiaDiem();
 
             boolean[] daCoDuLieu =
-                    new boolean[3];
+                    new boolean[5];
 
             for (DiaDiem diaDiem : danhSach) {
 
                 int id = diaDiem.id;
 
-                // GIU NGUYEN 3 ID DIA DIEM HIEN TAI
-                if (id < 0 || id >= 3) {
+                // CHI NHAN 5 ID DIA DIEM DA KHAI BAO
+                if (id < 0 || id >= TEN.length) {
                     continue;
                 }
 
@@ -759,10 +760,10 @@ public class MainActivity extends BaseActivity {
                 daCoDuLieu[id] = true;
             }
 
-            boolean thanhCong =
-                    daCoDuLieu[0]
-                            && daCoDuLieu[1]
-                            && daCoDuLieu[2];
+            boolean thanhCong = true;
+            for (boolean co : daCoDuLieu) {
+                if (!co) { thanhCong = false; break; }
+            }
 
             android.util.Log.d(
                     "KIEM_TRA_SQLITE",
@@ -831,7 +832,7 @@ public class MainActivity extends BaseActivity {
     // DONG BO 5 THE TREN TRANG CHU
     private void capNhatTheDiaDiemTuSQLite() {
 
-        // 3 THE DIA DIEM NOI BAT
+        // 5 THE DIA DIEM NOI BAT
         ganDuLieuChoThe(
                 0,
                 R.id.anhTheDinhDocLap,
@@ -844,11 +845,9 @@ public class MainActivity extends BaseActivity {
                 R.id.tenTheBaoTang
         );
 
-        ganDuLieuChoThe(
-                2,
-                R.id.anhTheBuuDien,
-                R.id.tenTheBuuDien
-        );
+        ganDuLieuChoThe(2, R.id.anhTheLangVanHoa, R.id.tenTheLangVanHoa);
+        ganDuLieuChoThe(3, R.id.anhTheConDao, R.id.tenTheConDao);
+        ganDuLieuChoThe(4, R.id.anhTheVanMieu, R.id.tenTheVanMieu);
 
         // 2 THE GOI Y
         ganDuLieuChoThe(
@@ -868,7 +867,11 @@ public class MainActivity extends BaseActivity {
                 "Da dong bo 5 the dia diem tu SQLite"
         );
     }
-
+    @Override
+    protected void onStop() {
+        dungThuyetMinhTrangChu();
+        super.onStop();
+    }
     @Override
     protected void onDestroy() {
 
@@ -877,7 +880,117 @@ public class MainActivity extends BaseActivity {
             dbKiemTra = null;
         }
 
+        // DUNG VA GIAI PHONG THUYET MINH
+        if (ttsTrangChu != null) {
+            ttsTrangChu.stop();
+            ttsTrangChu.shutdown();
+            ttsTrangChu = null;
+        }
+
         super.onDestroy();
+    }
+
+    private void khoiTaoThuyetMinh() {
+
+        ttsTrangChu = new TextToSpeech(
+                this,
+                trangThai -> {
+
+                    if (trangThai == TextToSpeech.SUCCESS
+                            && ttsTrangChu != null) {
+
+                        int ketQua = ttsTrangChu.setLanguage(
+                                new Locale("vi", "VN")
+                        );
+
+                        sanSangThuyetMinh =
+                                ketQua != TextToSpeech.LANG_MISSING_DATA
+                                        && ketQua != TextToSpeech.LANG_NOT_SUPPORTED;
+
+                        if (!sanSangThuyetMinh) {
+                            android.util.Log.w(
+                                    "KIEM_TRA_SQLITE",
+                                    "Thiet bi chua ho tro giong doc tieng Viet"
+                            );
+                        }
+                    }
+                }
+        );
+    }
+
+    // HIEN THI DANH SACH DIA DIEM CO THUYET MINH
+    private void hienThiDanhSachThuyetMinh() {
+
+        new AlertDialog.Builder(this)
+                .setTitle("Thuyết minh địa điểm")
+                .setItems(
+                        TEN,
+                        (dialog, viTri) -> phatThuyetMinh(viTri)
+                )
+                .setNeutralButton(
+                        "Dừng đọc",
+                        (dialog, which) -> dungThuyetMinhTrangChu()
+                )
+                .setNegativeButton("Đóng", null)
+                .show();
+    }
+
+    // PHAT NOI DUNG MO TA DA LUU TRONG SQLITE
+    private void phatThuyetMinh(int viTri) {
+
+        if (viTri < 0 || viTri >= duLieuDiaDiem.length) {
+            hienThongBao("Địa điểm không hợp lệ.");
+            return;
+        }
+
+        DiaDiem diaDiem = duLieuDiaDiem[viTri];
+
+        if (diaDiem == null ||
+                diaDiem.moTa == null ||
+                diaDiem.moTa.trim().isEmpty()) {
+
+            hienThongBao(
+                    "Địa điểm chưa có nội dung thuyết minh trong SQLite."
+            );
+            return;
+        }
+
+        if (!sanSangThuyetMinh || ttsTrangChu == null) {
+
+            hienThongBao(
+                    "Giọng đọc tiếng Việt chưa sẵn sàng."
+            );
+            return;
+        }
+
+        int ketQua = ttsTrangChu.speak(
+                diaDiem.moTa,
+                TextToSpeech.QUEUE_FLUSH,
+                null,
+                "thuyet_minh_trang_chu_" + viTri
+        );
+
+        if (ketQua == TextToSpeech.ERROR) {
+            hienThongBao("Không thể phát thuyết minh.");
+            return;
+        }
+
+        hienThongBao(
+                "Đang thuyết minh: " + diaDiem.ten
+        );
+
+        android.util.Log.d(
+                "KIEM_TRA_SQLITE",
+                "Thuyet minh trang chu doc SQLite, id=" + viTri
+        );
+    }
+
+    // DUNG GIONG DOC
+    private void dungThuyetMinhTrangChu() {
+
+        if (ttsTrangChu != null) {
+            ttsTrangChu.stop();
+        }
     }
 
 }

@@ -14,7 +14,7 @@ import javax.crypto.spec.PBEKeySpec;
 
 public class TaiKhoanDb extends SQLiteOpenHelper {
     private static final String DB = "du_lich_tai_khoan.db";
-    private static final int VERSION = 6;
+    private static final int VERSION = 8;
     public TaiKhoanDb(Context context) { super(context, DB, null, VERSION); }
     @Override public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE tai_khoan (id INTEGER PRIMARY KEY AUTOINCREMENT, ten_dang_nhap TEXT NOT NULL UNIQUE, muoi TEXT NOT NULL, mat_khau_bam TEXT NOT NULL, ma_khoi_phuc_bam TEXT)");
@@ -74,15 +74,48 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
         if (oldVersion < 6) {
 
             // BO SUNG DANH MUC CHO DATABASE CU
-            db.execSQL(
-                    "ALTER TABLE dia_diem " +
-                            "ADD COLUMN danh_muc TEXT"
-            );
+            boolean coDanhMuc = false;
+            try (Cursor cursor = db.rawQuery("PRAGMA table_info(dia_diem)", null)) {
+                int cotTen = cursor.getColumnIndexOrThrow("name");
+                while (cursor.moveToNext()) {
+                    if ("danh_muc".equals(cursor.getString(cotTen))) {
+                        coDanhMuc = true;
+                        break;
+                    }
+                }
+            }
+            if (!coDanhMuc) {
+                db.execSQL("ALTER TABLE dia_diem ADD COLUMN danh_muc TEXT");
+            }
 
             // BO SUNG MO TA VA DANH MUC
             themMoTaVaDanhMuc(db);
         }
 
+        if (oldVersion < 7) {
+            xoaDiaDiemKhongConSuDung(db);
+        }
+
+        // Phiên bản 8: bổ sung 3 địa điểm mới, không xóa dữ liệu cũ.
+        if (oldVersion < 8) {
+            taoBangDuLich(db);
+            themDuLieuDiaDiem(db);
+            themMoTaVaDanhMuc(db);
+        }
+    }
+
+    // Dọn địa điểm ID 2 và dữ liệu liên kết trong các bản cài đặt cũ.
+    // Xóa bảng con trước, giữ nguyên hai địa điểm ID 0 và 1 cùng tài khoản.
+    private void xoaDiaDiemKhongConSuDung(SQLiteDatabase db) {
+        String[] idDaXoa = {"2"};
+        String cacKhuVuc = "SELECT id FROM khu_vuc WHERE dia_diem_id=?";
+        String cacDiem = "SELECT id FROM diem_tham_quan WHERE khu_vuc_id IN ("
+                + cacKhuVuc + ")";
+        db.delete("thuyet_minh", "diem_tham_quan_id IN (" + cacDiem + ")", idDaXoa);
+        db.delete("diem_tham_quan", "khu_vuc_id IN (" + cacKhuVuc + ")", idDaXoa);
+        db.delete("khu_vuc", "dia_diem_id=?", idDaXoa);
+        db.delete("yeu_thich", "dia_diem_id=?", idDaXoa);
+        db.delete("dia_diem", "id=?", idDaXoa);
     }
 
     // TAO CAC BANG DU LIEU DU LICH
@@ -142,7 +175,7 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
         );
     }
 
-    // THEM 3 DIA DIEM BAN DAU
+    // THEM 2 DIA DIEM BAN DAU
     private void themDuLieuDiaDiem(
             SQLiteDatabase db
     ) {
@@ -167,15 +200,39 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
                 "anh_bao_tang_chung_tich"
         );
 
+        // ID 2: Làng Văn hóa – Du lịch các dân tộc Việt Nam.
         themDiaDiem(
                 db,
                 2,
-                "Bưu điện Trung tâm Sài Gòn",
-                "2 Công xã Paris, TP. Hồ Chí Minh",
-                10.7799,
-                106.6999,
-                "anh_buu_dien_sai_gon"
+                "Làng Văn hóa – Du lịch các dân tộc Việt Nam",
+                "Đồng Mô, Sơn Tây, Hà Nội",
+                21.06452,
+                105.49827,
+                "anh_lang_van_hoa"
         );
+
+        // ID 3: Hệ thống Nhà tù Côn Đảo.
+        themDiaDiem(
+                db,
+                3,
+                "Hệ thống Nhà tù Côn Đảo",
+                "Côn Đảo, TP. Hồ Chí Minh",
+                8.68907,
+                106.61484,
+                "anh_nha_tu_con_dao"
+        );
+
+        // ID 4: Văn Miếu – Quốc Tử Giám.
+        themDiaDiem(
+                db,
+                4,
+                "Văn Miếu – Quốc Tử Giám",
+                "58 Quốc Tử Giám, Hà Nội",
+                21.02930,
+                105.83575,
+                "anh_van_mieu"
+        );
+
     }
 
     // HAM HO TRO THEM DIA DIEM
@@ -529,7 +586,7 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
         return null;
     }
 
-    // BO SUNG MO TA VA DANH MUC CHO BA DIA DIEM
+    // BO SUNG MO TA VA DANH MUC CHO HAI DIA DIEM
     private void themMoTaVaDanhMuc(
             SQLiteDatabase db
     ) {
@@ -561,12 +618,27 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
         capNhatThongTinDiaDiem(
                 db,
                 2,
-                "Kiến trúc – lịch sử",
-                "Bưu điện Trung tâm Sài Gòn là một công trình " +
-                        "kiến trúc tiêu biểu tại trung tâm Thành phố Hồ Chí Minh. " +
-                        "Công trình nổi bật với mặt tiền, sảnh chính " +
-                        "và những chi tiết trang trí nội thất đặc trưng."
+                "Văn hóa – dân tộc",
+                "Không gian giới thiệu và bảo tồn các giá trị văn hóa " +
+                        "của cộng đồng các dân tộc Việt Nam tại Đồng Mô, Sơn Tây."
         );
+
+        capNhatThongTinDiaDiem(
+                db,
+                3,
+                "Di tích – lịch sử",
+                "Quần thể di tích Nhà tù Côn Đảo ghi dấu lịch sử " +
+                        "đấu tranh của những người từng bị giam giữ tại đây."
+        );
+
+        capNhatThongTinDiaDiem(
+                db,
+                4,
+                "Văn hóa – kiến trúc",
+                "Văn Miếu – Quốc Tử Giám là di tích lịch sử văn hóa " +
+                        "nổi tiếng tại Hà Nội, gắn với truyền thống hiếu học."
+        );
+
     }
 
     // CHI CAP NHAT TRUONG CHUA CO DU LIEU

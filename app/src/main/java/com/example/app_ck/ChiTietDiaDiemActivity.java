@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Locale;
 import java.util.ArrayList;
@@ -29,79 +28,74 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
     private TextView nutYeuThich;
     private TextView nutTimYeuThich;
 
-    // Danh sách địa điểm du lịch chính
+    // Năm địa điểm, mã ID khớp với bảng dia_diem trong SQLite v7.
     private final String[] TEN = {
             "Dinh Độc Lập",
             "Bảo tàng Chứng tích Chiến tranh",
-            "Bưu điện Trung tâm Sài Gòn"
+            "Làng Văn hóa – Du lịch các dân tộc Việt Nam",
+            "Hệ thống Nhà tù Côn Đảo",
+            "Văn Miếu – Quốc Tử Giám"
     };
-
 
     private final String[] DANH_MUC = {
             "Văn hóa – lịch sử",
             "Bảo tàng – lịch sử",
-            "Kiến trúc – lịch sử"
+            "Văn hóa – dân tộc",
+            "Di tích – lịch sử",
+            "Văn hóa – lịch sử"
     };
-
 
     private final String[] DIA_CHI = {
             "135 Nam Kỳ Khởi Nghĩa, TP. Hồ Chí Minh",
             "28 Võ Văn Tần, TP. Hồ Chí Minh",
-            "2 Công xã Paris, TP. Hồ Chí Minh"
+            "Đồng Mô, Sơn Tây, Hà Nội",
+            "Khu di tích Nhà tù Côn Đảo, Côn Đảo, TP. Hồ Chí Minh",
+            "58 Quốc Tử Giám, Hà Nội"
     };
 
     private final String[] MO_TA = {
-            "Dinh Độc Lập là một di tích lịch sử nổi bật, " +
-                    "gắn liền với những sự kiện quan trọng trong " +
-                    "lịch sử Việt Nam. Công trình có nhiều không " +
-                    "gian tham quan như Phòng Khánh tiết, Phòng họp " +
-                    "Hội đồng Nội các, các phòng làm việc và khu hầm. " +
-                    "Du khách có thể tìm hiểu về kiến trúc và những " +
-                    "câu chuyện lịch sử tại đây.",
-
-            "Bảo tàng Chứng tích Chiến tranh trưng bày " +
-                    "các tư liệu, hình ảnh và hiện vật về chiến tranh " +
-                    "cùng những tác động đối với con người. Các không " +
-                    "gian trưng bày được tổ chức theo nhiều chủ đề, " +
-                    "giúp khách tham quan tìm hiểu lịch sử.",
-
-            "Bưu điện Trung tâm Sài Gòn là một công trình " +
-                    "kiến trúc tiêu biểu tại trung tâm Thành phố Hồ Chí Minh. " +
-                    "Công trình nổi bật với mặt tiền, sảnh chính " +
-                    "và những chi tiết trang trí nội thất đặc trưng."
+            "Dinh Độc Lập là di tích lịch sử nổi bật, gắn liền với các sự kiện " +
+                    "quan trọng trong lịch sử Việt Nam, gồm các phòng làm việc, phòng khánh tiết và khu hầm.",
+            "Bảo tàng Chứng tích Chiến tranh trưng bày tư liệu, hình ảnh và " +
+                    "hiện vật về chiến tranh cùng những tác động đối với con người.",
+            "Làng Văn hóa – Du lịch các dân tộc Việt Nam là không gian giới thiệu, " +
+                    "bảo tồn và phát huy bản sắc văn hóa các dân tộc tại Đồng Mô, Sơn Tây, Hà Nội.",
+            "Hệ thống di tích Nhà tù Côn Đảo lưu giữ dấu tích về lịch sử đấu tranh " +
+                    "và các trại giam trong nhiều thời kỳ.",
+            "Văn Miếu – Quốc Tử Giám là quần thể di tích lịch sử và văn hóa " +
+                    "gắn liền với truyền thống giáo dục, khoa cử Việt Nam."
     };
 
-    // Danh sách điểm tham quan nhỏ
+    // Tên khu vực giới thiệu. Ba điểm mới chưa có sơ đồ Marker tương tác.
     private static final String[][] DIEM = {
-            {
-                    "Cổng chính và khuôn viên",
-                    "Phòng Khánh tiết",
-                    "Phòng họp Hội đồng Nội các",
-                    "Khu hầm"
-            },
-            {
-                    "Khu trưng bày ngoài trời",
-                    "Không gian trưng bày chuyên đề",
-                    "Khu tư liệu và hình ảnh"
-            },
-            {
-                    "Mặt tiền công trình",
-                    "Sảnh chính",
-                    "Không gian giao dịch và kiến trúc nội thất"
-            }
+            {"Cổng chính và khuôn viên", "Phòng Khánh tiết",
+                    "Phòng họp Hội đồng Nội các", "Khu hầm"},
+            {"Khu trưng bày ngoài trời", "Không gian trưng bày chuyên đề",
+                    "Khu tư liệu và hình ảnh"},
+            {"Không gian văn hóa các dân tộc", "Các công trình kiến trúc truyền thống",
+                    "Khu hoạt động văn hóa"},
+            {"Trại Phú Hải", "Trại Phú Tường", "Chuồng cọp Pháp"},
+            {"Văn Miếu Môn", "Khuê Văn Các", "Giếng Thiên Quang",
+                    "Khu Đại Thành", "Khu Thái Học"}
     };
 
+    // Hai ảnh có thật của dự án; ba địa điểm mới dùng ảnh thay thế trung tính
+    // cho đến khi bạn thêm đúng tệp drawable được khai báo trong SQLite.
     private final int[] ANH = {
             R.drawable.anh_dinh_doc_lap,
             R.drawable.anh_bao_tang_chung_tich,
-            R.drawable.anh_buu_dien_sai_gon
+            android.R.drawable.ic_menu_gallery,
+            android.R.drawable.ic_menu_gallery,
+            android.R.drawable.ic_menu_gallery
     };
 
-    // Tọa độ GPS của các địa điểm du lịch chính
+    // Tọa độ tham khảo, dữ liệu từ SQLite sẽ ghi đè khi đọc thành công.
     private final double[][] TOA_DO = {
             {10.7770, 106.6953},
             {10.7795, 106.6921},
-            {10.7799, 106.6999}
+            {21.0770, 105.4190},
+            {8.68355, 106.61029},
+            {21.0290, 105.8359}
     };
 
     @Override
@@ -493,9 +487,13 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
             the.addView(nghe);
 
             // Chọn điểm thì mở màn hình tham quan
-            the.setOnClickListener(v ->
-                    moManHinhThamQuan(chiSo)
-            );
+            the.setOnClickListener(v -> {
+                if (viTri >= 2) {
+                    thongBao("Sơ đồ tham quan đang được bổ sung cho địa điểm này.");
+                } else {
+                    moManHinhThamQuan(chiSo);
+                }
+            });
         }
     }
 
@@ -509,24 +507,71 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
     }
 
     // Mở màn hình tham quan
+    // Mở màn hình tham quan theo ID của từng địa điểm.
+    // Giữ nguyên 25 Marker Dinh Độc Lập và 13 Marker Bảo tàng.
     private void moManHinhThamQuan(int chiSo) {
 
         dungThuyetMinh();
 
-        Intent intent = new Intent(
-                this,
-                ThamQuanActivity.class
-        );
+        Intent intent;
 
-        intent.putExtra(
-                "viTriDiaDiem",
-                viTri
-        );
+        switch (viTri) {
 
-        intent.putExtra(
-                "viTriKhuVuc",
-                chiSo
-        );
+            case 0:
+                intent = new Intent(
+                        this,
+                        ThamQuanActivity.class
+                );
+
+                intent.putExtra(
+                        "viTriDiaDiem",
+                        0
+                );
+
+                intent.putExtra(
+                        "viTriKhuVuc",
+                        chiSo
+                );
+                break;
+
+            case 1:
+                intent = new Intent(
+                        this,
+                        BaoTangThamQuanActivity.class
+                );
+
+                // Màn hình Bảo tàng tự chọn Marker mặc định.
+                intent.putExtra(
+                        "viTriKhuVuc",
+                        chiSo
+                );
+                break;
+
+            case 2:
+                intent = new Intent(
+                        this,
+                        LangVanHoaThamQuanActivity.class
+                );
+                break;
+
+            case 3:
+                intent = new Intent(
+                        this,
+                        ConDaoThamQuanActivity.class
+                );
+                break;
+
+            case 4:
+                intent = new Intent(
+                        this,
+                        VanMieuThamQuanActivity.class
+                );
+                break;
+
+            default:
+                thongBao("Địa điểm tham quan chưa được hỗ trợ.");
+                return;
+        }
 
         startActivity(intent);
     }
@@ -655,3 +700,5 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
         super.onDestroy();
     }
 }
+
+

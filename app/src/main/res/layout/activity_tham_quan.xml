@@ -39,17 +39,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hành trình tham quan"
+                android:text="Tham quan tương tác"
                 android:textColor="#24382D"
                 android:textStyle="bold"
                 android:textSize="18sp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Khám phá từng điểm đến"
-                android:textColor="#7C8B7D"
-                android:textSize="11sp"/>
         </LinearLayout>
 
         <TextView
@@ -109,7 +103,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="HÀNH TRÌNH CỦA BẠN"
+                android:text="KHÁM PHÁ ĐỊA ĐIỂM"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.12"
@@ -120,7 +114,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="Dinh Độc Lập"
+                android:text="Tên địa điểm du lịch"
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:textColor="#24382D"/>
@@ -129,7 +123,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="⌖  Thành phố Hồ Chí Minh"
+                android:text="⌖  Thông tin địa điểm"
                 android:textSize="13sp"
                 android:textColor="#7C8B7D"/>
 
@@ -177,7 +171,7 @@
                         android:layout_height="wrap_content"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="8dp"
-                        android:text="Điểm 1/4"
+                        android:text="Điểm 1/1"
                         android:textSize="13sp"
                         android:textStyle="bold"
                         android:textColor="#4F7C5A"
@@ -228,7 +222,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Phòng Khánh tiết"
+                    android:text="Chọn điểm tham quan"
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:textColor="#24382D"/>
@@ -321,7 +315,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Lộ trình tham quan"
+                    android:text="Danh sách điểm tham quan"
                     android:textSize="19sp"
                     android:textStyle="bold"
                     android:textColor="#24382D"/>
@@ -346,7 +340,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="18dp"
                 android:gravity="center"
-                android:text="✦  Mỗi điểm đến là một câu chuyện"
+                android:text="✦  Mỗi điểm tham quan là một câu chuyện"
                 android:textSize="13sp"
                 android:textColor="#7C8B7D"/>
 
