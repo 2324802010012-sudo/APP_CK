@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="14dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E3EAE2"
+    app:strokeWidth="1dp">
+
+    <!-- BO CUC NGANG CUA THE -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:gravity="center_vertical">
+
+        <!-- ANH DIA DIEM -->
+        <ImageView
+            android:id="@+id/ytAnhDiaDiem"
+            android:layout_width="100dp"
+            android:layout_height="128dp"
+            android:scaleType="centerCrop"
+            android:importantForAccessibility="no" />
+
+        <!-- NOI DUNG DIA DIEM -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="14dp"
+            android:orientation="vertical">
+
+            <!-- DANH MUC -->
+            <TextView
+                android:id="@+id/ytDanhMuc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#4F7C5A" />
+
+            <!-- TEN DIA DIEM -->
+            <TextView
+                android:id="@+id/ytTenDiaDiem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#20382A" />
+
+            <!-- DIA CHI -->
+            <TextView
+                android:id="@+id/ytDiaChi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:textSize="12sp"
+                android:textColor="#6F8074" />
+
+            <!-- XEM CHI TIET VA BO YEU THICH -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Xem chi tiết →"
+                    android:textSize="12sp"
+                    android:textColor="#2C7351" />
+
+                <ImageButton
+                    android:id="@+id/ytBoLuu"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="13dp"
+                    android:src="@drawable/ui_ic_heart"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Bỏ yêu thích" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

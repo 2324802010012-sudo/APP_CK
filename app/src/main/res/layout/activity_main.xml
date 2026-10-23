@@ -385,7 +385,7 @@
                     android:paddingBottom="6dp">
                     <LinearLayout
                         android:id="@+id/diaDiemDinhDocLap"
-                        android:layout_width="205dp"
+                        android:layout_width="@dimen/featured_destination_card_width"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="12dp"
                         android:orientation="vertical"
@@ -396,7 +396,7 @@
                         <ImageView
                             android:id="@+id/anhTheDinhDocLap"
                             android:layout_width="match_parent"
-                            android:layout_height="125dp"
+                            android:layout_height="@dimen/featured_destination_image_height"
                             android:src="@drawable/anh_dinh_doc_lap"
                             android:scaleType="centerCrop"
                             android:contentDescription="Ảnh Dinh Độc Lập"/>
@@ -406,7 +406,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="10dp"
-                            android:maxLines="2"
+                            android:lines="2"
                             android:ellipsize="end"
                             android:text="Dinh Độc Lập"
                             android:textSize="14sp"
@@ -418,13 +418,15 @@
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="5dp"
                             android:layout_marginBottom="9dp"
+                            android:singleLine="true"
+                            android:ellipsize="end"
                             android:text="Lịch sử · Quận 1"
                             android:textSize="11sp"
                             android:textColor="#788B7E"/>
                     </LinearLayout>
                     <LinearLayout
                         android:id="@+id/diaDiemBaoTang"
-                        android:layout_width="205dp"
+                        android:layout_width="@dimen/featured_destination_card_width"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="12dp"
                         android:orientation="vertical"
@@ -435,7 +437,7 @@
                         <ImageView
                             android:id="@+id/anhTheBaoTang"
                             android:layout_width="match_parent"
-                            android:layout_height="125dp"
+                            android:layout_height="@dimen/featured_destination_image_height"
                             android:src="@drawable/anh_bao_tang_chung_tich"
                             android:scaleType="centerCrop"
                             android:contentDescription="Ảnh Bảo tàng Chứng tích Chiến tranh"/>
@@ -445,7 +447,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="10dp"
-                            android:maxLines="2"
+                            android:lines="2"
                             android:ellipsize="end"
                             android:text="Bảo tàng Chứng tích Chiến tranh"
                             android:textSize="14sp"
@@ -457,52 +459,15 @@
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="5dp"
                             android:layout_marginBottom="9dp"
+                            android:singleLine="true"
+                            android:ellipsize="end"
                             android:text="Bảo tàng · Quận 3"
                             android:textSize="11sp"
                             android:textColor="#788B7E"/>
                     </LinearLayout>
                     <LinearLayout
-                        android:id="@+id/diaDiemLangVanHoa"
-                        android:layout_width="205dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="12dp"
-                        android:orientation="vertical"
-                        android:padding="7dp"
-                        android:background="@drawable/ui_card"
-                        android:clickable="true"
-                        android:focusable="true">
-                        <ImageView
-                            android:id="@+id/anhTheLangVanHoa"
-                            android:layout_width="match_parent"
-                            android:layout_height="125dp"
-                            android:src="@android:drawable/ic_menu_gallery"
-                            android:scaleType="centerCrop"
-                            android:contentDescription="Ảnh minh họa Làng Văn hóa – Du lịch các dân tộc Việt Nam"/>
-                        <TextView
-                            android:id="@+id/tenTheLangVanHoa"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginTop="10dp"
-                            android:maxLines="2"
-                            android:ellipsize="end"
-                            android:text="Làng Văn hóa – Du lịch các dân tộc Việt Nam"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="#20382A"/>
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="5dp"
-                            android:layout_marginTop="5dp"
-                            android:layout_marginBottom="9dp"
-                            android:text="Văn hóa · Hà Nội"
-                            android:textSize="11sp"
-                            android:textColor="#788B7E"/>
-                    </LinearLayout>
-                    <LinearLayout
                         android:id="@+id/diaDiemConDao"
-                        android:layout_width="205dp"
+                        android:layout_width="@dimen/featured_destination_card_width"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="12dp"
                         android:orientation="vertical"
@@ -513,7 +478,7 @@
                         <ImageView
                             android:id="@+id/anhTheConDao"
                             android:layout_width="match_parent"
-                            android:layout_height="125dp"
+                            android:layout_height="@dimen/featured_destination_image_height"
                             android:src="@android:drawable/ic_menu_gallery"
                             android:scaleType="centerCrop"
                             android:contentDescription="Ảnh minh họa Hệ thống Nhà tù Côn Đảo"/>
@@ -523,7 +488,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="10dp"
-                            android:maxLines="2"
+                            android:lines="2"
                             android:ellipsize="end"
                             android:text="Hệ thống Nhà tù Côn Đảo"
                             android:textSize="14sp"
@@ -535,13 +500,15 @@
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="5dp"
                             android:layout_marginBottom="9dp"
+                            android:singleLine="true"
+                            android:ellipsize="end"
                             android:text="Lịch sử · Côn Đảo"
                             android:textSize="11sp"
                             android:textColor="#788B7E"/>
                     </LinearLayout>
                     <LinearLayout
                         android:id="@+id/diaDiemVanMieu"
-                        android:layout_width="205dp"
+                        android:layout_width="@dimen/featured_destination_card_width"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="12dp"
                         android:orientation="vertical"
@@ -552,7 +519,7 @@
                         <ImageView
                             android:id="@+id/anhTheVanMieu"
                             android:layout_width="match_parent"
-                            android:layout_height="125dp"
+                            android:layout_height="@dimen/featured_destination_image_height"
                             android:src="@android:drawable/ic_menu_gallery"
                             android:scaleType="centerCrop"
                             android:contentDescription="Ảnh minh họa Văn Miếu – Quốc Tử Giám"/>
@@ -562,7 +529,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="10dp"
-                            android:maxLines="2"
+                            android:lines="2"
                             android:ellipsize="end"
                             android:text="Văn Miếu – Quốc Tử Giám"
                             android:textSize="14sp"
@@ -574,6 +541,8 @@
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="5dp"
                             android:layout_marginBottom="9dp"
+                            android:singleLine="true"
+                            android:ellipsize="end"
                             android:text="Văn hóa · Hà Nội"
                             android:textSize="11sp"
                             android:textColor="#788B7E"/>
@@ -621,7 +590,7 @@
                     android:paddingBottom="6dp">
                     <LinearLayout
                         android:id="@+id/goiYDinhDocLap"
-                        android:layout_width="172dp"
+                        android:layout_width="@dimen/suggested_destination_card_width"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="12dp"
                         android:orientation="vertical"
@@ -632,7 +601,7 @@
                         <ImageView
                             android:id="@+id/anhGoiYDinhDocLap"
                             android:layout_width="match_parent"
-                            android:layout_height="104dp"
+                            android:layout_height="@dimen/suggested_destination_image_height"
                             android:src="@drawable/anh_dinh_doc_lap"
                             android:scaleType="centerCrop"
                             android:contentDescription="Ảnh Dinh Độc Lập"/>
@@ -642,7 +611,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="10dp"
-                            android:maxLines="2"
+                            android:lines="2"
                             android:ellipsize="end"
                             android:text="Dinh Độc Lập"
                             android:textSize="14sp"
@@ -655,12 +624,14 @@
                             android:layout_marginTop="5dp"
                             android:layout_marginBottom="9dp"
                             android:text="Khám phá kiến trúc"
+                            android:singleLine="true"
+                            android:ellipsize="end"
                             android:textSize="11sp"
                             android:textColor="#788B7E"/>
                     </LinearLayout>
                     <LinearLayout
                         android:id="@+id/goiYBaoTang"
-                        android:layout_width="172dp"
+                        android:layout_width="@dimen/suggested_destination_card_width"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="12dp"
                         android:orientation="vertical"
@@ -671,7 +642,7 @@
                         <ImageView
                             android:id="@+id/anhGoiYBaoTang"
                             android:layout_width="match_parent"
-                            android:layout_height="104dp"
+                            android:layout_height="@dimen/suggested_destination_image_height"
                             android:src="@drawable/anh_bao_tang_chung_tich"
                             android:scaleType="centerCrop"
                             android:contentDescription="Ảnh Bảo tàng Chứng tích Chiến tranh"/>
@@ -681,7 +652,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:layout_marginTop="10dp"
-                            android:maxLines="2"
+                            android:lines="2"
                             android:ellipsize="end"
                             android:text="Bảo tàng Chứng tích Chiến tranh"
                             android:textSize="14sp"
@@ -694,6 +665,8 @@
                             android:layout_marginTop="5dp"
                             android:layout_marginBottom="9dp"
                             android:text="Tìm hiểu lịch sử"
+                            android:singleLine="true"
+                            android:ellipsize="end"
                             android:textSize="11sp"
                             android:textColor="#788B7E"/>
                     </LinearLayout>
@@ -801,180 +774,6 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
-    <!-- THANH DIEU HUONG CO DINH DUOI CUNG -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="96dp"
-        android:clipChildren="false"
-        android:clipToPadding="false">
-        <!-- THANH NEN: CAC MUC CAN DEU NHAU -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="76dp"
-            android:layout_gravity="bottom"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            android:background="@drawable/nen_thanh_dieu_huong"
-            android:baselineAligned="false">
-            <!-- KHAM PHA -->
-            <LinearLayout
-                android:id="@+id/navKhamPha"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:paddingTop="9dp"
-                android:clickable="true"
-                android:focusable="true">
-                <ImageView
-                    android:layout_width="23dp"
-                    android:layout_height="23dp"
-                    android:src="@drawable/bieu_tuong_kham_pha"
-                    android:tint="#6F806F"
-                    android:contentDescription="Khám phá"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center"
-                    android:singleLine="true"
-                    android:text="Khám phá"
-                    android:textSize="10sp"
-                    android:textColor="#6F806F"/>
-            </LinearLayout>
-            <!-- YEU THICH -->
-            <!-- YEU THICH -->
-            <LinearLayout
-                android:id="@+id/navYeuThich"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:paddingTop="8dp"
-                android:paddingBottom="4dp"
-                android:clickable="true"
-                android:focusable="true">
-                <TextView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:gravity="center"
-                    android:text="♥"
-                    android:textSize="25sp"
-                    android:textColor="#6F806F"
-                    android:includeFontPadding="false"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center"
-                    android:text="Yêu thích"
-                    android:textSize="10sp"
-                    android:textColor="#6F806F"
-                    android:singleLine="true"/>
-            </LinearLayout>
-            <!-- CHUA CHO NUT TRANG CHU -->
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-            <!-- CA NHAN -->
-            <LinearLayout
-                android:id="@+id/navCaNhan"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:paddingTop="9dp"
-                android:clickable="true"
-                android:focusable="true">
-                <ImageView
-                    android:layout_width="23dp"
-                    android:layout_height="23dp"
-                    android:src="@drawable/bieu_tuong_ca_nhan"
-                    android:tint="#6F806F"
-                    android:contentDescription="Cá nhân"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center"
-                    android:singleLine="true"
-                    android:text="Cá nhân"
-                    android:textSize="10sp"
-                    android:textColor="#6F806F"/>
-            </LinearLayout>
-            <!-- GOI Y -->
-            <LinearLayout
-                android:id="@+id/navGoiY"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:paddingTop="9dp"
-                android:clickable="true"
-                android:focusable="true">
-                <ImageView
-                    android:layout_width="23dp"
-                    android:layout_height="23dp"
-                    android:src="@drawable/bieu_tuong_goi_y_nav"
-                    android:tint="#6F806F"
-                    android:contentDescription="Gợi ý"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center"
-                    android:singleLine="true"
-                    android:text="Gợi ý"
-                    android:textSize="10sp"
-                    android:textColor="#6F806F"/>
-            </LinearLayout>
-        </LinearLayout>
-        <!-- TRANG CHU: NUT NOI VA CHU NAM RIENG -->
-        <LinearLayout
-            android:id="@+id/navTrangChu"
-            android:layout_width="76dp"
-            android:layout_height="96dp"
-            android:layout_gravity="top|center_horizontal"
-            android:orientation="vertical"
-            android:gravity="top|center_horizontal"
-            android:clickable="true"
-            android:focusable="true"
-            android:elevation="8dp">
-            <FrameLayout
-                android:layout_width="58dp"
-                android:layout_height="58dp"
-                android:background="@drawable/nen_trang_chu_vien"
-                android:padding="4dp">
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/nen_trang_chu_tron">
-                    <ImageView
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/bieu_tuong_ngoi_nha"
-                        android:tint="#FFFFFF"
-                        android:contentDescription="Trang chủ"/>
-                </FrameLayout>
-            </FrameLayout>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center"
-                android:singleLine="true"
-                android:text="Trang chủ"
-                android:textColor="#4F7C5A"
-                android:textSize="11sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
-    </FrameLayout>
+    <include layout="@layout/view_thanh_dieu_huong_duoi" />
+
 </LinearLayout>

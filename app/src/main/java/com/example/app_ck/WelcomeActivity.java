@@ -3,8 +3,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
 public class WelcomeActivity extends BaseActivity {
     private Button nutBatDau;
     private TextView nutDangNhap;
@@ -12,6 +10,7 @@ public class WelcomeActivity extends BaseActivity {
     protected void onCreate(Bundle trangThaiDaLuu) {
         super.onCreate(trangThaiDaLuu);
         setContentView(R.layout.activity_welcome);
+        apDungKhoangTrongHeThong();
         nutBatDau = findViewById(R.id.btnBatDau);
         nutDangNhap = findViewById(R.id.btnDangNhap);
         nutBatDau.setOnClickListener(v -> {
@@ -20,7 +19,13 @@ public class WelcomeActivity extends BaseActivity {
             finish();
         });
         nutDangNhap.setOnClickListener(v -> {
-            Toast.makeText(WelcomeActivity.this, "Chức năng đăng nhập đang được xây dựng", Toast.LENGTH_SHORT).show();
+            if (PhienDangNhap.daDangNhap(this)) {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+            } else {
+                startActivity(new Intent(this, DangNhapActivity.class)
+                        .putExtra(DangNhapActivity.VE_TRANG_CHU, true));
+            }
         });
     }
 }

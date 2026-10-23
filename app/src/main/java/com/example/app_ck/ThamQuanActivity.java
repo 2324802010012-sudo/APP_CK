@@ -1,4 +1,4 @@
- package com.example.app_ck;
+package com.example.app_ck;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,7 +21,20 @@ import androidx.appcompat.widget.AppCompatImageView;
 import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
-public class ThamQuanActivity extends BaseActivity {
+public class ThamQuanActivity extends BaseActivity implements NguonThamQuanTuDong {
+    @Override public int idDiaDiemTuDong() { return 0; }
+    @Override public java.util.List<NguonThamQuanTuDong.Diem> cacDiemTuDong() {
+        java.util.List<NguonThamQuanTuDong.Diem> ds = new java.util.ArrayList<>();
+        for (DuLieuDinhDocLap.DiemThamQuan d : diemDinh)
+            ds.add(new NguonThamQuanTuDong.Diem(d.id, d.ten, d.tang));
+        return ds;
+    }
+    @Override public int idDiemDangChon() { return diemDinh.get(viTriKhuVuc).id; }
+    @Override public void chonDiemTuDong(int id) {
+        for (int i = 0; i < diemDinh.size(); i++) if (diemDinh.get(i).id == id) { chuyenKhuVuc(i); return; }
+    }
+    @Override public TextToSpeech mayDocTuDong() { return tts; }
+    @Override public boolean sanSangTuDong() { return ttsSanSang; }
     // Màn hình này chỉ phụ trách 25 Marker Dinh Độc Lập.
     // Bảo tàng sử dụng màn hình riêng với 13 Marker.
 
@@ -68,6 +81,17 @@ public class ThamQuanActivity extends BaseActivity {
             }
             intent.putExtra("viTriKhuVuc",
                     getIntent().getIntExtra("viTriKhuVuc", 0));
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        if (idDiaDiem == 2) {
+            android.content.Intent intent = new android.content.Intent(
+                    this, DaiNoiHueThamQuanActivity.class);
+            if (getIntent().hasExtra("idMarker")) {
+                intent.putExtra("idMarker", getIntent().getIntExtra("idMarker", 1));
+            }
             startActivity(intent);
             finish();
             return;
@@ -184,6 +208,7 @@ public class ThamQuanActivity extends BaseActivity {
     }
 
     private void hienThiKhuVuc() {
+        thongBaoDoiDiemThamQuan();
         int soDiem = diemDinh.size();
         DuLieuDinhDocLap.DiemThamQuan diem = diemDinh.get(viTriKhuVuc);
         tenKhuVuc.setText(diem.ten);
@@ -324,8 +349,7 @@ public class ThamQuanActivity extends BaseActivity {
 
         SoDoAnhView soDo = new SoDoAnhView();
         // Mỗi ảnh được cắt riêng; độ cao 390dp giúp đọc được nhãn.
-        danhSachKhuVuc.addView(soDo,
-                new LinearLayout.LayoutParams(-1, dp(390)));
+        SoDoThuPhongLayout.themVao(danhSachKhuVuc, soDo, dp(390));
 
         TextView ghiChu = taoNhan(
                 "Chạm vào số trên sơ đồ để chọn phòng. " +

@@ -1,0 +1,58 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="#F6F8F5">
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:scrollbars="none">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
+                android:gravity="center_vertical" android:padding="20dp" android:layout_marginTop="24dp" android:background="@drawable/ui_profile_hero">
+                <TextView android:id="@+id/cnAvatar" android:layout_width="64dp" android:layout_height="64dp" android:background="@drawable/ui_profile_avatar"
+                    android:gravity="center" android:textSize="24sp" android:textStyle="bold" android:textColor="#FFFFFF" android:importantForAccessibility="no" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="16dp">
+                    <TextView android:id="@+id/cnTen" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:textSize="20sp" android:textStyle="bold" android:textColor="#20382A" />
+                    <TextView android:id="@+id/cnTenDangNhap" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp" android:textColor="#607467" android:textSize="13sp" />
+                    <TextView android:id="@+id/cnTrangThai" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp" android:textColor="#2C7351" android:textStyle="bold" android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:orientation="horizontal">
+                <TextView android:id="@+id/cnSoYeuThich" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:minHeight="86dp" android:gravity="center" android:padding="12dp" android:background="@drawable/ui_card"
+                    android:textColor="#2C7351" android:textStyle="bold" android:textSize="15sp" android:clickable="true" android:focusable="true" />
+                <TextView android:id="@+id/cnSoDiaDiem" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:minHeight="86dp" android:gravity="center" android:padding="12dp" android:layout_marginStart="12dp" android:background="@drawable/ui_card"
+                    android:textColor="#2C7351" android:textStyle="bold" android:textSize="15sp" android:clickable="true" android:focusable="true" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/cnKhach" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="18dp" android:layout_marginTop="20dp" android:background="@drawable/ui_card">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Lưu giữ những điểm đến yêu thích"
+                    android:textSize="17sp" android:textStyle="bold" android:textColor="#20382A" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                    android:text="Đăng nhập để quản lý bộ sưu tập và hồ sơ của bạn." android:textSize="14sp" android:textColor="#718277" />
+                <Button android:id="@+id/cnDangNhap" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="52dp"
+                    android:layout_marginTop="14dp" android:text="Đăng nhập" android:textAllCaps="false" android:backgroundTint="#2C7351" android:textColor="#FFFFFF" />
+                <Button android:id="@+id/cnDangKy" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp"
+                    android:text="Tạo tài khoản" android:textAllCaps="false" android:backgroundTint="#EAF1E8" android:textColor="#2C7351" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/cnDaDangNhap" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="26dp"
+                    android:layout_marginBottom="10dp" android:text="TÀI KHOẢN CỦA BẠN" android:textSize="12sp" android:textStyle="bold" android:textColor="#718277" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/ui_card">
+                    <include android:id="@+id/cnSuaHoSo" layout="@layout/item_ca_nhan_action" />
+                    <include android:id="@+id/cnYeuThich" layout="@layout/item_ca_nhan_action" />
+                    <include android:id="@+id/cnDoiMatKhau" layout="@layout/item_ca_nhan_action" />
+                </LinearLayout>
+                <Button android:id="@+id/cnDangXuat" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="52dp"
+                    android:layout_marginTop="14dp" android:text="Đăng xuất" android:textAllCaps="false" android:backgroundTint="#F4EAE7" android:textColor="#9C493B" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+                android:layout_marginTop="20dp" android:background="@drawable/ui_card">
+                <include android:id="@+id/cnHuongDan" layout="@layout/item_ca_nhan_action" />
+            </LinearLayout>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:gravity="center"
+                android:text="APP_CK · Khám phá Việt Nam" android:textSize="12sp" android:textColor="#849387" />
+        </LinearLayout>
+    </ScrollView>
+    <include layout="@layout/view_thanh_dieu_huong_duoi" />
+</LinearLayout>

@@ -1,0 +1,7 @@
+<resources>
+    <item name="hsHoTen" type="id" />
+    <item name="hsEmail" type="id" />
+    <item name="hsMatKhauCu" type="id" />
+    <item name="hsMatKhauMoi" type="id" />
+    <item name="hsXacNhan" type="id" />
+</resources>

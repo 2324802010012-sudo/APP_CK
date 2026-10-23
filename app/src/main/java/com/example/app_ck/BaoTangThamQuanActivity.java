@@ -27,7 +27,17 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /** Sơ đồ 13 điểm dựa theo ảnh do người dùng cung cấp. Không dùng làm định vị trong nhà. */
-public class BaoTangThamQuanActivity extends BaseActivity {
+public class BaoTangThamQuanActivity extends BaseActivity implements NguonThamQuanTuDong {
+    @Override public int idDiaDiemTuDong() { return 1; }
+    @Override public java.util.List<NguonThamQuanTuDong.Diem> cacDiemTuDong() {
+        java.util.List<NguonThamQuanTuDong.Diem> cacDiem = new java.util.ArrayList<>();
+        for (Diem d : ds) cacDiem.add(new NguonThamQuanTuDong.Diem(d.id, d.ten, d.tang));
+        return cacDiem;
+    }
+    @Override public int idDiemDangChon() { return idDangChon; }
+    @Override public void chonDiemTuDong(int id) { chon(id); }
+    @Override public TextToSpeech mayDocTuDong() { return tts; }
+    @Override public boolean sanSangTuDong() { return ttsOK; }
     private static final String[] TEN_TANG = {"Tầng trệt / Ngoài trời", "Lầu 1", "Lầu 2"};
     private static final int[] ANH = {
             R.drawable.so_do_bao_tang_0,
@@ -181,10 +191,7 @@ public class BaoTangThamQuanActivity extends BaseActivity {
         noiDungDanhSach.addView(thanhTang, tangLp);
 
         soDo = new SoDoView(this);
-        LinearLayout.LayoutParams soDoLp =
-                new LinearLayout.LayoutParams(-1, dp(385));
-        soDoLp.topMargin = dp(12);
-        noiDungDanhSach.addView(soDo, soDoLp);
+        SoDoThuPhongLayout.themVao(noiDungDanhSach, soDo, dp(385));
 
         TextView ghiChu = text(
                 "Chạm vào số Marker trên sơ đồ để xem thông tin. "
@@ -245,6 +252,7 @@ public class BaoTangThamQuanActivity extends BaseActivity {
         hienThi();
     }
     private void hienThi() {
+        thongBaoDoiDiemThamQuan();
         if (soDo == null) return;
         Diem cur = hienTai();
         if (cur != null && cur.tang != tang) {
@@ -297,6 +305,9 @@ public class BaoTangThamQuanActivity extends BaseActivity {
         private final RectF area=new RectF();
         SoDoView(Context ctx){super(ctx);setLayerType(View.LAYER_TYPE_SOFTWARE,null);setClickable(true);}
         void setTang(int t){
+            if (getParent() instanceof SoDoThuPhongLayout) {
+                ((SoDoThuPhongLayout) getParent()).datLai();
+            }
             if(image!=null)image.recycle();
             image=BitmapFactory.decodeResource(getResources(),ANH[t]);invalidate();
         }

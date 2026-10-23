@@ -96,11 +96,14 @@
         <activity
             android:name=".ConDaoThamQuanActivity"
             android:exported="false" />
-
         <activity
-            android:name=".LangVanHoaThamQuanActivity"
+            android:name=".DaiNoiHueThamQuanActivity"
             android:exported="false" />
 
+        <activity android:name=".CaNhanActivity" android:exported="false" />
+        <activity android:name=".SuaHoSoActivity" android:exported="false" />
+        <activity android:name=".DoiMatKhauActivity" android:exported="false" />
+        <activity android:name=".KhamPhaActivity" android:exported="false" />
     </application>
 
 </manifest>

@@ -36,14 +36,23 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class BanDoActivity extends AppCompatActivity {
+public class BanDoActivity extends BaseActivity {
 
     // =====================================================
     // 1. KHAI BÁO DỮ LIỆU
     // =====================================================
 
     private static final int YEU_CAU_VI_TRI = 101;
-    private static final int SO_DIA_DIEM = 5;
+    private static final int[] ID_DIA_DIEM = {0, 1, 2, 3, 4};
+
+    private int viTriTheoId(int id) {
+        for (int i = 0; i < ID_DIA_DIEM.length; i++) {
+            if (ID_DIA_DIEM[i] == id) return i;
+        }
+        return -1;
+    }
+
+    private static final int SO_DIA_DIEM = ID_DIA_DIEM.length;
 
     // ID phải trùng với SQLite.
     private final String[] TEN_DIA_DIEM =
@@ -65,7 +74,7 @@ public class BanDoActivity extends AppCompatActivity {
     private final int[] ANH_DIA_DIEM = {
             R.drawable.anh_dinh_doc_lap,
             R.drawable.anh_bao_tang_chung_tich,
-            android.R.drawable.ic_menu_gallery,
+            R.drawable.anh_dai_noi_hue,
             android.R.drawable.ic_menu_gallery,
             android.R.drawable.ic_menu_gallery
     };
@@ -115,6 +124,7 @@ public class BanDoActivity extends AppCompatActivity {
         );
 
         setContentView(R.layout.activity_ban_do);
+        apDungKhoangTrongHeThong();
 
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -282,7 +292,7 @@ public class BanDoActivity extends AppCompatActivity {
     }
 
     // =====================================================
-    // 6. ĐỌC 5 ĐỊA ĐIỂM TỪ SQLITE
+    // 6. ĐỌC 4 ĐỊA ĐIỂM TỪ SQLITE
     // =====================================================
 
     private boolean taiDiaDiemTuSQLite() {
@@ -297,7 +307,7 @@ public class BanDoActivity extends AppCompatActivity {
 
             for (DiaDiem diaDiem : danhSach) {
 
-                int id = diaDiem.id;
+                int id = viTriTheoId(diaDiem.id);
 
                 if (id < 0 || id >= SO_DIA_DIEM) {
                     continue;
@@ -540,9 +550,10 @@ public class BanDoActivity extends AppCompatActivity {
         );
 
         // Tìm nút mới theo tên để tránh lỗi
-        // khi XML chưa khai báo ba ID này.
+        // khi XML chưa khai báo các ID này.
+
         ganNutChonNhanhTheoTen(
-                "nutChonLangVanHoa",
+                "nutChonDaiNoiHue",
                 2
         );
 
@@ -927,7 +938,7 @@ public class BanDoActivity extends AppCompatActivity {
 
         intent.putExtra(
                 "viTriDiaDiem",
-                viTriDaChon
+                ID_DIA_DIEM[viTriDaChon]
         );
 
         startActivity(intent);

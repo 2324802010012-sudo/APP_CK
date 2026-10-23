@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="#F6F8F5">
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:scrollbars="none">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+            <TextView android:id="@+id/kpTieuDe" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:textSize="28sp" android:textStyle="bold" android:textColor="#20382A" />
+            <TextView android:id="@+id/kpMoTa" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:textColor="#718277" android:textSize="14sp" android:lineSpacingExtra="3dp" />
+            <EditText android:id="@+id/kpTimKiem" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="24dp"
+                android:background="@drawable/nen_dn_input" android:paddingHorizontal="16dp" android:singleLine="true"
+                android:hint="Tìm tên, địa chỉ, nội dung điểm đến" android:inputType="text" android:imeOptions="actionSearch"
+                android:textSize="14sp" android:textColor="#20382A" android:textColorHint="#849387" />
+            <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:scrollbars="none">
+                <LinearLayout android:id="@+id/kpDanhMuc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
+            </HorizontalScrollView>
+            <TextView android:id="@+id/kpSoLuong" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:layout_marginBottom="14dp" android:textSize="14sp" android:textStyle="bold" android:textColor="#20382A" />
+            <LinearLayout android:id="@+id/kpDanhSach" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+            <LinearLayout android:id="@+id/kpTrangThai" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="24dp" android:background="@drawable/ui_card" android:gravity="center">
+                <ImageView android:layout_width="48dp" android:layout_height="48dp" android:src="@drawable/ui_ic_search" android:importantForAccessibility="no" />
+                <TextView android:id="@+id/kpThongBao" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp" android:gravity="center" android:textColor="#607467" android:textSize="15sp" />
+                <Button android:id="@+id/kpThuLai" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp"
+                    android:layout_marginTop="14dp" android:text="Xem tất cả địa điểm" android:textAllCaps="false" android:backgroundTint="#2C7351" android:textColor="#FFFFFF" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+    <include layout="@layout/view_thanh_dieu_huong_duoi" />
+</LinearLayout>

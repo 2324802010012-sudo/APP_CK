@@ -26,6 +26,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import android.widget.ImageView;
+import android.view.ViewGroup;
+import android.graphics.drawable.GradientDrawable;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,13 +36,22 @@ import java.util.Locale;
 public class MainActivity extends BaseActivity {
     private TextToSpeech ttsTrangChu;
     private boolean sanSangThuyetMinh = false;
+    private static final int[] ID_DIA_DIEM = {0, 1, 2, 3, 4};
+
+    private int viTriTheoId(int id) {
+        for (int i = 0; i < ID_DIA_DIEM.length; i++) {
+            if (ID_DIA_DIEM[i] == id) return i;
+        }
+        return -1;
+    }
+
     private TaiKhoanDb dbKiemTra;
     private EditText oTimKiem;
     private ScrollView vungCuonTrangChu;
 
     private View diaDiemDinhDocLap;
     private View diaDiemBaoTang;
-    private View diaDiemLangVanHoa;
+    private View diaDiemDaiNoi;
     private View diaDiemConDao;
     private View diaDiemVanMieu;
 
@@ -103,6 +114,7 @@ public class MainActivity extends BaseActivity {
         }
 // CAP NHAT ANH VA TEN CUA 5 THE TU SQLITE
         capNhatTheDiaDiemTuSQLite();
+        taoTheDaiNoiHue();
 
         khoiTaoThuyetMinh();
 
@@ -147,8 +159,6 @@ public class MainActivity extends BaseActivity {
         diaDiemBaoTang =
                 findViewById(R.id.diaDiemBaoTang);
 
-        diaDiemLangVanHoa =
-                findViewById(R.id.diaDiemLangVanHoa);
         diaDiemConDao = findViewById(R.id.diaDiemConDao);
         diaDiemVanMieu = findViewById(R.id.diaDiemVanMieu);
     }
@@ -194,15 +204,15 @@ public class MainActivity extends BaseActivity {
 
     // TEN DIA DIEM DOC TU SQLITE
     private final String[] TEN =
-            new String[5];
+            new String[ID_DIA_DIEM.length];
 
     // TOA DO DIA DIEM DOC TU SQLITE
     private final double[][] TOA_DO =
-            new double[5][2];
+            new double[ID_DIA_DIEM.length][2];
 
     // LUU DOI TUONG DIA DIEM DOC TU SQLITE
     private final DiaDiem[] duLieuDiaDiem =
-            new DiaDiem[5];
+            new DiaDiem[ID_DIA_DIEM.length];
     private void thucHienTimKiem() {
         String tuKhoa = chuanHoa(oTimKiem.getText().toString());
         if (tuKhoa.isEmpty()) {
@@ -225,11 +235,12 @@ public class MainActivity extends BaseActivity {
         String[] danhSach = new String[ketQua.size()];
         for (int i = 0; i < ketQua.size(); i++) danhSach[i] = TEN[ketQua.get(i)];
         new AlertDialog.Builder(this).setTitle("Kết quả tìm kiếm")
-                .setItems(danhSach, (dialog, viTri) -> moChiTiet(ketQua.get(viTri)))
+                .setItems(danhSach, (dialog, viTri) -> moChiTiet(ID_DIA_DIEM[ketQua.get(viTri)]))
                 .setNegativeButton("Đóng", null).show();
     }
 
     private void moChiTiet(int viTri) {
+        if (viTriTheoId(viTri) < 0) return;
         Intent intent = new Intent(this, ChiTietDiaDiemActivity.class);
         intent.putExtra("viTriDiaDiem", viTri);
         startActivity(intent);
@@ -280,7 +291,9 @@ public class MainActivity extends BaseActivity {
     private void xuLyDiaDiem() {
         ganSuKien(R.id.diaDiemDinhDocLap, () -> moChiTiet(0));
         ganSuKien(R.id.diaDiemBaoTang, () -> moChiTiet(1));
-        ganSuKien(R.id.diaDiemLangVanHoa, () -> moChiTiet(2));
+        if (diaDiemDaiNoi != null) {
+            diaDiemDaiNoi.setOnClickListener(v -> moChiTiet(2));
+        }
         ganSuKien(R.id.diaDiemConDao, () -> moChiTiet(3));
         ganSuKien(R.id.diaDiemVanMieu, () -> moChiTiet(4));
     }
@@ -288,39 +301,12 @@ public class MainActivity extends BaseActivity {
     // XU LY THANH DIEU HUONG
 
     private void xuLyDieuHuong() {
-        findViewById(R.id.navKhamPha).setOnClickListener(v ->
-                hienThongBao("Khám phá địa điểm du lịch"));
-
-
-        findViewById(R.id.navYeuThich)
-                .setOnClickListener(v -> {
-
-                    Intent intent = new Intent(
-                            MainActivity.this,
-                            YeuThichActivity.class
-                    );
-
-                    startActivity(intent);
-                });
-
-
-        findViewById(R.id.navTrangChu).setOnClickListener(v -> {
-            if (oTimKiem != null) {
-                oTimKiem.setText("");
-            }
-            hienThongBao("Bạn đang ở Trang chủ");
-        });
-
-        findViewById(R.id.navCaNhan).setOnClickListener(v ->
-                hienThongBao("Thông tin cá nhân"));
-
-        findViewById(R.id.navGoiY).setOnClickListener(v ->
-                hienThongBao("Gợi ý địa điểm du lịch"));
+        ThanhDieuHuongDuoi.gan(this, ThanhDieuHuongDuoi.TRANG_CHU);
     }
     // HIEN THI DANH SACH DIA DIEM
     private void hienThiDanhSachDiaDiem() {
         new AlertDialog.Builder(this).setTitle("Khám phá điểm du lịch")
-                .setItems(TEN, (dialog, viTri) -> moChiTiet(viTri))
+                .setItems(TEN, (dialog, viTri) -> moChiTiet(ID_DIA_DIEM[viTri]))
                 .setNegativeButton("Đóng", null).show();
     }
 
@@ -366,23 +352,7 @@ public class MainActivity extends BaseActivity {
 
     // MENU TAI KHOAN
     private void hienThiMenuTaiKhoan() {
-
-        String[] danhSach = {
-                "Thông tin cá nhân",
-                "Đăng nhập",
-                "Đăng ký",
-                "Lịch sử tham quan",
-                "Cài đặt"
-        };
-
-        new AlertDialog.Builder(this)
-                .setTitle("Tài khoản và tiện ích")
-                .setItems(danhSach, (hopThoai, viTri) -> {
-
-                    hienThongBao(danhSach[viTri]);
-                })
-                .setNegativeButton("Đóng", null)
-                .show();
+        ThanhDieuHuongDuoi.mo(this, ThanhDieuHuongDuoi.CA_NHAN);
     }
 
     // HIEN THI THONG BAO
@@ -454,13 +424,13 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    // LOC 5 THE DIA DIEM THEO DANH MUC DUOC LUU TRONG SQLITE
+    // LOC 4 THE DIA DIEM THEO DANH MUC DUOC LUU TRONG SQLITE
     private void locDiaDiemTheoDanhMuc(String danhMuc) {
 
         View[] cacThe = {
                 diaDiemDinhDocLap,
                 diaDiemBaoTang,
-                diaDiemLangVanHoa,
+                diaDiemDaiNoi,
                 diaDiemConDao,
                 diaDiemVanMieu
         };
@@ -475,7 +445,7 @@ public class MainActivity extends BaseActivity {
             ArrayList<DiaDiem> danhSach = db.danhSachDiaDiem();
 
             for (DiaDiem diaDiem : danhSach) {
-                int id = diaDiem.id;
+                int id = viTriTheoId(diaDiem.id);
                 if (id < 0 || id >= cacThe.length) {
                     continue;
                 }
@@ -520,9 +490,11 @@ public class MainActivity extends BaseActivity {
         }
 
         for (int i = 0; i < cacThe.length; i++) {
-            cacThe[i].setVisibility(
-                    hienThi[i] ? View.VISIBLE : View.GONE
-            );
+            if (cacThe[i] != null) {
+                cacThe[i].setVisibility(
+                        hienThi[i] ? View.VISIBLE : View.GONE
+                );
+            }
             if (hienThi[i]) {
                 soKetQua++;
             }
@@ -552,7 +524,7 @@ public class MainActivity extends BaseActivity {
 
     private void hienThiDanhSachGoiY() {
         new AlertDialog.Builder(this).setTitle("Địa điểm gợi ý")
-                .setItems(TEN, (dialog, viTri) -> moChiTiet(viTri))
+                .setItems(TEN, (dialog, viTri) -> moChiTiet(ID_DIA_DIEM[viTri]))
                 .setNegativeButton("Đóng", null).show();
     }
 
@@ -720,7 +692,7 @@ public class MainActivity extends BaseActivity {
             dongDiaDiem.setPadding(12, 16, 12, 16);
 
             final int chiSoDiaDiem = viTri;
-            dongDiaDiem.setOnClickListener(v -> moChiTiet(chiSoDiaDiem));
+            dongDiaDiem.setOnClickListener(v -> moChiTiet(ID_DIA_DIEM[chiSoDiaDiem]));
 
             danhSachGanToi.addView(dongDiaDiem);
         }
@@ -735,13 +707,13 @@ public class MainActivity extends BaseActivity {
                     db.danhSachDiaDiem();
 
             boolean[] daCoDuLieu =
-                    new boolean[5];
+                    new boolean[ID_DIA_DIEM.length];
 
             for (DiaDiem diaDiem : danhSach) {
 
-                int id = diaDiem.id;
+                int id = viTriTheoId(diaDiem.id);
 
-                // CHI NHAN 5 ID DIA DIEM DA KHAI BAO
+                // CHI NHAN CAC ID DIA DIEM DA KHAI BAO
                 if (id < 0 || id >= TEN.length) {
                     continue;
                 }
@@ -794,7 +766,9 @@ public class MainActivity extends BaseActivity {
             int idTen
     ) {
 
-        DiaDiem diaDiem = duLieuDiaDiem[id];
+        int viTri = viTriTheoId(id);
+        if (viTri < 0) return;
+        DiaDiem diaDiem = duLieuDiaDiem[viTri];
 
         if (diaDiem == null) {
             return;
@@ -829,10 +803,94 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    // Tạo thẻ Đại Nội Huế ngay trong nhóm thẻ nổi bật hiện có.
+    // Không yêu cầu thêm ID vào activity_main.xml.
+    private void taoTheDaiNoiHue() {
+        int viTri = viTriTheoId(2);
+        if (viTri < 0 || duLieuDiaDiem[viTri] == null || diaDiemVanMieu == null) {
+            return;
+        }
+
+        if (!(diaDiemVanMieu.getParent() instanceof ViewGroup)) return;
+        ViewGroup cha = (ViewGroup) diaDiemVanMieu.getParent();
+        if (cha == null) {
+            return;
+        }
+
+        DiaDiem diaDiem = duLieuDiaDiem[viTri];
+        LinearLayout the = new LinearLayout(this);
+        the.setOrientation(LinearLayout.VERTICAL);
+        the.setPadding(dpThe(7), dpThe(7), dpThe(7), dpThe(7));
+        the.setClickable(true);
+        the.setFocusable(true);
+        GradientDrawable nen = new GradientDrawable();
+        nen.setColor(Color.WHITE);
+        nen.setCornerRadius(dpThe(14));
+        nen.setStroke(dpThe(1), Color.parseColor("#E0E8DF"));
+        the.setBackground(nen);
+
+        ImageView anh = new ImageView(this);
+        anh.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        int maAnh = getResources().getIdentifier(
+                "anh_dai_noi_hue", "drawable", getPackageName());
+        if (maAnh != 0) {
+            anh.setImageResource(maAnh);
+        } else {
+            anh.setImageResource(android.R.drawable.ic_menu_gallery);
+        }
+        the.addView(anh, new LinearLayout.LayoutParams(-1,
+                getResources().getDimensionPixelSize(R.dimen.featured_destination_image_height)));
+
+        TextView ten = new TextView(this);
+        ten.setText(diaDiem.ten);
+        ten.setTextSize(14);
+        ten.setLines(2);
+        ten.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        ten.setTypeface(null, android.graphics.Typeface.BOLD);
+        ten.setTextColor(Color.parseColor("#24382D"));
+        LinearLayout.LayoutParams thongSoTen = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        thongSoTen.setMarginStart(dpThe(5));
+        thongSoTen.topMargin = dpThe(10);
+        the.addView(ten, thongSoTen);
+
+        TextView moTa = new TextView(this);
+        moTa.setText("Di sản kiến trúc và lịch sử triều Nguyễn");
+        moTa.setTextSize(11);
+        moTa.setSingleLine(true);
+        moTa.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        moTa.setTextColor(Color.parseColor("#66766B"));
+        LinearLayout.LayoutParams thongSoMoTa = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        thongSoMoTa.setMarginStart(dpThe(5));
+        thongSoMoTa.topMargin = dpThe(5);
+        thongSoMoTa.bottomMargin = dpThe(9);
+        the.addView(moTa, thongSoMoTa);
+        the.setOnClickListener(v -> moChiTiet(2));
+
+        // Thêm vào cùng container với các thẻ cũ.
+        // Không ép LayoutParams kiểu LinearLayout vào GridLayout.
+        int viTriChen = Math.min(2, cha.getChildCount());
+        if (cha instanceof LinearLayout) {
+            LinearLayout.LayoutParams thongSoThe = new LinearLayout.LayoutParams(
+                    getResources().getDimensionPixelSize(R.dimen.featured_destination_card_width),
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            thongSoThe.setMarginEnd(dpThe(12));
+            cha.addView(the, viTriChen, thongSoThe);
+        } else {
+            cha.addView(the, viTriChen);
+        }
+        diaDiemDaiNoi = the;
+    }
+
+    private int dpThe(float soDp) {
+        return Math.round(soDp * getResources().getDisplayMetrics().density);
+    }
+
     // DONG BO 5 THE TREN TRANG CHU
     private void capNhatTheDiaDiemTuSQLite() {
 
-        // 5 THE DIA DIEM NOI BAT
+        // 4 THE DIA DIEM NOI BAT
         ganDuLieuChoThe(
                 0,
                 R.id.anhTheDinhDocLap,
@@ -845,7 +903,6 @@ public class MainActivity extends BaseActivity {
                 R.id.tenTheBaoTang
         );
 
-        ganDuLieuChoThe(2, R.id.anhTheLangVanHoa, R.id.tenTheLangVanHoa);
         ganDuLieuChoThe(3, R.id.anhTheConDao, R.id.tenTheConDao);
         ganDuLieuChoThe(4, R.id.anhTheVanMieu, R.id.tenTheVanMieu);
 

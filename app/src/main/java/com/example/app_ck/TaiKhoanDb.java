@@ -14,7 +14,7 @@ import javax.crypto.spec.PBEKeySpec;
 
 public class TaiKhoanDb extends SQLiteOpenHelper {
     private static final String DB = "du_lich_tai_khoan.db";
-    private static final int VERSION = 8;
+    private static final int VERSION = 12;
     public TaiKhoanDb(Context context) { super(context, DB, null, VERSION); }
     @Override public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE tai_khoan (id INTEGER PRIMARY KEY AUTOINCREMENT, ten_dang_nhap TEXT NOT NULL UNIQUE, muoi TEXT NOT NULL, mat_khau_bam TEXT NOT NULL, ma_khoi_phuc_bam TEXT)");
@@ -24,6 +24,8 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
         themDuLieuSoDoDinhDocLap(db);
         themThuyetMinhDinhDocLap(db);
         themMoTaVaDanhMuc(db);
+        KhoToaDoThamQuan.nangCap(db);
+        nangCapHoSo(db);
     }
 
     @Override
@@ -96,12 +98,75 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
             xoaDiaDiemKhongConSuDung(db);
         }
 
-        // Phiên bản 8: bổ sung 3 địa điểm mới, không xóa dữ liệu cũ.
+        // Phiên bản 8: bổ sung các địa điểm mới, không xóa dữ liệu cũ.
         if (oldVersion < 8) {
             taoBangDuLich(db);
             themDuLieuDiaDiem(db);
             themMoTaVaDanhMuc(db);
         }
+
+        if (oldVersion < 9) {
+            xoaDiaDiemKhongConSuDung(db);
+            db.execSQL("DROP TABLE IF EXISTS lang_van_hoa_toa_do");
+            db.execSQL("DROP TABLE IF EXISTS lang_van_hoa_diem");
+        }
+
+        // Phiên bản 10: tái sử dụng ID 2 cho Đại Nội Huế.
+        // Giữ nguyên mọi tài khoản, yêu thích và dữ liệu của địa điểm khác.
+        if (oldVersion < 10) {
+            taoBangDuLich(db);
+            themDuLieuDiaDiem(db);
+            themMoTaVaDanhMuc(db);
+        }
+        if (oldVersion < 11) {
+            KhoToaDoThamQuan.nangCap(db);
+        }
+        if (oldVersion < 12) nangCapHoSo(db);
+    }
+
+
+    private void nangCapHoSo(SQLiteDatabase db) {
+        java.util.Set<String> cot = new java.util.HashSet<>();
+        try (Cursor c = db.rawQuery("PRAGMA table_info(tai_khoan)", null)) {
+            while (c.moveToNext()) cot.add(c.getString(c.getColumnIndexOrThrow("name")));
+        }
+        if (!cot.contains("ho_ten")) db.execSQL("ALTER TABLE tai_khoan ADD COLUMN ho_ten TEXT NOT NULL DEFAULT ''");
+        if (!cot.contains("email")) db.execSQL("ALTER TABLE tai_khoan ADD COLUMN email TEXT NOT NULL DEFAULT ''");
+    }
+
+    public HoSoTaiKhoan layHoSo(long id) {
+        try (Cursor c = getReadableDatabase().query("tai_khoan", new String[]{"ten_dang_nhap","ho_ten","email"},
+                "id=?", new String[]{String.valueOf(id)}, null, null, null)) {
+            return c.moveToFirst() ? new HoSoTaiKhoan(id, c.getString(0), c.getString(1), c.getString(2)) : null;
+        }
+    }
+
+    public boolean capNhatHoSo(long id, String hoTen, String email) {
+        String h = hoTen.trim(), e = email.trim();
+        if (id <= 0 || h.length() > 80 || e.length() > 254
+                || (!e.isEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(e).matches())) return false;
+        ContentValues v = new ContentValues();
+        v.put("ho_ten", h); v.put("email", e);
+        return getWritableDatabase().update("tai_khoan", v, "id=?", new String[]{String.valueOf(id)}) == 1;
+    }
+
+    /** Xác thực mật khẩu hiện tại, đổi salt và cấp mã khôi phục mới cho tài khoản đang đăng nhập. */
+    public String doiMatKhauDaDangNhap(long id, String matKhauCu, String matKhauMoi) {
+        if (id <= 0 || matKhauMoi.length() < 8 || matKhauMoi.equals(matKhauCu)) return null;
+        try (Cursor c = getReadableDatabase().query("tai_khoan", new String[]{"muoi","mat_khau_bam"},
+                "id=?", new String[]{String.valueOf(id)}, null, null, null)) {
+            if (!c.moveToFirst()) return null;
+            String hashCu = c.getString(1);
+            if (!bangNhau(bam(matKhauCu, Base64.decode(c.getString(0), Base64.NO_WRAP)), hashCu)) return null;
+            byte[] salt = muoiMoi();
+            String maMoi = taoMaKhoiPhuc();
+            ContentValues v = new ContentValues();
+            v.put("muoi", Base64.encodeToString(salt, Base64.NO_WRAP));
+            v.put("mat_khau_bam", bam(matKhauMoi, salt));
+            v.put("ma_khoi_phuc_bam", bamMa(maMoi, salt));
+            return getWritableDatabase().update("tai_khoan", v, "id=? AND mat_khau_bam=?",
+                    new String[]{String.valueOf(id), hashCu}) == 1 ? maMoi : null;
+        } catch (Exception e) { return null; }
     }
 
     // Dọn địa điểm ID 2 và dữ liệu liên kết trong các bản cài đặt cũ.
@@ -175,7 +240,7 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
         );
     }
 
-    // THEM 2 DIA DIEM BAN DAU
+    // THEM 4 DIA DIEM HIEN TAI
     private void themDuLieuDiaDiem(
             SQLiteDatabase db
     ) {
@@ -200,15 +265,13 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
                 "anh_bao_tang_chung_tich"
         );
 
-        // ID 2: Làng Văn hóa – Du lịch các dân tộc Việt Nam.
+
+        // ID 2: Đại Nội Huế.
         themDiaDiem(
-                db,
-                2,
-                "Làng Văn hóa – Du lịch các dân tộc Việt Nam",
-                "Đồng Mô, Sơn Tây, Hà Nội",
-                21.06452,
-                105.49827,
-                "anh_lang_van_hoa"
+                db, 2, "Đại Nội Huế",
+                "Đường 23 Tháng 8, Huế",
+                16.4698, 107.5799,
+                "anh_dai_noi_hue"
         );
 
         // ID 3: Hệ thống Nhà tù Côn Đảo.
@@ -615,12 +678,14 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
                         "giúp khách tham quan tìm hiểu lịch sử."
         );
 
+
         capNhatThongTinDiaDiem(
                 db,
                 2,
-                "Văn hóa – dân tộc",
-                "Không gian giới thiệu và bảo tồn các giá trị văn hóa " +
-                        "của cộng đồng các dân tộc Việt Nam tại Đồng Mô, Sơn Tây."
+                "Di sản – kiến trúc",
+                "Đại Nội Huế là trung tâm Hoàng cung triều Nguyễn, " +
+                        "có Ngọ Môn, Điện Thái Hòa, Điện Kiến Trung, " +
+                        "các cung điện và khu vườn di sản."
         );
 
         capNhatThongTinDiaDiem(

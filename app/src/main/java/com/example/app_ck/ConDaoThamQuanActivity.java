@@ -28,7 +28,20 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class ConDaoThamQuanActivity extends BaseActivity {
+public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQuanTuDong {
+    @Override public int idDiaDiemTuDong() { return 3; }
+    @Override public java.util.List<NguonThamQuanTuDong.Diem> cacDiemTuDong() {
+        java.util.List<NguonThamQuanTuDong.Diem> ds = new java.util.ArrayList<>();
+        for (int i = 0; i < danhSachId.size(); i++) ds.add(
+                new NguonThamQuanTuDong.Diem(danhSachId.get(i), danhSachTen.get(i), -1));
+        return ds;
+    }
+    @Override public int idDiemDangChon() { return danhSachId.get(viTriHienTai); }
+    @Override public void chonDiemTuDong(int id) {
+        for (int i = 0; i < danhSachId.size(); i++) if (danhSachId.get(i) == id) { chuyenDiem(i); return; }
+    }
+    @Override public TextToSpeech mayDocTuDong() { return tts; }
+    @Override public boolean sanSangTuDong() { return sanSangDoc; }
 
     private static final String TEN_BANG = "con_dao_diem";
 
@@ -172,6 +185,7 @@ public class ConDaoThamQuanActivity extends BaseActivity {
     }
 
     private void hienThiDiem() {
+        thongBaoDoiDiemThamQuan();
         int soDiem = danhSachId.size();
         tenKhuVuc.setText(danhSachTen.get(viTriHienTai));
         moTaKhuVuc.setText(danhSachMoTa.get(viTriHienTai));
@@ -479,10 +493,7 @@ public class ConDaoThamQuanActivity extends BaseActivity {
                     idDangChon,
                     xuLyChon
             );
-            khung.addView(
-                    soDo,
-                    new LinearLayout.LayoutParams(-1, dp(activity, 440))
-            );
+            SoDoThuPhongLayout.themVao(khung, soDo, dp(activity, 440));
 
             TextView ghiChu = new TextView(activity);
             ghiChu.setText(

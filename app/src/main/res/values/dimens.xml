@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="featured_destination_card_width">205dp</dimen>
+    <dimen name="featured_destination_image_height">125dp</dimen>
+    <dimen name="suggested_destination_card_width">172dp</dimen>
+    <dimen name="suggested_destination_image_height">104dp</dimen>
+</resources>

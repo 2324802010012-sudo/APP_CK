@@ -64,11 +64,11 @@ public class TaiKhoanDbMigrationTest {
     }
 
     @Test
-    public void freshInstallContainsOnlyTwoActivePlaces() {
+    public void freshInstallContainsFiveActivePlaces() {
         try (TaiKhoanDb helper = new TaiKhoanDb(testContext)) {
             SQLiteDatabase db = helper.getReadableDatabase();
-            assertEquals(7, db.getVersion());
-            assertEquals(2, count(db, "SELECT COUNT(*) FROM dia_diem"));
+            assertEquals(12, db.getVersion());
+            assertEquals(5, count(db, "SELECT COUNT(*) FROM dia_diem"));
             assertEquals(2, count(db, "SELECT COUNT(*) FROM dia_diem WHERE id IN (0,1)"));
             assertEquals(25, count(db, "SELECT COUNT(*) FROM diem_tham_quan"));
         }
@@ -79,7 +79,7 @@ public class TaiKhoanDbMigrationTest {
         try (TaiKhoanDb helper = new TaiKhoanDb(testContext)) {
             SQLiteDatabase db = helper.getWritableDatabase();
             db.execSQL("INSERT INTO tai_khoan(id,ten_dang_nhap,muoi,mat_khau_bam) VALUES(1,'tester','salt','hash')");
-            db.execSQL("INSERT INTO dia_diem(id,ten,vi_do,kinh_do) VALUES(2,'Retired',0,0)");
+            db.execSQL("INSERT OR REPLACE INTO dia_diem(id,ten,vi_do,kinh_do) VALUES(2,'Retired',0,0)");
             db.execSQL("INSERT INTO khu_vuc(id,dia_diem_id,ten,tang) VALUES(70,2,'Retired area',1)");
             db.execSQL("INSERT INTO diem_tham_quan(id,khu_vuc_id,ten) VALUES(200,70,'Retired point')");
             db.execSQL("INSERT INTO thuyet_minh(diem_tham_quan_id,noi_dung) VALUES(200,'Retired narration')");
@@ -91,8 +91,8 @@ public class TaiKhoanDbMigrationTest {
 
         try (TaiKhoanDb helper = new TaiKhoanDb(testContext)) {
             SQLiteDatabase db = helper.getReadableDatabase();
-            assertEquals(7, db.getVersion());
-            assertEquals(2, count(db, "SELECT COUNT(*) FROM dia_diem"));
+            assertEquals(12, db.getVersion());
+            assertEquals(5, count(db, "SELECT COUNT(*) FROM dia_diem"));
             assertEquals(0, count(db, "SELECT COUNT(*) FROM khu_vuc WHERE id=70"));
             assertEquals(0, count(db, "SELECT COUNT(*) FROM diem_tham_quan WHERE id=200"));
             assertEquals(0, count(db, "SELECT COUNT(*) FROM thuyet_minh WHERE diem_tham_quan_id=200"));
@@ -103,6 +103,45 @@ public class TaiKhoanDbMigrationTest {
             assertEquals(25, count(db, "SELECT COUNT(*) FROM diem_tham_quan"));
             assertEquals(25, count(db, "SELECT COUNT(*) FROM thuyet_minh"));
             assertEquals(1, count(db, "SELECT COUNT(*) FROM bao_tang_marker"));
+        }
+    }
+
+    @Test
+    public void upgradeFromEightDeletesOnlyRemovedDestination() {
+        String[] keptTables = {"bao_tang_marker", "con_dao_diem", "con_dao_toa_do",
+                "van_mieu_diem", "van_mieu_toa_do"};
+        try (TaiKhoanDb helper = new TaiKhoanDb(testContext)) {
+            SQLiteDatabase db = helper.getWritableDatabase();
+            db.execSQL("INSERT INTO tai_khoan(id,ten_dang_nhap,muoi,mat_khau_bam) VALUES(1,'keep_user','salt','hash')");
+            db.execSQL("INSERT OR REPLACE INTO dia_diem(id,ten,vi_do,kinh_do) VALUES(2,'Removed destination',21,105)");
+            db.execSQL("INSERT INTO yeu_thich VALUES(1,0),(1,1),(1,2),(1,3),(1,4)");
+            db.execSQL("CREATE TABLE lang_van_hoa_diem(id INTEGER PRIMARY KEY,ten TEXT,mo_ta TEXT)");
+            db.execSQL("INSERT INTO lang_van_hoa_diem VALUES(101,'Removed data','Removed narration')");
+            db.execSQL("CREATE TABLE lang_van_hoa_toa_do(id INTEGER PRIMARY KEY,x_ty_le REAL,y_ty_le REAL)");
+            db.execSQL("INSERT INTO lang_van_hoa_toa_do VALUES(101,0.5,0.5)");
+            for (String table : keptTables) {
+                db.execSQL("CREATE TABLE " + table + "(id INTEGER PRIMARY KEY, sentinel TEXT)");
+                db.execSQL("INSERT INTO " + table + " VALUES(1,'keep unchanged')");
+            }
+            db.execSQL("UPDATE dia_diem SET ten='Keep custom name',mo_ta='Keep custom description',vi_do=8.7,kinh_do=106.6 WHERE id=3");
+            db.setVersion(8);
+        }
+        try (TaiKhoanDb helper = new TaiKhoanDb(testContext)) {
+            SQLiteDatabase db = helper.getReadableDatabase();
+            assertEquals(12, db.getVersion());
+            assertEquals(5, count(db, "SELECT COUNT(*) FROM dia_diem"));
+            assertEquals(4, count(db, "SELECT COUNT(*) FROM dia_diem WHERE id IN (0,1,3,4)"));
+            assertEquals(1, count(db, "SELECT COUNT(*) FROM dia_diem WHERE id=2"));
+            assertEquals(0, count(db, "SELECT COUNT(*) FROM sqlite_master WHERE name IN ('lang_van_hoa_diem','lang_van_hoa_toa_do')"));
+            assertEquals(1, count(db, "SELECT COUNT(*) FROM tai_khoan WHERE ten_dang_nhap='keep_user' AND muoi='salt' AND mat_khau_bam='hash'"));
+            assertEquals(4, count(db, "SELECT COUNT(*) FROM yeu_thich WHERE tai_khoan_id=1 AND dia_diem_id IN (0,1,3,4)"));
+            assertEquals(4, count(db, "SELECT COUNT(*) FROM yeu_thich"));
+            assertEquals(1, count(db, "SELECT COUNT(*) FROM dia_diem WHERE id=3 AND ten='Keep custom name' AND mo_ta='Keep custom description' AND vi_do=8.68907 AND kinh_do=106.61484"));
+            for (String table : keptTables) {
+                assertEquals(1, count(db, "SELECT COUNT(*) FROM " + table + " WHERE id=1 AND sentinel='keep unchanged'"));
+            }
+            assertEquals(25, count(db, "SELECT COUNT(*) FROM diem_tham_quan"));
+            assertEquals(25, count(db, "SELECT COUNT(*) FROM thuyet_minh"));
         }
     }
 
@@ -127,11 +166,73 @@ public class TaiKhoanDbMigrationTest {
         }
         try (TaiKhoanDb helper = new TaiKhoanDb(testContext)) {
             SQLiteDatabase db = helper.getReadableDatabase();
-            assertEquals(7, db.getVersion());
-            assertEquals(2, count(db, "SELECT COUNT(*) FROM dia_diem WHERE danh_muc IS NOT NULL"));
+            assertEquals(12, db.getVersion());
+            assertEquals(5, count(db, "SELECT COUNT(*) FROM dia_diem WHERE danh_muc IS NOT NULL"));
             assertEquals(1, count(db, "SELECT COUNT(*) FROM tai_khoan WHERE id=1"));
             assertEquals(1, count(db, "SELECT COUNT(*) FROM yeu_thich WHERE tai_khoan_id=1 AND dia_diem_id=0"));
             assertEquals(1, count(db, "SELECT COUNT(*) FROM yeu_thich"));
+        }
+    }
+
+    @Test
+    public void upgradeFromTenKeepsHueFavoriteAndUpdatesGpsOnly() {
+        try (TaiKhoanDb helper = new TaiKhoanDb(testContext)) {
+            SQLiteDatabase db = helper.getWritableDatabase();
+            db.execSQL("INSERT INTO tai_khoan(id,ten_dang_nhap,muoi,mat_khau_bam) VALUES(1,'gps_user','salt','hash')");
+            db.execSQL("INSERT INTO yeu_thich VALUES(1,2)");
+            db.execSQL("UPDATE dia_diem SET ten='Custom Hue',mo_ta='Keep narration',vi_do=16.4698,kinh_do=107.5799 WHERE id=2");
+            db.execSQL("DROP TABLE gps_diem_tham_quan");
+            db.setVersion(10);
+        }
+        try (TaiKhoanDb helper = new TaiKhoanDb(testContext)) {
+            SQLiteDatabase db = helper.getWritableDatabase();
+            assertEquals(12, db.getVersion());
+            assertEquals(1, count(db, "SELECT COUNT(*) FROM yeu_thich WHERE tai_khoan_id=1 AND dia_diem_id=2"));
+            assertEquals(1, count(db, "SELECT COUNT(*) FROM tai_khoan WHERE ten_dang_nhap='gps_user' AND mat_khau_bam='hash'"));
+            assertEquals(1, count(db, "SELECT COUNT(*) FROM dia_diem WHERE id=2 AND ten='Custom Hue' AND mo_ta='Keep narration' AND vi_do=16.4689726 AND kinh_do=107.5781266"));
+            assertEquals(0, count(db, "SELECT COUNT(*) FROM gps_diem_tham_quan"));
+        }
+    }
+
+    @Test
+    public void gpsPointIsScopedByDestinationAndRetainsFloorAndRadius() {
+        try (TaiKhoanDb helper = new TaiKhoanDb(testContext)) {
+            SQLiteDatabase db = helper.getWritableDatabase();
+            KhoToaDoThamQuan.luu(db, 0, 1, 1, 10.77702, 106.6954, 8, 30);
+            KhoToaDoThamQuan.luu(db, 1, 1, 0, 10.779475, 106.692132, 6, 40);
+            assertEquals(1, KhoToaDoThamQuan.doc(db, 0).size());
+            assertEquals(1, KhoToaDoThamQuan.doc(db, 1).size());
+            assertEquals(1, KhoToaDoThamQuan.doc(db, 0).get(0).tang);
+            assertEquals(30f, KhoToaDoThamQuan.doc(db, 0).get(0).banKinh, 0);
+            assertEquals(0, KhoToaDoThamQuan.doc(db, 2).size());
+            assertEquals(25, count(db, "SELECT COUNT(*) FROM diem_tham_quan"));
+        }
+    }
+
+    @Test
+    public void upgradeFromElevenAddsProfileWithoutChangingCredentialsFavoritesOrGps() {
+        // Các bảng liên quan trong schema v11, trước khi có ho_ten và email.
+        try (SQLiteDatabase db = testContext.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null)) {
+            db.execSQL("CREATE TABLE tai_khoan(id INTEGER PRIMARY KEY,ten_dang_nhap TEXT,muoi TEXT,mat_khau_bam TEXT,ma_khoi_phuc_bam TEXT)");
+            db.execSQL("INSERT INTO tai_khoan VALUES(1,'profile_user','keep_salt','keep_hash','keep_recovery')");
+            db.execSQL("CREATE TABLE yeu_thich(tai_khoan_id INTEGER,dia_diem_id INTEGER)");
+            db.execSQL("INSERT INTO yeu_thich VALUES(1,2)");
+            db.execSQL("CREATE TABLE gps_diem_tham_quan(dia_diem_id INTEGER,marker_id INTEGER,tang INTEGER,vi_do REAL,kinh_do REAL,ban_kinh REAL)");
+            db.execSQL("INSERT INTO gps_diem_tham_quan VALUES(2,1,-1,16.4689,107.5781,40)");
+            db.setVersion(11);
+        }
+        try (TaiKhoanDb helper = new TaiKhoanDb(testContext)) {
+            SQLiteDatabase db = helper.getWritableDatabase();
+            assertEquals(12, db.getVersion());
+            assertEquals("profile_user", helper.layHoSo(1).tenHienThi());
+            assertEquals("", helper.layHoSo(1).email);
+            assertEquals(1, count(db, "SELECT COUNT(*) FROM tai_khoan WHERE muoi='keep_salt' AND mat_khau_bam='keep_hash' AND ma_khoi_phuc_bam='keep_recovery'"));
+            assertEquals(1, count(db, "SELECT COUNT(*) FROM yeu_thich WHERE tai_khoan_id=1 AND dia_diem_id=2"));
+            assertEquals(1, KhoToaDoThamQuan.doc(db, 2).size());
+            org.junit.Assert.assertTrue(helper.capNhatHoSo(1, "Nguyễn Minh Anh", "minhanh@example.com"));
+            assertEquals("Nguyễn Minh Anh", helper.layHoSo(1).tenHienThi());
+            assertEquals("minhanh@example.com", helper.layHoSo(1).email);
+            assertEquals(1, count(db, "SELECT COUNT(*) FROM tai_khoan WHERE mat_khau_bam='keep_hash'"));
         }
     }
 

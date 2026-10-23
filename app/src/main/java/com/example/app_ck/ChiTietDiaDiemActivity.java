@@ -27,12 +27,25 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
     private TextView nutYeuThich;
     private TextView nutTimYeuThich;
+    private final androidx.activity.result.ActivityResultLauncher<Intent> dangNhapDeLuu =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+                    ketQua -> {
+                        if (ketQua.getResultCode() == RESULT_OK && PhienDangNhap.daDangNhap(this)) {
+                            try (TaiKhoanDb db = new TaiKhoanDb(this)) {
+                                db.datYeuThich(PhienDangNhap.id(this), viTri, true);
+                                capNhatYeuThich();
+                            } catch (Exception e) {
+                                Toast.makeText(this, "Không thể lưu địa điểm. Vui lòng thử lại.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
 
-    // Năm địa điểm, mã ID khớp với bảng dia_diem trong SQLite v7.
+    // Năm địa điểm: ID 2 dành cho Đại Nội Huế.
     private final String[] TEN = {
             "Dinh Độc Lập",
             "Bảo tàng Chứng tích Chiến tranh",
-            "Làng Văn hóa – Du lịch các dân tộc Việt Nam",
+            "Đại Nội Huế",
             "Hệ thống Nhà tù Côn Đảo",
             "Văn Miếu – Quốc Tử Giám"
     };
@@ -40,7 +53,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
     private final String[] DANH_MUC = {
             "Văn hóa – lịch sử",
             "Bảo tàng – lịch sử",
-            "Văn hóa – dân tộc",
+            "Di sản – kiến trúc",
             "Di tích – lịch sử",
             "Văn hóa – lịch sử"
     };
@@ -48,7 +61,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
     private final String[] DIA_CHI = {
             "135 Nam Kỳ Khởi Nghĩa, TP. Hồ Chí Minh",
             "28 Võ Văn Tần, TP. Hồ Chí Minh",
-            "Đồng Mô, Sơn Tây, Hà Nội",
+            "Đại Nội Huế, đường 23 Tháng 8, Huế",
             "Khu di tích Nhà tù Côn Đảo, Côn Đảo, TP. Hồ Chí Minh",
             "58 Quốc Tử Giám, Hà Nội"
     };
@@ -58,28 +71,29 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                     "quan trọng trong lịch sử Việt Nam, gồm các phòng làm việc, phòng khánh tiết và khu hầm.",
             "Bảo tàng Chứng tích Chiến tranh trưng bày tư liệu, hình ảnh và " +
                     "hiện vật về chiến tranh cùng những tác động đối với con người.",
-            "Làng Văn hóa – Du lịch các dân tộc Việt Nam là không gian giới thiệu, " +
-                    "bảo tồn và phát huy bản sắc văn hóa các dân tộc tại Đồng Mô, Sơn Tây, Hà Nội.",
+            "Đại Nội Huế là trung tâm kiến trúc cung đình triều Nguyễn, gồm Ngọ Môn, " +
+                    "Điện Thái Hòa, Tử Cấm Thành và nhiều công trình lịch sử đặc sắc.",
             "Hệ thống di tích Nhà tù Côn Đảo lưu giữ dấu tích về lịch sử đấu tranh " +
                     "và các trại giam trong nhiều thời kỳ.",
             "Văn Miếu – Quốc Tử Giám là quần thể di tích lịch sử và văn hóa " +
                     "gắn liền với truyền thống giáo dục, khoa cử Việt Nam."
     };
 
-    // Tên khu vực giới thiệu. Ba điểm mới chưa có sơ đồ Marker tương tác.
+    // Tên khu vực giới thiệu. Giữ nguyên các thẻ của những địa điểm còn lại.
     private static final String[][] DIEM = {
             {"Cổng chính và khuôn viên", "Phòng Khánh tiết",
                     "Phòng họp Hội đồng Nội các", "Khu hầm"},
             {"Khu trưng bày ngoài trời", "Không gian trưng bày chuyên đề",
                     "Khu tư liệu và hình ảnh"},
-            {"Không gian văn hóa các dân tộc", "Các công trình kiến trúc truyền thống",
-                    "Khu hoạt động văn hóa"},
+            {"Ngọ Môn", "Điện Thái Hòa", "Nền điện Cần Chánh",
+                    "Điện Kiến Trung", "Duyệt Thị Đường", "Thái Bình Lâu",
+                    "Vườn Cơ Hạ", "Cung Diên Thọ", "Cung Trường Sanh", "Hậu hồ"},
             {"Trại Phú Hải", "Trại Phú Tường", "Chuồng cọp Pháp"},
             {"Văn Miếu Môn", "Khuê Văn Các", "Giếng Thiên Quang",
                     "Khu Đại Thành", "Khu Thái Học"}
     };
 
-    // Hai ảnh có thật của dự án; ba địa điểm mới dùng ảnh thay thế trung tính
+    // Ảnh dự phòng; các điểm mới dùng ảnh thay thế trung tính
     // cho đến khi bạn thêm đúng tệp drawable được khai báo trong SQLite.
     private final int[] ANH = {
             R.drawable.anh_dinh_doc_lap,
@@ -93,7 +107,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
     private final double[][] TOA_DO = {
             {10.7770, 106.6953},
             {10.7795, 106.6921},
-            {21.0770, 105.4190},
+            {16.4698, 107.5799},
             {8.68355, 106.61029},
             {21.0290, 105.8359}
     };
@@ -103,16 +117,26 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
         super.onCreate(state);
 
         setContentView(R.layout.activity_chi_tiet_dia_diem);
+        apDungKhoangTrongHeThong();
 
         // Nhận vị trí địa điểm từ màn hình trước
         viTri = getIntent().getIntExtra("viTriDiaDiem", 0);
 
-        if (viTri < 0 || viTri >= TEN.length) {
-            viTri = 0;
+        if (viTri < 0 || viTri >= TEN.length || TEN[viTri] == null) {
+            thongBao("Địa điểm không còn khả dụng.");
+            finish();
+            return;
         }
 
         // DOC THONG TIN DIA DIEM TU SQLITE TRUOC KHI HIEN THI
         taiChiTietTuSQLite();
+
+        // Ưu tiên ảnh Đại Nội Huế nếu đã thêm vào res/drawable.
+        if (viTri == 2) {
+            int anhHue = getResources().getIdentifier(
+                    "anh_dai_noi_hue", "drawable", getPackageName());
+            if (anhHue != 0) { ANH[2] = anhHue; }
+        }
 
         // Hiển thị thông tin địa điểm
         ((ImageView) findViewById(R.id.anhChiTiet))
@@ -488,11 +512,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
             // Chọn điểm thì mở màn hình tham quan
             the.setOnClickListener(v -> {
-                if (viTri >= 2) {
-                    thongBao("Sơ đồ tham quan đang được bổ sung cho địa điểm này.");
-                } else {
-                    moManHinhThamQuan(chiSo);
-                }
+                moManHinhThamQuan(chiSo);
             });
         }
     }
@@ -547,11 +567,10 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                 );
                 break;
 
+
             case 2:
-                intent = new Intent(
-                        this,
-                        LangVanHoaThamQuanActivity.class
-                );
+                intent = new Intent(this, DaiNoiHueThamQuanActivity.class);
+                intent.putExtra("idMarker", chiSo + 1);
                 break;
 
             case 3:
@@ -641,7 +660,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                     )
                     .setPositiveButton(
                             "Đăng nhập",
-                            (d, w) -> startActivity(
+                            (d, w) -> dangNhapDeLuu.launch(
                                     new Intent(
                                             this,
                                             DangNhapActivity.class
@@ -700,5 +719,3 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
         super.onDestroy();
     }
 }
-
-

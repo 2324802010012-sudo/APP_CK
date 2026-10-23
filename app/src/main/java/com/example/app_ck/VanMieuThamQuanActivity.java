@@ -30,7 +30,17 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 
-public class VanMieuThamQuanActivity extends BaseActivity {
+public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQuanTuDong {
+    @Override public int idDiaDiemTuDong() { return 4; }
+    @Override public java.util.List<NguonThamQuanTuDong.Diem> cacDiemTuDong() {
+        java.util.List<NguonThamQuanTuDong.Diem> ds = new java.util.ArrayList<>();
+        for (int i = 0; i < tenDiem.size(); i++) ds.add(new NguonThamQuanTuDong.Diem(i + 1, tenDiem.get(i), -1));
+        return ds;
+    }
+    @Override public int idDiemDangChon() { return viTri + 1; }
+    @Override public void chonDiemTuDong(int id) { chuyenDiem(id - 1); }
+    @Override public TextToSpeech mayDocTuDong() { return tts; }
+    @Override public boolean sanSangTuDong() { return sanSangDoc; }
 
     private static final String[] TEN = {
             "Phương Đình – Hồ Văn",
@@ -181,6 +191,7 @@ public class VanMieuThamQuanActivity extends BaseActivity {
     }
 
     private void hienThi() {
+        thongBaoDoiDiemThamQuan();
         tenKhuVuc.setText(tenDiem.get(viTri));
         moTaKhuVuc.setText(moTaDiem.get(viTri));
         demKhuVuc.setText("Điểm " + (viTri + 1) + "/" + tenDiem.size());
@@ -449,10 +460,7 @@ public class VanMieuThamQuanActivity extends BaseActivity {
                     idDangChon,
                     xuLyChon
             );
-            khung.addView(
-                    soDo,
-                    new LinearLayout.LayoutParams(-1, dp(activity, 385))
-            );
+            SoDoThuPhongLayout.themVao(khung, soDo, dp(activity, 385));
 
             TextView ghiChu = new TextView(activity);
             ghiChu.setText(

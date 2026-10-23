@@ -1,569 +1,356 @@
-# APP_CK – Ứng dụng hỗ trợ tham quan du lịch
+﻿# APP_CK – Ứng dụng hỗ trợ tham quan du lịch
 
-**Cập nhật: 23/10/2026.** README mô tả working tree hiện tại, gồm các thay đổi chưa commit. Ứng dụng hiện có **5 địa điểm**, **13 Activity** và **SQLite phiên bản 8**. Nội dung từng địa điểm/tọa độ dưới đây được mô tả theo dữ liệu trong code, chưa phải xác minh thực địa. Phần đối chiếu file Word và lộ trình triển khai tiếp được giữ ở cuối tài liệu.
+Ứng dụng Android hỗ trợ tra cứu điểm du lịch, xem bản đồ và sơ đồ tương tác, nghe thuyết minh tiếng Việt, lưu yêu thích và quản lý hồ sơ cá nhân.
+
+**Cập nhật ngày 23/10/2026 theo mã nguồn trong workspace, bao gồm các thay đổi chưa commit.** Hiện có **5 địa điểm, 71 điểm tham quan thành phần, 17 Activity và SQLite v12**. Dữ liệu tài khoản và nội dung được lưu cục bộ; chưa có backend, lịch sử tham quan hoặc quản trị.
+
+README mô tả chức năng đang có và đối chiếu với báo cáo **`Nhom15_BaoCao.docx`** do nhóm cung cấp. Báo cáo Word không nằm trong repository. Trạng thái “có luồng chính” bên dưới không đồng nghĩa đã hoàn thành toàn bộ đặc tả hoặc đã kiểm chứng thực địa.
+
+**Tiến độ tổng thể ước tính: khoảng 60% so với toàn bộ yêu cầu trong báo cáo Word**, tính cả quản trị và phân quyền. Đây là ước lượng theo mức độ hiện thực chức năng, chưa phải tỷ lệ nghiệm thu chính thức. Căn cứ và phần còn thiếu được trình bày tại mục 13; các bước hoàn thiện ở mục 15.
 
 ## 1. Tổng quan và phạm vi
 
 | Nội dung | Hiện trạng |
 | --- | --- |
-| Tên / phiên bản / package | `APP_CK` / `1.0` (versionCode 1) / `com.example.app_ck` |
-| Nền tảng | Android Java, giao diện XML và giao diện dựng bằng Java |
-| Kiến trúc | Activity xử lý giao diện/nghiệp vụ; `TaiKhoanDb` truy cập SQLite; các lớp Java cung cấp dữ liệu seed |
-| Dữ liệu | Cục bộ trên thiết bị, chưa có backend/đồng bộ |
-| Bản đồ | OpenStreetMap qua osmdroid; chỉ đường dùng Google Maps URL |
-| Thuyết minh | TextToSpeech tiếng Việt, phát/dừng thủ công từ trang chủ, chi tiết hoặc tham quan |
-| Tài khoản | Tên đăng nhập, mật khẩu, mã khôi phục; phiên SharedPreferences; yêu thích/đăng xuất |
-| Phần chưa có | AUTO theo vị trí, lịch sử, tiến độ tham quan lưu lâu dài, quản trị và phân quyền |
+| Tên / phiên bản | APP_CK / `1.0`, versionCode `1` |
+| Namespace / applicationId | `com.example.app_ck` |
+| Giao diện | Android Java, XML, một số sơ đồ và thẻ dựng bằng Java/Canvas |
+| Dữ liệu | SQLite trên thiết bị, dữ liệu khởi tạo từ mã nguồn |
+| Bản đồ | OpenStreetMap qua osmdroid; chỉ đường bằng URL Google Maps |
+| Giọng đọc | Android TextToSpeech tiếng Việt |
+| Chế độ tham quan | Chọn thủ công, demo tự động, AUTO theo GPS khi màn hình tham quan đang mở |
+| Tài khoản | Đăng ký, đăng nhập, mã khôi phục, hồ sơ, đổi mật khẩu, đăng xuất |
+| Cá nhân hóa | Yêu thích theo tài khoản; gợi ý theo danh mục của các điểm đã lưu |
 
-### 5 địa điểm khởi tạo trong SQLite v8
+Ứng dụng cho phép khách khám phá mà chưa đăng nhập. Danh sách yêu thích và thao tác thay đổi hồ sơ yêu cầu đăng nhập. Dữ liệu chưa đồng bộ giữa các thiết bị.
 
-| ID | Địa điểm | Địa chỉ trong seed | Vĩ độ, kinh độ | Drawable |
-| ---: | --- | --- | --- | --- |
-| 0 | Dinh Độc Lập | 135 Nam Kỳ Khởi Nghĩa, TP. Hồ Chí Minh | 10.7770, 106.6953 | `anh_dinh_doc_lap` |
-| 1 | Bảo tàng Chứng tích Chiến tranh | 28 Võ Văn Tần, TP. Hồ Chí Minh | 10.7795, 106.6921 | `anh_bao_tang_chung_tich` |
-| 2 | Làng Văn hóa – Du lịch các dân tộc Việt Nam | Đồng Mô, Sơn Tây, Hà Nội | 21.06452, 105.49827 | `anh_lang_van_hoa` |
-| 3 | Hệ thống Nhà tù Côn Đảo | Côn Đảo, TP. Hồ Chí Minh | 8.68907, 106.61484 | `anh_nha_tu_con_dao` |
-| 4 | Văn Miếu – Quốc Tử Giám | 58 Quốc Tử Giám, Hà Nội | 21.02930, 105.83575 | `anh_van_mieu` |
+## 2. Công nghệ và cấu hình
 
-ID 2 hiện được dùng cho Làng Văn hóa. Migration v7 dọn dữ liệu địa điểm cũ trước khi migration v8 seed 3 địa điểm mới. Giá trị tọa độ Java dự phòng trong chi tiết có thể khác seed SQLite; thông tin SQLite được ưu tiên khi đọc thành công. Ảnh của các địa điểm mới đã có trong drawable, dù một số chú thích code còn mô tả ảnh thay thế.
-
-## 2. Chức năng và màn hình hiện tại
-
-| Nhóm | Phần đã hiện thực | Giới hạn |
-| --- | --- | --- |
-| Welcome | Hai ảnh địa điểm, giới thiệu tính năng, mở trang chủ | Đăng nhập tại Welcome vẫn chỉ Toast |
-| Trang chủ | Đọc 5 địa điểm; đồng bộ 5 thẻ nổi bật và 2 thẻ gợi ý; mở chi tiết/bản đồ/yêu thích | Mảng/thẻ và điều hướng còn cố định theo ID 0–4 |
-| Tìm kiếm | Trang chủ tìm tên + địa chỉ không dấu; bản đồ tìm tên không dấu | Chưa tìm mô tả/hoạt động; bản đồ chọn kết quả khớp đầu tiên |
-| Danh mục | Đọc lại `danh_muc` từ SQLite, chuẩn hóa và lọc thẻ; báo khi rỗng | Lọc trong Java, chưa áp dụng đồng thời cho gợi ý/gần tôi |
-| Gần tôi | Xin quyền, lấy vị trí, tính và sắp khoảng cách, mở chi tiết | Chưa giới hạn bán kính; kết quả chủ yếu tên/km; API dưới 30 dùng vị trí đã biết gần nhất |
-| Thuyết minh trang chủ | Nút Thuyết minh và banner trải nghiệm mở danh sách 5 địa điểm, phát mô tả từ SQLite, có dừng đọc | Chưa có AUTO hoặc ghi lịch sử |
-| Chi tiết | Tên, ảnh, danh mục, địa chỉ, mô tả, xem thêm/thu gọn, yêu thích, nghe/dừng và mở tham quan | Dữ liệu Java dự phòng; thư viện 1 ảnh/địa điểm; giờ mở cửa chỉ nhắc kiểm tra nguồn chính thức |
-| Bản đồ | 5 marker, 5 nút chọn nhanh, ảnh lấy theo tên resource trong SQLite, vị trí của tôi, khoảng cách và chỉ đường | Chưa có routing nội bộ/offline riêng; một số nhãn XML còn cũ |
-| Tham quan | Màn hình riêng cho cả 5 địa điểm, danh sách, điểm trước/tiếp theo, TTS; 4 địa điểm có ảnh sơ đồ | Làng Văn hóa mới có danh sách; dữ liệu chưa thống nhất trong một schema điểm thành phần |
-| Yêu thích | Lấy ID và tên địa điểm từ SQLite, mở chi tiết, bỏ yêu thích, trạng thái rỗng, đăng xuất | Giới hạn ID 0–4; thiếu ảnh/địa chỉ/mô tả và thời gian thêm |
-| Tài khoản/cá nhân | Đăng ký, đăng nhập, khôi phục bằng mã, phiên đăng nhập | Chưa có email/họ tên/vai trò/trạng thái; menu tài khoản, tab cá nhân/khám phá/gợi ý còn Toast |
-
-Không có chức năng lập lộ trình chuyến đi riêng. Nút/banners thuyết minh trên trang chủ đã hoạt động, khác README cũ ghi chỉ hiện thông báo.
-
-### Bản đồ OpenStreetMap
-
-`BanDoActivity` sử dụng osmdroid `6.1.20`, tải tile từ `https://tile.openstreetmap.org/`, có user agent và nhãn nguồn OSM. Zoom từ **4 đến 19**, khởi đầu **5.5** để phù hợp danh sách địa điểm ở nhiều khu vực; chọn nhanh/GPS có thể đưa zoom về 17.
-
-- Đọc tên, địa chỉ, tọa độ và tên ảnh từ SQLite; kiểm tra tọa độ hữu hạn, đúng giới hạn, không đồng thời bằng 0.
-- Chạm marker/nút nhanh cập nhật thẻ thông tin và bật xem chi tiết/chỉ đường.
-- Tìm tên không dấu qua Search trên bàn phím; chuẩn hóa chữ thường, dấu, `đ` và khoảng trắng.
-- Vị trí của tôi dùng `MyLocationNewOverlay`; khoảng cách là đường chim bay, không phải quãng đường đi thực tế.
-- `onPause()` tắt lớp định vị; `onResume()` khôi phục nếu đã bật; `onDestroy()` giải phóng MapView/helper.
-- Không cần Google Maps API key cho cấu hình hiện tại; tile chưa cache cần mạng. Chỉ đường mở ứng dụng/trình duyệt ngoài.
-
-## 3. Các màn hình tham quan và thuyết minh
-
-Marker được khởi tạo từ `DuLieuDinhDocLap`, lưu vào SQLite, sau đó `ThamQuanActivity` đọc lại để vẽ bằng `Canvas`. Tọa độ `x`, `y` nằm trong khoảng `[0, 1]`, được nhân với kích thước ảnh khi hiển thị. Khi nhiều marker ở gần nhau, thao tác chạm chọn marker gần nhất trong ngưỡng 26dp.
-
-| ID điểm | Tầng / mã khu vực | Tên điểm |
-| ---: | --- | --- |
-| 1 | Tầng 1 / 1 | Phòng Nội các |
-| 2 | Tầng 1 / 1 | Phòng Đại yến |
-| 3 | Tầng 1 / 1 | Cầu thang trung tâm |
-| 4 | Tầng 1 / 1 | Phòng Khánh tiết |
-| 5 | Tầng 2 / 2 | Phòng Hội đồng an ninh Quốc gia |
-| 6 | Tầng 2 / 2 | Phòng làm việc của Tổng thống |
-| 7 | Tầng 2 / 2 | Phòng khách của Tổng thống |
-| 8 | Tầng 2 / 2 | Phòng khách của Phó Tổng thống |
-| 9 | Tầng 2 / 2 | Phòng trình quốc thư |
-| 10 | Tầng 2 / 2 | Khu gia đình Tổng thống |
-| 11 | Tầng 3 / 3 | Thư viện |
-| 12 | Tầng 3 / 3 | Phòng khách phu nhân Tổng thống |
-| 13 | Tầng 3 / 3 | Phòng chiếu phim |
-| 14 | Tầng 3 / 3 | Phòng giải trí |
-| 15 | Tầng 4 / 4 | Tứ phương vô sự lầu |
-| 16 | Tầng 4 / 4 | Trực thăng UH1 |
-| 17 | Tầng hầm / 5 | Tham mưu tác chiến |
-| 18 | Tầng hầm / 5 | Thông tin liên lạc |
-| 19 | Tầng hầm / 5 | Phòng ngủ Tổng thống |
-| 20 | Tầng hầm / 5 | Phòng trực chiến của Tổng thống |
-| 21 | Tầng trệt / 6 | Bếp |
-| 22 | Tầng trệt / 6 | Xe Jeep |
-| 23 | Tầng trệt / 6 | Xe Mercedes |
-| 24 | Tầng trệt / 6 | Phim tư liệu |
-| 25 | Tầng trệt / 6 | Phòng tập bắn |
-
-Số điểm theo thứ tự 6 khu vực là **4, 6, 4, 2, 4, 5**. Tên “Phim tư liệu” là một điểm trên sơ đồ, không có nghĩa ứng dụng đã tích hợp phát video.
-
-Khi mở tham quan, ứng dụng yêu cầu đủ 25 marker, ID tuần tự 1–25, mã tầng 1–6 và tọa độ hợp lệ. Nếu dữ liệu thiếu/sai, màn hình thông báo rồi đóng. Chuyển điểm sẽ dừng giọng đọc, đổi tầng nếu cần và cập nhật nội dung. Đổi tầng đồng bộ điểm được chọn sang một điểm thuộc tầng mới, tránh nội dung và sơ đồ lệch tầng.
-
-### Điều hướng vào màn hình tham quan
-
-`ChiTietDiaDiemActivity.moManHinhThamQuan()` chọn Activity theo ID: 0 → `ThamQuanActivity`, 1 → `BaoTangThamQuanActivity`, 2 → `LangVanHoaThamQuanActivity`, 3 → `ConDaoThamQuanActivity`, 4 → `VanMieuThamQuanActivity`.
-
-Với Dinh Độc Lập, extra `idMarker` hợp lệ được ưu tiên; nếu không có, bốn thẻ giới thiệu được tìm theo tên trong SQLite, có từ khóa dự phòng. Cổng/khuôn viên mở từ điểm đầu. Các Activity mới chủ yếu nhận `idMarker`, nhưng luồng mở từ chi tiết chưa truyền ID này cho mọi thẻ; cần kiểm tra để tránh các thẻ cùng mở điểm mặc định.
-
-### Phạm vi các địa điểm còn lại
-
-| Địa điểm | Nội dung seed | Sơ đồ và giới hạn |
-| --- | --- | --- |
-| Bảo tàng | 13 điểm trong `bao_tang_marker` | 3 tầng (0–2), marker có tọa độ; chọn tầng/điểm đồng bộ, có trước/tiếp và TTS |
-| Làng Văn hóa | 5 mục: tổng quan và các cụm làng I–IV trong `lang_van_hoa_diem` | Danh sách và TTS; chưa có sơ đồ/marker, ảnh đầu màn hình còn dùng icon gallery dù drawable địa điểm đã có |
-| Côn Đảo | 7 mục trong `con_dao_diem` | Ảnh `so_do_nha_tu_con_dao`; 6 tọa độ seed trong `con_dao_toa_do`, chỉ thêm khi ảnh đúng tỷ lệ gốc 1366×970; điểm Bảo tàng Côn Đảo chưa có tọa độ |
-| Văn Miếu | 16 điểm trong `van_mieu_diem` | Ảnh `so_do_van_mieu_chinh_thuc`; 16 tọa độ seed trong `van_mieu_toa_do`; bản debug cho nhấn giữ để căn điểm và xác nhận lưu SQLite |
-
-Côn Đảo và Văn Miếu đều có lớp hỗ trợ ảnh/sơ đồ riêng bên trong Activity. Tọa độ là tỷ lệ trên ảnh, không phải GPS. Khi không có ảnh hoặc tọa độ phù hợp, danh sách/thuyết minh vẫn là cách truy cập nội dung. Các bảng riêng được tạo và seed khi mở màn hình tương ứng, không đồng loạt trong `TaiKhoanDb.onCreate()`.
-
-### Nguồn nội dung và giọng đọc
-
-- Trang chủ/chi tiết đọc mô tả tổng quan; chưa có trường thuyết minh riêng cho điểm du lịch chính.
-- Dinh Độc Lập đọc bảng `thuyet_minh`; seed chỉ có bài riêng cho điểm 1 và 4, 23 điểm còn lại giới thiệu vị trí/tầng và thông báo đang cập nhật.
-- Bảo tàng đọc `noi_dung`; ba địa điểm mới đọc `mo_ta` từ các bảng riêng.
-- TTS dùng tiếng Việt và `QUEUE_FLUSH`; các màn hình dừng/giải phóng giọng đọc theo vòng đời. Chưa có AUTO, audio thu sẵn, lưu lịch sử nghe hoặc tốc độ đọc trên UI.
-- Thanh tiến trình thể hiện thứ tự điểm đang chọn, chưa phải phần trăm các điểm đã thực sự tham quan.
-
-## 4. SQLite và luồng dữ liệu
-
-Tệp CSDL: **`du_lich_tai_khoan.db`**, phiên bản hiện tại: **8**. `TaiKhoanDb` kế thừa `SQLiteOpenHelper`. Cài mới khởi tạo 6 bảng, seed 5 địa điểm, 6 khu vực, 25 điểm và 25 nội dung thuyết minh. Đây là số lượng theo mã khởi tạo v8, chưa truy vấn trên thiết bị trong lần cập nhật tài liệu này; các bảng tham quan riêng được khởi tạo khi mở từng Activity.
-
-### Các bảng
-
-| Bảng | Cột và ràng buộc chính |
+| Thành phần | Cấu hình trong dự án |
 | --- | --- |
-| `tai_khoan` | `id INTEGER PRIMARY KEY AUTOINCREMENT`, `ten_dang_nhap TEXT NOT NULL UNIQUE`, `muoi TEXT NOT NULL`, `mat_khau_bam TEXT NOT NULL`, `ma_khoi_phuc_bam TEXT` |
-| `yeu_thich` | `tai_khoan_id INTEGER NOT NULL`, `dia_diem_id INTEGER NOT NULL`; khóa chính ghép hai cột; khai báo FK tài khoản tới `tai_khoan(id)` |
-| `dia_diem` | `id INTEGER PRIMARY KEY`, `ten TEXT NOT NULL`, `dia_chi TEXT`, `mo_ta TEXT`, `danh_muc TEXT`, `vi_do REAL NOT NULL`, `kinh_do REAL NOT NULL`, `ten_anh TEXT` |
-| `khu_vuc` | `id INTEGER PRIMARY KEY`, `dia_diem_id INTEGER NOT NULL`, `ten TEXT NOT NULL`, `tang INTEGER`, `ten_anh_so_do TEXT`; FK tới `dia_diem(id)` |
-| `diem_tham_quan` | `id INTEGER PRIMARY KEY`, `khu_vuc_id INTEGER NOT NULL`, `ten TEXT NOT NULL`, `mo_ta TEXT`, `toa_do_x REAL`, `toa_do_y REAL`, `ten_anh TEXT`; FK tới `khu_vuc(id)` |
-| `thuyet_minh` | `id INTEGER PRIMARY KEY`, `diem_tham_quan_id INTEGER NOT NULL UNIQUE`, `noi_dung TEXT NOT NULL`; FK tới `diem_tham_quan(id)` |
-
-Quan hệ nội dung: `dia_diem → khu_vuc → diem_tham_quan → thuyet_minh`. `yeu_thich` lưu ID địa điểm nhưng **chưa khai báo FK tới `dia_diem`**. Code hiện chưa bật cưỡng chế khóa ngoại bằng `onConfigure()`/`setForeignKeyConstraintsEnabled(true)`; không nên xem khai báo FK là bằng chứng mọi liên kết đã được kiểm soát lúc chạy.
-
-ID địa điểm cố định 0–4; ID khu vực 1–6 đồng thời được dùng làm mã tầng; ID điểm Dinh Độc Lập 1–25. Nhiều luồng vẫn phụ thuộc quy ước này, chưa hỗ trợ thêm địa điểm tùy ý chỉ bằng cách thêm hàng vào CSDL.
-
-### Mức độ sử dụng SQLite
-
-| Thành phần | Đọc từ SQLite | Phần còn cố định trong Java/XML |
-| --- | --- | --- |
-| Trang chủ | Tên, tọa độ, tên ảnh, địa chỉ/mô tả/danh mục; đọc mô tả cho TTS trang chủ | Số thẻ, ID, nhãn phụ, các lựa chọn bộ lọc và gợi ý |
-| Bản đồ | Tên, địa chỉ, tọa độ và ảnh từ tên resource SQLite | Số địa điểm và điều hướng còn cố định 5 ID |
-| Chi tiết | Tên, địa chỉ, mô tả, danh mục, tọa độ, tên drawable | Giá trị dự phòng và các thẻ điểm nổi bật |
-| Sơ đồ Dinh Độc Lập | ID/tên/tầng/tọa độ marker; thuyết minh theo điểm | Tên/ảnh các tầng dùng mảng; `ten_anh_so_do` trong bảng `khu_vuc` chưa điều khiển ảnh hiển thị |
-| Tham quan ngoài Dinh Độc Lập | Các bảng riêng theo Activity, xem bảng dưới | Ảnh/tên và nội dung seed vẫn khai báo trong Java |
-| Yêu thích | ID theo tài khoản, tên địa điểm từ `dia_diem`, thêm/xóa | Chưa có thẻ ảnh/địa chỉ/mô tả; giới hạn 5 ID |
-
-`DuLieuDinhDocLap` và `NoiDungThuyetMinhDinhDocLap` vẫn là nguồn seed. Phần lớn thao tác seed dùng `CONFLICT_IGNORE`, nên sửa nội dung seed Java không tự cập nhật bản ghi đã tồn tại. `themMoTaVaDanhMuc()` chỉ điền trường trống/null để giữ nội dung đã có.
-
-### Các bảng riêng tạo khi mở màn hình
-
-| Bảng | Cột | Seed dự kiến |
-| --- | --- | --- |
-| `bao_tang_marker` | `id`, `tang`, `x`, `y`, `ten`, `noi_dung` | 13 |
-| `lang_van_hoa_diem` | `id`, `ten`, `mo_ta` | 5 |
-| `con_dao_diem` | `id`, `ten`, `mo_ta` | 7 |
-| `con_dao_toa_do` | `id`, `x_ty_le`, `y_ty_le` | 6, phụ thuộc ảnh gốc phù hợp |
-| `van_mieu_diem` | `id`, `ten`, `mo_ta` | 16 |
-| `van_mieu_toa_do` | `id`, `x_ty_le`, `y_ty_le` | 16, có thể căn lại trong debug |
-
-Như vậy có 6 bảng lõi và tối đa 6 bảng riêng kể trên khi đã mở các màn hình tương ứng. Chúng chưa được liên kết về một bảng điểm thành phần chung bằng PlaceID/FK, cần chuẩn hóa trước khi mở rộng quản trị.
-
-### Các mốc nâng cấp CSDL
-
-| Phiên bản đích | Thay đổi trong `onUpgrade()` |
-| ---: | --- |
-| 2 | Thêm `ma_khoi_phuc_bam` vào `tai_khoan` |
-| 3 | Tạo bảng du lịch và seed 5 địa điểm |
-| 4 | Seed 6 khu vực và 25 marker |
-| 5 | Tạo bổ sung bảng nếu thiếu và seed thuyết minh |
-| 6 | Thêm cột `danh_muc` nếu chưa có, điền danh mục/mô tả trống |
-| 7 | Dọn ID 2 cũ và dữ liệu liên kết; giữ ID 0/1 và tài khoản |
-| 8 | Seed thêm Làng Văn hóa (ID 2), Côn Đảo (ID 3), Văn Miếu (ID 4); điền mô tả/danh mục còn trống |
-
-**Thứ tự nâng cấp:** kiểm tra cột `danh_muc` trước khi thêm; nếu từ bản dưới v7 thì dọn ID 2 cũ trước, sau đó nhánh `< 8` seed đủ 5 địa điểm. ID 2 hiện là Làng Văn hóa, không được xem mọi hàng ID 2 là dữ liệu cần xóa. Seed dùng `CONFLICT_IGNORE`; mô tả/danh mục chỉ điền trường trống nên không tự ghi đè nội dung đã sửa. Các tọa độ/nhãn cũ cũng có thể được giữ lại, cần kiểm tra dữ liệu thực tế khi nâng cấp.
-
-## 5. Tài khoản, phiên đăng nhập và yêu thích
-
-- Đăng ký yêu cầu tên khớp `[A-Za-z0-9_]{3,30}`, mật khẩu từ 8 ký tự và xác nhận trùng khớp. Tên được trim/chuyển chữ thường khi lưu và tra cứu; có ràng buộc không trùng.
-- PBKDF2 dùng `PBKDF2WithHmacSHA1`, 120.000 vòng lặp, khóa 256 bit và salt ngẫu nhiên 16 byte; mật khẩu và mã khôi phục lưu dạng băm Base64.
-- Đăng ký mới cấp mã khôi phục ngẫu nhiên từ 12 byte, hiển thị để người dùng tự lưu. Khôi phục dùng tên đăng nhập + mã + mật khẩu mới; thành công tạo salt/mã mới, mã cũ hết hiệu lực. Tài khoản cũ không có mã khôi phục không dùng được luồng này.
-- Luồng khôi phục không gửi email/SMS và không yêu cầu Internet. Chưa có backend xác thực, phân quyền hoặc chức năng khóa tài khoản.
-- `SharedPreferences` tên `phien_dang_nhap` lưu `id`, `ten`; đăng nhập thành công đóng màn hình đăng nhập và quay lại màn hình trước.
-- Yêu thích yêu cầu đăng nhập. Từ chi tiết, ứng dụng mở hộp thoại mời đăng nhập; quay lại cần bấm yêu thích để thực hiện thao tác. Từ trang chủ có thể vào danh sách yêu thích rồi bấm đăng nhập.
-- Danh sách cho phép mở chi tiết, bỏ yêu thích với xác nhận và đăng xuất với xác nhận. Đăng xuất xóa phiên, không xóa tài khoản hoặc các địa điểm đã lưu.
-- Ứng dụng bật `allowBackup`; các file backup/extraction hiện còn cấu hình mẫu, chưa có quy tắc loại trừ riêng cho CSDL/phiên. Chưa có chức năng đồng bộ do ứng dụng tự cung cấp.
-
-## 6. Điều hướng và cấu trúc dự án
-
-Manifest khai báo **13 Activity**, chỉ `WelcomeActivity` được export làm launcher. Có 8 layout màn hình XML; `YeuThichActivity` dựng giao diện bằng Java qua các hàm hỗ trợ trong `DangNhapActivity`.
-
-```text
-Welcome --Bắt đầu--> Main
-Main --chọn địa điểm/tìm kiếm/gợi ý/gần tôi--> ChiTietDiaDiem
-Main --Bản đồ--> BanDo --Xem chi tiết--> ChiTietDiaDiem
-Main --Yêu thích (tiện ích hoặc tab)--> YeuThich
-ChiTietDiaDiem --ID 0--> ThamQuan
-ChiTietDiaDiem --ID 1--> BaoTangThamQuan
-ChiTietDiaDiem --ID 2--> LangVanHoaThamQuan
-ChiTietDiaDiem --ID 3--> ConDaoThamQuan
-ChiTietDiaDiem --ID 4--> VanMieuThamQuan
-ChiTietDiaDiem --Yêu thích khi chưa đăng nhập--> DangNhap
-YeuThich --chưa đăng nhập--> DangNhap
-DangNhap --> DangKy / QuenMatKhau
-YeuThich --Đăng xuất--> xóa phiên, cập nhật giao diện
-ChiTietDiaDiem / BanDo --Chỉ đường--> ứng dụng ngoài
-```
-
-Các luồng trên chỉ mô tả liên kết đã có trong code. Nút đăng nhập tại Welcome và mục đăng nhập/đăng ký của menu tài khoản trang chủ chưa được nối.
-
-### Vai trò các tệp Java
-
-Tất cả nằm trong [`app/src/main/java/com/example/app_ck/`](app/src/main/java/com/example/app_ck/).
-
-| Tệp | Trách nhiệm |
-| --- | --- |
-| `BaseActivity.java` | Ẩn thanh điều hướng hệ thống khi tạo/tiếp tục màn hình; cho phép vuốt hiện tạm thời |
-| `WelcomeActivity.java` | Màn hình chào và mở trang chủ |
-| `MainActivity.java` | Tải 5 địa điểm, đồng bộ thẻ, tìm kiếm/lọc, gợi ý, gần tôi và điều hướng |
-| `BanDoActivity.java` | OpenStreetMap, marker, tìm kiếm, vị trí, khoảng cách và liên kết chỉ đường |
-| `ChiTietDiaDiemActivity.java` | Đồng bộ chi tiết từ CSDL, dữ liệu dự phòng, ảnh, thuyết minh, yêu thích và mở tham quan |
-| `ThamQuanActivity.java` | Tải/kiểm tra marker Dinh Độc Lập, vẽ sơ đồ, chuyển điểm và đọc thuyết minh |
-| `BaoTangThamQuanActivity.java` | Sơ đồ bảo tàng 13 marker trên 3 tầng và thuyết minh từ bảng `bao_tang_marker` |
-| `LangVanHoaThamQuanActivity.java` | Danh sách 5 khu vực, tạo/đọc bảng riêng và TTS |
-| `ConDaoThamQuanActivity.java` | Danh sách 7 điểm, sơ đồ/tọa độ Côn Đảo và TTS |
-| `VanMieuThamQuanActivity.java` | 16 điểm, sơ đồ và căn tọa độ trong debug, TTS |
-| `TaiKhoanDb.java` | Tạo/nâng cấp/seed CSDL, xử lý tài khoản, yêu thích và truy vấn nội dung |
-| `DiaDiem.java` | Đối tượng dữ liệu địa điểm, gồm cả mô tả/danh mục/tên ảnh |
-| `DuLieuDinhDocLap.java` | Model điểm, dữ liệu seed 25 marker, quy ước tầng và tên ảnh sơ đồ |
-| `NoiDungThuyetMinhDinhDocLap.java` | Nội dung seed thuyết minh theo ID |
-| `DangNhapActivity.java` | Đăng nhập, mở đăng ký/khôi phục và các hàm dựng UI dùng chung |
-| `DangKyActivity.java` | Kiểm tra dữ liệu đăng ký và hiển thị mã khôi phục |
-| `QuenMatKhauActivity.java` | Đổi mật khẩu bằng mã và hiển thị mã thay thế |
-| `PhienDangNhap.java` | Đọc/lưu/xóa phiên SharedPreferences |
-| `YeuThichActivity.java` | Danh sách riêng theo tài khoản, bỏ yêu thích và đăng xuất |
-
-Các màn hình kế thừa `BaseActivity`, ngoại trừ `BanDoActivity` kế thừa trực tiếp `AppCompatActivity` và tự xử lý thanh điều hướng.
-
-### Tài nguyên và cấu hình
-
-| Đường dẫn | Nội dung |
-| --- | --- |
-| `app/src/main/res/layout/` | 8 layout màn hình và `styles_chi_tiet_bo_sung.xml`; tệp style bổ sung hiện nằm trong `layout`, chưa được tham chiếu |
-| `app/src/main/res/drawable/` | 61 tệp: 2 JPG, 14 PNG (ảnh địa điểm và sơ đồ), 45 XML nền/vector icon |
-| `app/src/main/res/mipmap-*/` | Icon launcher theo mật độ màn hình và adaptive icon |
-| `app/src/main/res/values/`, `values-night/` | App name, màu và theme `Theme.Material3.DayNight.NoActionBar`; nhiều màu/chuỗi vẫn viết trực tiếp trong layout/Java |
-| `app/src/main/res/xml/` | Quy tắc backup/extraction mẫu |
-| `app/src/main/AndroidManifest.xml` | Activity, quyền và cấu hình ứng dụng |
-| `app/src/test/`, `app/src/androidTest/` | Unit test mẫu, test package và 4 test migration viết cho v7 (chưa cập nhật v8) |
-| `app/build.gradle.kts` | SDK, applicationId, Java và dependency module |
-| `gradle/libs.versions.toml` | Phiên bản thư viện và plugin Android |
-| `settings.gradle.kts` | Module `app`, Google/Maven Central/Plugin Portal và Foojay resolver |
-| `gradle/wrapper/gradle-wrapper.properties` | Phiên bản và checksum Gradle Wrapper |
-| `gradle/gradle-daemon-jvm.properties` | Toolchain JVM 21 |
-
-
-## 7. Môi trường và quyền truy cập
-
-| Thành phần | Cấu hình trong mã nguồn |
-| --- | --- |
-| Android tối thiểu / target | API 24 / API 36 |
-| Compile SDK | API 36, minor API 1 (`36.1`) |
-| Android Gradle Plugin / Gradle | 9.1.1 / 9.3.1 |
-| JVM Gradle / mức ngôn ngữ ứng dụng | Java 21 / Java 11 |
-| AppCompat / Material | 1.8.0 / 1.14.0 |
-| AndroidX Activity / ConstraintLayout | 1.13.0 / 2.2.2 |
-| osmdroid | 6.1.20 |
-| JUnit / AndroidX JUnit / Espresso | 4.13.2 / 1.3.0 / 3.7.0 |
-| Release | `isMinifyEnabled = false`; chưa cấu hình signing release riêng |
-
-Manifest khai báo `INTERNET`, `ACCESS_NETWORK_STATE`, `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`. Quyền vị trí được xin lúc dùng tính năng gần tôi/vị trí của tôi. Chưa khai báo quyền vị trí nền hoặc service theo dõi nền. Nội dung lưu cục bộ có thể đọc khi không có mạng; việc nghe còn tùy TTS engine/giọng đã cài. Bản đồ và Google Maps URL phụ thuộc kết nối và ứng dụng bên ngoài.
-
-
-## 11. Tồn đọng và ưu tiên hoàn thiện
-
-1. **Cập nhật kiểm thử migration lên v8**, kiểm tra 5 địa điểm, đúng ý nghĩa ID 2 qua từng phiên bản, giữ tài khoản/yêu thích và các bảng tham quan riêng.
-2. **Hoàn thiện điều hướng** đăng nhập tại Welcome và menu tài khoản; triển khai cá nhân/lịch sử/cài đặt hoặc điều chỉnh các mục giới thiệu cho khớp chức năng.
-3. **Thống nhất dữ liệu** giữa trang chủ, bản đồ, chi tiết, yêu thích và tham quan; bỏ phụ thuộc mảng 5 ID, giữ ảnh bản đồ/tên yêu thích đã đọc CSDL và chuyển tên ảnh sơ đồ/danh sách sang dữ liệu chung, truy vấn marker theo khu vực/địa điểm thay vì đọc toàn bộ bảng.
-4. **Bổ sung nội dung và media** cho 23 điểm còn thiếu bài riêng, ảnh từng điểm, giờ tham quan; đối chiếu tư liệu lịch sử, địa chỉ, tọa độ. Báo cáo đã được đối chiếu ở mục 12; nội dung lịch sử của từng điểm vẫn cần kiểm chứng bằng tư liệu chính thức.
-5. **Lưu hoạt động cá nhân**: thêm bảng/màn hình lịch sử nghe/tham quan và tiến độ thực tế. Hiện chưa có các bảng này.
-6. **Hoàn thiện bản đồ và vị trí**: giữ tìm kiếm không dấu đã có; sửa nhãn phạm vi/số điểm, xử lý mất mạng/GPS, kiểm tra khoảng cách theo cập nhật vị trí và bán kính gần tôi. Routing/offline riêng là hướng phát triển, không bắt buộc theo đặc tả đã đối chiếu.
-7. **Thuyết minh theo vị trí**: bổ sung bán kính/cơ chế kích hoạt và chống lặp theo UC06.1–UC06.2; hiện chưa có geofencing hoặc phát tự động.
-8. **Quản trị và tài khoản**: bổ sung vai trò/trạng thái và quản lý nội dung, tài khoản theo UC08 của báo cáo; hiện chưa có Activity quản trị, vai trò ADMIN hoặc chức năng khóa/mở tài khoản.
-9. **Chuẩn hóa UI/tài nguyên**: đưa chuỗi/màu về resources, thống nhất xử lý thanh điều hướng và giao diện sáng/tối; chuyển style bổ sung về `values` nếu thực sự dùng.
-10. **Bổ sung kiểm thử có ý nghĩa**, tập trung migration, tài khoản, yêu thích, truy vấn và tìm kiếm; chạy demo trên thiết bị cho bản đồ/GPS/TTS trước khi kết luận hoàn tất chức năng.
-
-## 12. Đối chiếu với báo cáo Word
-
-Dựa trên đặc tả đã đọc từ `Nhom15_BaoCao.docx` và code hiện tại, vẫn có **15/37 UC chưa có luồng sử dụng**: UC06.1, UC06.2, UC07.4 và 12 UC quản trị. 22 UC còn lại có hiện thực liên quan nhưng nhiều mục chưa đủ đặc tả; phép đếm không phải tỷ lệ hoàn thành. Các sơ đồ/nội dung mới cải thiện phần tham quan, chưa thay thế AUTO, lịch sử hoặc quản trị.
-
-### 12.2. Ma trận 37 use case
-
-“Có luồng chính” nghĩa là tìm thấy xử lý tương ứng trong mã nguồn; không đồng nghĩa đã kiểm thử đạt toàn bộ luồng thay thế và yêu cầu phi chức năng. “Một phần/khác đặc tả” nghĩa là đã có chức năng liên quan nhưng còn thiếu yêu cầu được nêu trong báo cáo.
-
-| Use case | Chức năng trong báo cáo | Đánh giá và phần cần làm tiếp |
-| --- | --- | --- |
-| UC01.1 | Đăng ký tài khoản | **Một phần/khác đặc tả:** code dùng tên đăng nhập, mật khẩu và mã khôi phục; báo cáo yêu cầu họ tên, email duy nhất; CSDL chưa có họ tên/email/ngày tạo |
-| UC01.2 | Đăng nhập | **Một phần/khác đặc tả:** xác thực và lưu phiên đã có; chưa đăng nhập bằng email, xác định USER/ADMIN và chuyển màn hình theo quyền; chưa kiểm tra khóa tài khoản theo UC08.12 |
-| UC01.3 | Đăng xuất | **Một phần/khác đặc tả:** có xác nhận và xóa phiên trong yêu thích; báo cáo yêu cầu chuyển về đăng nhập, hiện chỉ cập nhật màn hình yêu thích |
-| UC01.4 | Quên mật khẩu | **Một phần/khác đặc tả:** đã đổi mật khẩu bằng mã khôi phục; báo cáo mô tả nhập email, không mô tả mã khôi phục. Cần thống nhất đặc tả với cơ chế xác minh hiện tại, không bỏ xác minh chỉ để khớp câu chữ |
-| UC02.1 | Xem danh sách điểm du lịch | **Một phần:** đọc SQLite và chọn chi tiết được; còn cố định 5 thẻ/ID, thẻ không hiển thị đủ địa chỉ và mô tả ngắn như đặc tả; thiếu dữ liệu thì trang chủ đóng thay vì danh sách trống |
-| UC02.2 | Tìm kiếm điểm du lịch | **Có luồng chính:** trang chủ tìm tên/địa chỉ, bản đồ tìm tên; cả hai chuẩn hóa hoa thường và dấu, xử lý rỗng/không có kết quả |
-| UC02.3 | Lọc điểm du lịch | **Có luồng chính:** đọc `danh_muc` từ SQLite, lọc thẻ và báo khi rỗng; còn giới hạn 5 thẻ và không lọc các khu vực gợi ý/gần tôi |
-| UC02.4 | Xem địa điểm gần vị trí hiện tại | **Một phần:** có quyền, GPS, khoảng cách, sắp xếp và mở chi tiết; chưa giới hạn theo phạm vi tìm kiếm BR02.4-4, chưa bỏ qua tọa độ sai; kết quả chỉ có tên/km, thiếu ảnh/địa chỉ |
-| UC03.1 | Xem chi tiết điểm du lịch chính | **Một phần:** đủ các nút chính cho 5 địa điểm; còn Java dự phòng, chưa hiện tọa độ/khoảng cách tại chi tiết; ID ngoài phạm vi đang quay về ID 0 |
-| UC03.2 | Bắt đầu tham quan | **Có luồng chính:** mở đúng Activity cho 5 địa điểm; còn ánh xạ cố định, một số thẻ chưa truyền ID điểm để mở đúng điểm được chọn |
-| UC04.1 | Xem bản đồ khu vực | **Có luồng chính:** OSM, 5 marker, 5 nút nhanh, zoom 4–19, ảnh từ SQLite, lớp vị trí khi bật; nhãn XML còn “2 điểm”/TP. Hồ Chí Minh |
-| UC04.2 | Chọn marker điểm du lịch | **Có luồng chính:** chọn đúng địa điểm, hiện tên/địa chỉ/khoảng cách khi có GPS, mở chi tiết/chỉ đường |
-| UC04.3 | Xem sơ đồ tham quan nội bộ | **Có luồng chính:** Dinh Độc Lập/Bảo tàng/Văn Miếu/Côn Đảo có sơ đồ; Làng Văn hóa dùng danh sách thay thế được đặc tả cho phép; cần kiểm chứng tọa độ/khả năng chọn trên thiết bị |
-| UC05.1 | Xác định vị trí hiện tại | **Có luồng chính:** xin quyền, lấy vị trí, hiển thị trên bản đồ khi bật; API 24–29 ở trang chủ chỉ dùng vị trí đã biết gần nhất, chưa đảm bảo độ mới |
-| UC05.2 | Xem khoảng cách đến địa điểm | **Một phần:** tính/hiển thị đã có; chưa tự cập nhật khoảng cách khi vị trí thay đổi đáng kể theo yêu cầu phi chức năng; hiện tính lại khi lấy vị trí/chọn địa điểm |
-| UC05.3 | Chỉ đường đến địa điểm | **Có luồng chính:** Intent Google Maps theo tọa độ và xử lý không có ứng dụng; báo cáo cho phép dùng ứng dụng bản đồ ngoài, không bắt buộc routing nội bộ |
-| UC06.1 | Bật/tắt thuyết minh tự động | **Chưa có:** thiếu giao diện, lưu trạng thái AUTO và theo dõi vị trí theo trạng thái |
-| UC06.2 | Nghe thuyết minh tự động tại điểm du lịch chính | **Chưa có:** thiếu bán kính, kiểm tra khoảng cách, chọn điểm gần nhất, chống phát lặp và lưu trạng thái/lịch sử |
-| UC06.3 | Nghe thuyết minh thủ công tại điểm du lịch chính | **Một phần:** phát mô tả từ SQLite ở trang chủ/chi tiết; chưa có nội dung tổng quan riêng và ghi lịch sử theo bước 5 |
-| UC06.4 | Nghe thuyết minh tại điểm tham quan thành phần | **Một phần:** cả 5 nơi có TTS theo điểm, đọc SQLite ở các bảng tương ứng; chưa ghi lịch sử, nội dung 23/25 điểm Dinh Độc Lập còn tạm |
-| UC06.5 | Điều khiển thuyết minh | **Có luồng chính:** phát, dừng, bấm nghe lại từ đầu và `QUEUE_FLUSH`; chưa quản lý vô hiệu hóa nút theo trạng thái đầy đủ. Tốc độ đọc là tùy chọn trong báo cáo, không tính là thiếu bắt buộc; báo cáo không bắt buộc pause/resume |
-| UC07.1 | Thêm địa điểm yêu thích | **Một phần:** lưu theo tài khoản, ngăn trùng đã có; chưa lưu thời gian thêm; nút hiện là toggle, bấm khi đã thích sẽ xóa thay vì chỉ báo đã lưu như luồng thêm riêng |
-| UC07.2 | Xem danh sách yêu thích | **Một phần:** truy vấn ID/tên theo CSDL và tài khoản, xử lý rỗng/mở chi tiết; chưa có ảnh/địa chỉ/mô tả, giới hạn 5 ID |
-| UC07.3 | Xóa địa điểm yêu thích | **Có luồng chính:** xóa theo tài khoản/địa điểm và cập nhật; danh sách có xác nhận/hủy; ở chi tiết là toggle, chưa có nhánh thông báo riêng khi bản ghi không tồn tại |
-| UC07.4 | Xem lịch sử tham quan | **Chưa có:** thiếu bảng, ghi lịch sử khi nghe, danh sách theo thời gian, AUTO/MANUAL và mở lại địa điểm/điểm thành phần |
-| UC08.1 | Quản trị: xem danh sách điểm du lịch | **Chưa có:** danh sách người dùng ở Main không thay thế chức năng quản trị và kiểm tra quyền |
-| UC08.2 | Quản trị: thêm điểm du lịch | **Chưa có:** thiếu form, kiểm tra tọa độ/bán kính, tạo ID và cập nhật danh sách/bản đồ |
-| UC08.3 | Quản trị: sửa điểm du lịch | **Chưa có:** thiếu form sửa và kiểm tra dữ liệu/giữ nguyên ID |
-| UC08.4 | Quản trị: xóa điểm du lịch | **Chưa có:** thiếu xác nhận, xử lý điểm thành phần và dữ liệu liên quan |
-| UC08.5 | Quản trị: thêm điểm tham quan thành phần | **Chưa có:** thiếu form, chọn sơ đồ/vị trí, nội dung và thứ tự tham quan |
-| UC08.6 | Quản trị: sửa điểm tham quan thành phần | **Chưa có:** thiếu sửa tên/nội dung/tọa độ/thứ tự và cập nhật sơ đồ |
-| UC08.7 | Quản trị: xóa điểm tham quan thành phần | **Chưa có:** thiếu xác nhận, xóa và cập nhật marker/danh sách |
-| UC08.8 | Quản trị: cập nhật nội dung thuyết minh | **Chưa có:** seed hoặc sửa bằng Database Inspector không phải giao diện quản trị có kiểm tra quyền |
-| UC08.9 | Quản trị: xem danh sách tài khoản | **Chưa có:** thiếu danh sách USER, họ tên/email/trạng thái/ngày tạo và kiểm tra quyền ADMIN |
-| UC08.10 | Quản trị: tìm kiếm tài khoản | **Chưa có:** thiếu tra cứu họ tên/email trong nhóm USER |
-| UC08.11 | Quản trị: xem thông tin tài khoản | **Chưa có:** thiếu màn hình và các trường theo đặc tả |
-| UC08.12 | Quản trị: khóa/mở khóa tài khoản | **Chưa có:** thiếu trạng thái, xác nhận, chặn đăng nhập khi khóa và ngăn tự khóa ADMIN đang sử dụng |
-
-Bằng chứng triển khai: `MainActivity` (tra cứu/lọc/gần tôi), `BanDoActivity` (bản đồ/GPS/khoảng cách/Intent), `ChiTietDiaDiemActivity` và `ThamQuanActivity` (chi tiết/sơ đồ/TTS), các Activity tài khoản, `PhienDangNhap`, `YeuThichActivity` và schema/phương thức trong `TaiKhoanDb`. Manifest hiện có 13 Activity, không có Activity quản trị hoặc lịch sử. Việc đánh giá không chỉ dựa vào tên màn hình mà còn đối chiếu các bước xử lý và trường dữ liệu.
-
-### 12.3. CSDL hiện tại so với ERD trong báo cáo
-
-Số bảng hoặc tên bảng khác nhau không tự động có nghĩa sai thiết kế: tách `khu_vuc` và `thuyet_minh` có thể hợp lý nếu bảo toàn quan hệ và nghiệp vụ. Các khoảng trống thực tế là:
-
-| Bảng trong báo cáo | Hiện thực tương ứng | Còn thiếu/khác |
-| --- | --- | --- |
-| `tblTaiKhoan` | `tai_khoan` và `PhienDangNhap` | `ho_ten`, `email`, `vai_tro`, `trang_thai`, `ngay_tao`; tên đăng nhập hiện thay email. Giữ mật khẩu băm, không chuyển về văn bản rõ để khớp tên trường `mat_khau` |
-| `tblDiemDuLich` | `dia_diem`, ảnh trong drawable, sơ đồ qua `khu_vuc` | `ban_kinh_kich_hoat`, nội dung thuyết minh tổng quan riêng; sơ đồ đã lưu qua bảng con nhưng UI chưa dùng tên ảnh từ bảng này |
-| `tblDiemThamQuan` | `diem_tham_quan → khu_vuc → dia_diem`, nội dung qua `thuyet_minh` | Chưa có `thu_tu_tham_quan` riêng (đang dùng ID); truy vấn marker chưa lọc theo PlaceID; nội dung/ảnh riêng phần lớn chưa hoàn thiện |
-| `tblYeuThich` | `yeu_thich` với khóa ghép chống trùng | `thoi_gian_them`, FK tới địa điểm; không nhất thiết thêm ID tự tăng nếu khóa ghép vẫn đáp ứng nghiệp vụ |
-| `tblLichSuThamQuan` | Chưa có | Toàn bộ dữ liệu liên kết tài khoản/địa điểm/điểm thành phần, thời gian và chế độ AUTO/MANUAL |
-
-Ngoài đối chiếu ERD, migration v8 ở mục 4 cần được kiểm thử lại với ID 2 hiện là Làng Văn hóa; các test v7 chưa phù hợp phạm vi 5 địa điểm. Các khai báo FK cũng cần cơ chế thực thi và cách xử lý dữ liệu liên quan khi triển khai xóa trong UC08.
-
-### 12.4. Màn hình và phần báo cáo còn thiếu
-
-Báo cáo liệt kê 21 màn hình, còn dự án có 13 Activity. Không dùng phép chia 13/21 để tính tiến độ: chi tiết điểm nhỏ và thuyết minh đang ghép trong `ThamQuanActivity`; chỉ đường mở ứng dụng ngoài đúng UC05.3; khám phá nằm ở trang chủ. Những màn hình ghép vẫn có thể đáp ứng yêu cầu nếu đủ luồng xử lý.
-
-Các phần thực sự thiếu là lịch sử, hồ sơ cá nhân, cài đặt AUTO/bán kính, trang quản trị, quản lý tài khoản, quản lý địa điểm/điểm thành phần, form thêm/sửa và cập nhật nội dung. Mục đăng nhập tại Welcome/menu trang chủ vẫn chỉ Toast, làm luồng demo chưa liền mạch.
-
-
-Các mục sau không nên tính thành thiếu sót bắt buộc theo báo cáo này: Google Maps SDK (OSM vẫn đáp ứng bản đồ), routing trong app (Intent ngoài được cho phép), GPS cho từng phòng (BR10 yêu cầu chọn thủ công), audio thu sẵn (báo cáo chọn TTS), tải bản đồ offline hoặc thuật toán lập lịch trình. Báo cáo nêu rõ chức năng lọc không lập kế hoạch chuyến đi; các hướng phát triển trong README cần phân biệt với tiêu chí phải hoàn thành.
-
-## 13. Lộ trình 14 bước hoàn thành chức năng theo file Word
-
-Thực hiện theo thứ tự dưới đây vì tài khoản, dữ liệu và lịch sử là nền tảng cho AUTO và quản trị. Mỗi bước cần hoàn thành **giao diện → xử lý → lưu dữ liệu → kiểm thử** trước khi đánh dấu đạt. Đây là kế hoạch tiếp theo, không phải danh sách chức năng đã hoàn thành; hiện trạng được đối chiếu trong ma trận 37 use case phía trên.
-
-### Bước 1. Chốt danh sách yêu cầu và tiêu chí nghiệm thu
-
-- Dùng đủ 37 use case trong báo cáo để lập danh sách theo dõi: luồng chính, luồng thay thế, điều kiện nghiệp vụ, kiểm thử và kết quả.
-- Giữ đúng thiết kế hai cấp: GPS/AUTO cho điểm du lịch chính; chọn thủ công trên sơ đồ cho điểm thành phần.
-- Giữ phạm vi bắt buộc: tài khoản, tra cứu, chi tiết, bản đồ, định vị/chỉ đường, TTS thủ công/tự động, yêu thích/lịch sử và quản trị.
-- Chỉ đường được phép mở ứng dụng ngoài; không bắt buộc thay OSM, thu âm sẵn hoặc xây thuật toán lập lịch trình.
-
-**Điều kiện đạt:** mỗi UC có tiêu chí kiểm tra cụ thể, phân biệt rõ yêu cầu bắt buộc và hướng phát triển. Chưa đánh dấu hoàn thành chỉ vì đã có màn hình.
-
-### Bước 2. Cập nhật kiểm thử migration trước khi mở rộng CSDL
-
-- Cập nhật kỳ vọng kiểm thử lên v8/5 địa điểm; kiểm tra nâng v1/v2/v6/v7 và ý nghĩa ID 2 sau khi dọn dữ liệu cũ rồi seed Làng Văn hóa.
-- Thiết kế migration lên phiên bản mới cho các trường/bảng sắp bổ sung, không xóa CSDL để thay thế việc nâng cấp.
-- Bật thực thi khóa ngoại; xác định cách xử lý dữ liệu liên quan khi xóa địa điểm, điểm thành phần hoặc tài khoản.
-- Kiểm thử cài mới và nâng cấp từ các phiên bản cũ có dữ liệu.
-
-**Điều kiện đạt:** mở CSDL không lỗi, không thêm trùng cột, giữ nguyên tài khoản/yêu thích và dữ liệu nội dung đã có.
-
-### Bước 3. Bổ sung schema theo ERD
-
-| Nhóm | Dữ liệu cần hoàn thiện |
-| --- | --- |
-| Tài khoản | Họ tên, email duy nhất, vai trò USER/ADMIN, trạng thái, ngày tạo |
-| Điểm du lịch | Bán kính kích hoạt, nội dung thuyết minh tổng quan riêng |
-| Điểm thành phần | Thứ tự tham quan riêng, nội dung, ảnh và liên kết với địa điểm |
-| Yêu thích | Thời gian thêm và liên kết địa điểm hợp lệ |
-| Lịch sử | Tài khoản, địa điểm, điểm thành phần có thể rỗng, thời gian, AUTO/MANUAL |
-
-- Có thể giữ các bảng `khu_vuc` và `thuyet_minh` riêng nếu bảo toàn quan hệ/nghiệp vụ của ERD.
-- Giữ mật khẩu và mã khôi phục dạng băm; kiểm tra ràng buộc email, vai trò, trạng thái, bán kính dương và tọa độ hợp lệ.
-- Xác định cách bổ sung email/họ tên cho tài khoản cũ, không tự tạo email giả rồi xem như người dùng đã xác nhận.
-
-**Điều kiện đạt:** cài mới/nâng cấp tạo đủ cấu trúc, dữ liệu cũ có lộ trình chuyển đổi rõ ràng và các truy vấn trả đúng liên kết.
-
-### Bước 4. Chuyển các màn hình sang dữ liệu động
-
-- Bỏ mảng cố định 5 địa điểm; đọc danh sách, tên, ảnh, danh mục và tọa độ từ SQLite.
-- Truy vấn khu vực/điểm thành phần theo ID địa điểm, thay vì đọc toàn bộ bảng marker.
-- Truyền ID thực giữa các màn hình; bỏ giả định vị trí mảng luôn bằng ID.
-- Bỏ kiểm tra bắt buộc đúng 25 điểm hoặc ID liên tiếp; dùng `thu_tu_tham_quan` để sắp xếp.
-- Đọc tên ảnh sơ đồ từ CSDL; thống nhất dữ liệu giữa trang chủ, bản đồ, chi tiết, yêu thích và tham quan.
-
-**Điều kiện đạt:** thêm địa điểm thứ sáu, thêm/xóa một marker hoặc dùng ID không liên tiếp vẫn hiển thị/chuyển màn hình đúng. Các luồng quản trị sau này không cần sửa Java mỗi khi thay nội dung.
-
-### Bước 5. Hoàn thành tài khoản và điều hướng — UC01.1–UC01.4
-
-- Đăng ký bằng họ tên, email, mật khẩu và xác nhận; kiểm tra email duy nhất.
-- Đăng nhập bằng email; kiểm tra trạng thái khóa, vai trò USER/ADMIN và mở giao diện phù hợp.
-- Đăng xuất xóa phiên rồi chuyển về đăng nhập, giữ dữ liệu cá nhân đã lưu.
-- Khôi phục dùng email để tìm tài khoản và giữ bước xác minh bằng mã khôi phục; bổ sung mô tả xác minh này vào Word cho khớp hiện thực.
-- Nối đăng nhập tại Welcome, menu tài khoản, hồ sơ cá nhân và các nút quay lại.
-- Tạo cách khởi tạo tài khoản ADMIN phục vụ demo; đăng ký người dùng thông thường không được tự chọn quyền ADMIN.
-
-**Điều kiện đạt:** kiểm tra được dữ liệu thiếu/sai, email trùng, mật khẩu sai, tài khoản khóa, phân quyền, đăng xuất và khôi phục. USER không vào được quản trị bằng cách điều hướng trực tiếp.
-
-### Bước 6. Hoàn thiện danh sách, tìm kiếm, lọc và gần tôi — UC02.1–UC02.4
-
-- Danh sách động hiển thị ảnh, tên, địa chỉ, loại hình và mô tả ngắn.
-- Tìm kiếm/lọc dựa trên dữ liệu CSDL; thống nhất xử lý hoa thường và dấu giữa các màn hình.
-- Có trạng thái danh sách trống và không có kết quả; không đóng trang chủ chỉ vì chưa có địa điểm.
-- Gần tôi phải giới hạn theo phạm vi tìm kiếm đã quy định, bỏ qua tọa độ sai và sắp xếp từ gần đến xa.
-- Kết quả gần tôi có ảnh, địa chỉ, khoảng cách và mở đúng chi tiết; từ chối vị trí vẫn dùng tra cứu thường được.
-
-**Điều kiện đạt:** kết quả chính xác với danh sách thay đổi, không có kết quả, ngoài phạm vi, tọa độ sai, GPS tắt hoặc quyền bị từ chối. Phân biệt **bán kính tìm gần tôi** với **bán kính kích hoạt AUTO**.
-
-### Bước 7. Hoàn thiện chi tiết và tham quan — UC03.1–UC03.2, UC04.3
-
-- Hiển thị đủ thông tin theo ID, bao gồm tọa độ/khoảng cách khi có vị trí và các nút chỉ đường, nghe, yêu thích, tham quan.
-- Thống nhất xử lý địa điểm không tồn tại theo đặc tả; tránh hiển thị dữ liệu dự phòng của một địa điểm đã bị xóa.
-- Bắt đầu tham quan tải đúng các điểm thuộc địa điểm đã chọn; có sơ đồ thì vẽ marker, không có sơ đồ có thể dùng danh sách thay thế.
-- Chọn điểm hiển thị đúng nội dung, ảnh và thứ tự; có thông báo khi chưa có điểm thành phần.
-- Kiểm tra bố cục, tọa độ tương đối và khả năng chọn marker trên nhiều kích thước màn hình.
-
-**Điều kiện đạt:** dữ liệu/marker đúng sau khi thêm, sửa, xóa; các ID không liên tiếp không gây nhầm điểm hoặc lỗi chuyển điểm.
-
-### Bước 8. Hoàn thiện bản đồ, định vị và khoảng cách — UC04.1–UC04.2, UC05.1–UC05.3
-
-- Đọc marker động từ SQLite; chọn marker mở đúng thẻ thông tin, chi tiết và chỉ đường.
-- Khi đã có quyền, hiển thị vị trí theo luồng bản đồ mô tả trong Word; khi chưa có quyền vẫn xem địa điểm được.
-- Nhận vị trí đủ mới và cập nhật khoảng cách khi người dùng di chuyển đáng kể; quản lý đăng ký/hủy cập nhật theo vòng đời màn hình.
-- Xử lý GPS tắt, chưa có tọa độ, mất mạng/tải tile thất bại, quyền bị thu hồi và không có ứng dụng mở Intent.
-- Giữ chỉ đường bằng Google Maps URL theo đúng tọa độ đích; không bắt buộc routing nội bộ.
-
-**Điều kiện đạt:** vị trí/khoảng cách cập nhật đúng, không hiển thị kết quả cũ như vị trí mới và ứng dụng không dừng bất thường ở các trường hợp lỗi.
-
-### Bước 9. Hoàn thiện TTS thủ công — UC06.3–UC06.5
-
-- Địa điểm chính đọc nội dung thuyết minh tổng quan riêng; điểm thành phần đọc nội dung theo ID từ CSDL.
-- Hoàn thiện phát, dừng, phát lại và trạng thái nút; xử lý thiếu nội dung hoặc giọng tiếng Việt.
-- Quản lý phát giữa các màn hình, dừng khi chuyển điểm/rời màn hình và giải phóng engine đúng vòng đời.
-- Bổ sung, đối chiếu bài thuyết minh riêng cho 23 điểm còn dùng nội dung tạm; bổ sung ảnh phù hợp.
-- Chuẩn bị callback khi bắt đầu phát thành công để bước 10 ghi lịch sử.
-
-**Điều kiện đạt:** nghe đúng nội dung đã chọn, không phát chồng, dừng/phát lại rõ ràng và lỗi TTS không gây treo ứng dụng. Tốc độ đọc là tùy chọn trong Word; pause/resume không phải yêu cầu bắt buộc.
-
-### Bước 10. Ghi và xem lịch sử — UC07.4, hậu điều kiện UC06.3–UC06.4
-
-- Ghi lịch sử cho tài khoản khi TTS bắt đầu phát thành công; không ghi chỉ vì mở màn hình hoặc nhấn nút nhưng phát thất bại.
-- Lưu đúng địa điểm, điểm thành phần nếu có, thời gian và chế độ MANUAL; thiết kế dùng chung cho AUTO ở bước 11.
-- Tạo màn hình lịch sử theo tài khoản, sắp mới nhất trước, hiện đủ tên/thời gian/chế độ.
-- Chọn mục lịch sử mở đúng nội dung; xử lý danh sách rỗng và nội dung đã bị xóa.
-- Quy định cách xử lý khi chưa đăng nhập và khi thay tài khoản để tránh gán lịch sử sai người.
-
-**Điều kiện đạt:** lịch sử được lưu sau khi phát, vẫn còn khi mở lại ứng dụng và tài khoản khác không đọc được lịch sử riêng.
-
-### Bước 11. Hoàn thành AUTO — UC06.1–UC06.2
-
-1. Tạo công tắc bật/tắt và lưu trạng thái AUTO.
-2. Khi bật, kiểm tra quyền và dịch vụ vị trí; thể hiện rõ nếu chưa thể hoạt động.
-3. Nhận cập nhật vị trí và tính khoảng cách tới các điểm du lịch chính có dữ liệu hợp lệ.
-4. Lọc điều kiện `khoảng cách ≤ bán kính kích hoạt`; nhiều điểm hợp lệ thì chọn gần nhất.
-5. Kiểm tra trạng thái đã phát để không phát lặp liên tục cùng địa điểm; xác định rõ phạm vi lưu trạng thái này.
-6. Phát nội dung đúng địa điểm, ghi trạng thái khi phát thành công và lưu lịch sử AUTO.
-7. Khi tắt, ngừng kiểm tra tự động; vẫn cho phép nghe thủ công. Điều phối AUTO/MANUAL để không phát chồng.
-
-**Điều kiện đạt:** thử vị trí mô phỏng ngoài/vào/đúng ranh giới bán kính, hai phạm vi giao nhau, đứng yên, mất GPS, thiếu nội dung, lỗi TTS và bật/tắt AUTO. Điểm thành phần trong nhà không tự kích hoạt bằng GPS.
-
-### Bước 12. Hoàn thiện yêu thích — UC07.1–UC07.3
-
-- Lưu thời gian thêm và ngăn trùng theo tài khoản/địa điểm.
-- Danh sách đọc thông tin từ CSDL, có ảnh, tên, địa chỉ, mô tả và mở đúng chi tiết.
-- Phân biệt luồng thêm với xóa; khi đã lưu thì xử lý theo đặc tả thêm, không vô tình xóa do cùng một thao tác.
-- Hoàn thiện thông báo, xác nhận/hủy và trường hợp bản ghi/địa điểm không còn tồn tại.
-- Đồng bộ trạng thái giữa chi tiết và danh sách sau khi quay lại.
-
-**Điều kiện đạt:** hai tài khoản có dữ liệu độc lập; thêm trùng không tạo dòng mới; hủy xóa không đổi dữ liệu; đăng xuất/đăng nhập lại vẫn còn danh sách.
-
-### Bước 13. Xây dựng quản trị — UC08.1–UC08.12
-
-Thực hiện theo thứ tự:
-
-1. Trang quản trị và kiểm tra quyền ở cả điều hướng lẫn thao tác dữ liệu.
-2. Xem/thêm/sửa/xóa điểm du lịch (UC08.1–UC08.4), gồm form tọa độ, bán kính và nội dung.
-3. Thêm/sửa/xóa điểm thành phần (UC08.5–UC08.7), gồm địa điểm chứa điểm, tọa độ sơ đồ, ảnh và thứ tự.
-4. Cập nhật nội dung thuyết minh hai cấp (UC08.8), kiểm tra dữ liệu và dùng nội dung mới khi nghe tiếp.
-5. Danh sách/tìm kiếm/chi tiết tài khoản USER (UC08.9–UC08.11), gồm họ tên, email, trạng thái, vai trò và ngày tạo theo từng màn hình.
-6. Khóa/mở khóa có xác nhận (UC08.12); chặn tài khoản khóa đăng nhập và ngăn ADMIN tự khóa tài khoản đang sử dụng.
-
-- Form phải kiểm tra dữ liệu bắt buộc, tọa độ, bán kính dương và vị trí marker hợp lệ.
-- Sửa giữ nguyên ID; hủy giữ nguyên dữ liệu. Xóa có xác nhận và xử lý liên kết điểm thành phần, thuyết minh, yêu thích/lịch sử theo chính sách đã chọn.
-- Danh sách, bản đồ và sơ đồ phải phản ánh dữ liệu sau thao tác quản trị.
-
-**Điều kiện đạt:** ADMIN thực hiện đủ 12 UC, USER không được gọi thao tác quản trị; dữ liệu thay đổi đúng, không có liên kết mồ côi và không cần sửa mã nguồn để thêm nội dung.
-
-
-
-### Bước 14. Nghiệm thu chức năng và cập nhật báo cáo
-
-- Chạy lại build, kiểm thử nghiệp vụ/migration và demo trên thiết bị với đủ 37 UC cùng các luồng thay thế.
-- Hoàn thiện phần hiện thực, ảnh màn hình và kết quả kiểm thử trong Word; cập nhật ERD, màn hình, hạn chế và hướng phát triển theo bản ứng dụng cuối.
-- Chỉ đánh dấu đạt khi có bằng chứng; không dùng các kết quả kiểm thử v7 để nghiệm thu v8.
-
-**Điều kiện đạt:** dữ liệu, chức năng, demo và báo cáo thống nhất; các thiếu sót được ghi đúng hiện trạng.
-
-### Thứ tự bắt đầu
-
-**Kiểm thử migration v8 → hoàn thiện schema → bỏ dữ liệu cố định → hoàn thành tài khoản**, sau đó tiếp tục lần lượt các bước 6–14. Chưa đặt thời hạn hoặc phần trăm hoàn thành khi chưa có lịch làm việc và ước lượng khối lượng; cập nhật tiến độ bằng các điều kiện nghiệm thu đã đạt.
-
-
-## 14. Build, kiểm thử và các điểm cần lưu ý — 23/10/2026
-
-### Kết quả hiện tại
-
-| Kiểm tra | Kết quả / phạm vi |
-| --- | --- |
-| `assembleDebug testDebugUnitTest` | **BUILD SUCCESSFUL** trong lần cập nhật này |
-| Unit test | 1 test mẫu `addition_isCorrect`, không bao phủ nghiệp vụ |
-| `TaiKhoanDbMigrationTest` | Có 4 test, nhưng vẫn kỳ vọng version 7 và 2 địa điểm; không còn phù hợp version 8/5 địa điểm |
-| Kiểm thử thiết bị lần này | Chưa chạy; kết quả 4 test đạt ngày 22/10 là của v7, không chứng minh v8 đạt |
-| UI/GPS/TTS và tọa độ các sơ đồ mới | Mô tả theo mã nguồn, chưa demo/xác minh trên thiết bị trong lần này |
-
-### Sai lệch còn thấy trong mã nguồn
-
-- Một số chú thích vẫn ghi SQLite v7/hai địa điểm/điểm mới chưa có sơ đồ dù code đã là v8 và có Activity riêng.
-- `activity_ban_do.xml` vẫn ghi “2 điểm” và “Khám phá TP. Hồ Chí Minh”, trong khi dữ liệu đã có 5 địa điểm ở nhiều khu vực.
-- Làng Văn hóa đã có ảnh drawable nhưng đầu màn hình tham quan vẫn dùng icon gallery.
-- Ảnh/tọa độ seed có thể không tự cập nhật vì dùng `CONFLICT_IGNORE`; tọa độ đã căn tay được giữ lại. Cần kiểm tra dữ liệu thật sau khi thay sơ đồ.
-- `ChiTietDiaDiemActivity` nhận ID không hợp lệ hiện quay về ID 0; một số thẻ giới thiệu chưa truyền `idMarker` cho màn hình tương ứng.
-- Chưa có AUTO, lịch sử, phân quyền/quản trị; còn nhiều giới hạn cố định 5 ID và số lượng marker theo từng Activity.
-
-### Cách chạy kiểm tra
-
-Chuẩn bị JDK 21, Android SDK 36.1 và đồng bộ Gradle trong Android Studio. Cấu hình `sdk.dir` trong `local.properties` theo máy đang dùng; lần đầu cần mạng tải dependency. Chạy tại thư mục gốc:
+| Android SDK | minSdk `24`, targetSdk `36`, compileSdk `36.1` |
+| Mã nguồn Java | sourceCompatibility và targetCompatibility `11` |
+| Gradle / Android Gradle Plugin | `9.3.1` / `9.1.1` |
+| AndroidX | AppCompat `1.8.0`, Activity `1.13.0`, ConstraintLayout `2.2.2` |
+| Material Components | `1.14.0` |
+| osmdroid | `6.1.20` |
+| Kiểm thử | JUnit `4.13.2`, AndroidX JUnit `1.3.0`, Espresso `3.7.0` |
+
+Cấu hình nằm tại [app/build.gradle.kts](app/build.gradle.kts), [libs.versions.toml](gradle/libs.versions.toml) và [Gradle Wrapper](gradle/wrapper/gradle-wrapper.properties). Mức Java 11 của mã nguồn khác với JDK chạy Gradle; môi trường build đã dùng JDK 21.
+
+## 3. Mở dự án và chạy ứng dụng
+
+1. Mở thư mục gốc bằng Android Studio; dùng JDK 21 cho Gradle.
+2. Cài Android SDK tương ứng `compileSdk 36.1`, Platform Tools và đồng bộ Gradle.
+3. Khai báo SDK trong `local.properties` theo máy đang dùng; không đưa đường dẫn riêng của máy vào repository.
+4. Chạy module `app` trên thiết bị/emulator Android 7.0 trở lên.
+5. Cài hoặc bật giọng đọc **Tiếng Việt** trong phần Text-to-speech của thiết bị để nghe thuyết minh.
+
+Lệnh PowerShell tại thư mục gốc:
 
 ```powershell
-.\gradlew.bat assembleDebug testDebugUnitTest
-.\gradlew.bat installDebug
-# Chỉ chạy bộ migration sau khi cập nhật kỳ vọng và dữ liệu kiểm thử cho v8:
-.\gradlew.bat connectedDebugAndroidTest '-Pandroid.testInstrumentationRunnerArguments.class=com.example.app_ck.TaiKhoanDbMigrationTest'
+.\gradlew.bat assembleDebug
+.\gradlew.bat testDebugUnitTest
+.\gradlew.bat connectedDebugAndroidTest
 ```
 
-APK: `app/build/outputs/apk/debug/app-debug.apk`. Báo cáo unit test: `app/build/reports/tests/testDebugUnitTest/index.html`. Không dùng build thành công để kết luận mọi chức năng/migration đã đạt.
+Lệnh cuối cần thiết bị/emulator đang kết nối và được cấp quyền ADB. APK debug nằm tại `app/build/outputs/apk/debug/app-debug.apk`.
 
-### Đối chiếu CSDL thực tế
+Bản đồ hiện tại không cần Google Maps API key. Tile bản đồ chưa cache cần Internet. Demo không cần quyền vị trí; GPS thật cần bật dịch vụ vị trí và cấp **Vị trí chính xác**. Không yêu cầu quyền vị trí nền.
 
-Mở Database Inspector, chọn đúng tiến trình và vào trang chủ/bản đồ để mở kết nối. Các bảng riêng chỉ xuất hiện sau khi đã mở màn hình tham quan tương ứng. Nếu kết nối đóng, bật Keep database connections open rồi mở lại màn hình có truy vấn.
+## 4. Năm địa điểm và nguồn tọa độ
 
-```sql
-PRAGMA user_version;
-SELECT id, ten, danh_muc, vi_do, kinh_do, ten_anh FROM dia_diem ORDER BY id;
-SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;
+Trang chủ, danh sách khám phá, bản đồ, chi tiết và yêu thích dùng ID địa điểm thống nhất.
+
+| ID | Địa điểm | Địa chỉ trong dữ liệu khởi tạo | Vĩ độ | Kinh độ |
+| ---: | --- | --- | ---: | ---: |
+| 0 | Dinh Độc Lập | 135 Nam Kỳ Khởi Nghĩa, TP. Hồ Chí Minh | 10.77702 | 106.69540 |
+| 1 | Bảo tàng Chứng tích Chiến tranh | 28 Võ Văn Tần, TP. Hồ Chí Minh | 10.779475 | 106.692132 |
+| 2 | Đại Nội Huế | Đường 23 Tháng 8, Huế | 16.4689726 | 107.5781266 |
+| 3 | Hệ thống Nhà tù Côn Đảo | Côn Đảo, TP. Hồ Chí Minh | 8.68907 | 106.61484 |
+| 4 | Văn Miếu – Quốc Tử Giám | 58 Quốc Tử Giám, Hà Nội | 21.02861 | 105.83556 |
+
+Tọa độ tập trung ở [KhoToaDoThamQuan.java](app/src/main/java/com/example/app_ck/KhoToaDoThamQuan.java), được cập nhật vào SQLite khi cài mới/nâng cấp từ trước v11. Đây là **mốc đại diện địa điểm**, chưa chứng minh là cổng vào và không phải GPS từng phòng.
+
+Nguồn đã dùng để đối chiếu tọa độ: [Dinh Độc Lập trên OpenStreetMap](https://www.openstreetmap.org/way/39598493), [Bảo tàng Chứng tích Chiến tranh](https://en.wikipedia.org/wiki/War_Remnants_Museum), [Hoàng Thành Huế trên OpenStreetMap](https://www.openstreetmap.org/node/5182931945), [Nhà tù Côn Đảo](https://mapcarta.com/W715077456), [Văn Miếu](https://en.wikipedia.org/wiki/Temple_of_Literature,_Hanoi). Các nguồn này không thay thế khảo sát GPS tại chỗ.
+
+Đại Nội Huế dùng ID `2` từ SQLite v10. Bưu điện và Làng Văn hóa dân tộc không còn trong danh sách địa điểm hiện hành; mã migration xử lý dữ liệu cũ vẫn được giữ để nâng cấp an toàn.
+
+## 5. Trang chủ, khám phá và gợi ý
+
+| Khu vực | Hành vi hiện tại |
+| --- | --- |
+| Điểm đến nổi bật | Hiển thị đủ 5 địa điểm, bấm thẻ mở đúng chi tiết |
+| Gợi ý trên trang chủ | Hai thẻ Dinh Độc Lập và Bảo tàng, cùng kích thước trong nhóm |
+| Tìm kiếm trang chủ | Tìm theo tên và địa chỉ, hỗ trợ nhập không dấu |
+| Danh mục trang chủ | Lọc nhóm điểm nổi bật; chưa kết hợp đồng thời với mọi nhóm gợi ý/gần tôi |
+| Gần tôi | Xin quyền, lấy vị trí, tính khoảng cách và sắp xếp từ gần đến xa |
+| Thuyết minh trang chủ | Chọn trong 5 địa điểm, đọc mô tả từ SQLite và dừng đọc |
+| Khám phá | Danh sách từ SQLite; tìm không dấu theo tên/địa chỉ/mô tả, lọc danh mục, mở chi tiết |
+| Tab Gợi ý | Loại địa điểm đã yêu thích, ưu tiên điểm có chủ đề danh mục tương tự |
+
+Gợi ý do [GoiYDiaDiem.java](app/src/main/java/com/example/app_ck/GoiYDiaDiem.java) xếp hạng theo danh mục. Khi chưa có yêu thích, danh sách theo thứ tự ID; khi đã lưu hết, có trạng thái hết gợi ý và chuyển sang xem tất cả. Dữ liệu được đọc lại khi quay về màn hình. Chưa có gợi ý bằng AI hoặc dựa trên lịch sử hành vi.
+
+Kích thước dùng chung tại [dimens.xml](app/src/main/res/values/dimens.xml): thẻ nổi bật rộng **205dp**, ảnh cao **125dp**; thẻ gợi ý trang chủ rộng **172dp**, ảnh cao **104dp**. Giới hạn dòng tiêu đề/phụ đề giúp các thẻ trong cùng nhóm có chiều cao đồng đều.
+
+**Giới hạn Gần tôi:** chưa lọc theo bán kính tìm kiếm như Word; API dưới 30 dùng vị trí đã biết gần nhất, cần kiểm tra thêm độ mới của vị trí. Khoảng cách hiển thị là đường chim bay.
+
+## 6. Bản đồ và chi tiết địa điểm
+
+[BanDoActivity.java](app/src/main/java/com/example/app_ck/BanDoActivity.java) đọc tên, ảnh và tọa độ từ SQLite, hiển thị **5 marker và 5 nút chọn nhanh**. Tìm kiếm tên không dấu chọn kết quả khớp đầu tiên; chạm marker cập nhật thẻ thông tin rồi có thể mở chi tiết/chỉ đường.
+
+Bản đồ dùng tile `https://tile.openstreetmap.org/`, có nhãn nguồn OpenStreetMap và user agent. Mức zoom 4–19, khởi đầu 5.5 để thấy các điểm ở nhiều vùng; chọn điểm có thể phóng tới mức 17. Vị trí của tôi dùng lớp định vị osmdroid; lớp này dừng khi màn hình tạm ngưng và giải phóng khi đóng.
+
+Chỉ đường mở Google Maps bằng URL qua ứng dụng/trình duyệt ngoài. Chưa có bộ tính tuyến đường hoặc tải bản đồ offline riêng trong app.
+
+[ChiTietDiaDiemActivity.java](app/src/main/java/com/example/app_ck/ChiTietDiaDiemActivity.java) hiển thị ảnh, tên, danh mục, địa chỉ, mô tả có mở rộng/thu gọn; hỗ trợ yêu thích, nghe/dừng, bản đồ và bắt đầu tham quan. Mỗi địa điểm hiện có một ảnh chính, chưa có bộ sưu tập ảnh đầy đủ. Giờ mở cửa chưa lấy từ nguồn cập nhật chính thức.
+
+## 7. Sơ đồ tham quan và nội dung thuyết minh
+
+| Địa điểm | Activity tham quan | Số điểm | Phân khu |
+| --- | --- | ---: | --- |
+| Dinh Độc Lập | `ThamQuanActivity` | 25 | Tầng 1, 2, 3, 4, hầm, trệt |
+| Bảo tàng Chứng tích Chiến tranh | `BaoTangThamQuanActivity` | 13 | 3 tầng/mức sơ đồ |
+| Đại Nội Huế | `DaiNoiHueThamQuanActivity` | 10 | Sơ đồ quần thể |
+| Hệ thống Nhà tù Côn Đảo | `ConDaoThamQuanActivity` | 7 | Các điểm trong quần thể |
+| Văn Miếu – Quốc Tử Giám | `VanMieuThamQuanActivity` | 16 | Sơ đồ di tích |
+| **Tổng** | | **71** | |
+
+Các màn hình có chọn điểm, trước/tiếp, nội dung thuyết minh và nghe/dừng bằng TTS tiếng Việt. Dinh Độc Lập có đủ ID 1–25; số điểm ở 6 khu vực lần lượt là **4, 6, 4, 2, 4, 5**. Chuyển điểm đồng bộ tầng và nội dung.
+
+Cả 5 sơ đồ hỗ trợ kéo, chụm hai ngón và nút thu/phóng/đặt lại, mức phóng 1–5 lần. Bốn sơ đồ dùng [SoDoThuPhongLayout.java](app/src/main/java/com/example/app_ck/SoDoThuPhongLayout.java); Đại Nội Huế dùng xử lý thu phóng riêng. Tọa độ chạm được quy đổi để tiếp tục chọn marker sau khi phóng.
+
+Tọa độ `x/y` tương đối trên ảnh **khác tọa độ GPS WGS84**. Chức năng GPS chọn/highlight marker, chưa chiếu vị trí thật thành chấm di chuyển chính xác trên mọi ảnh sơ đồ. Văn Miếu có công cụ chỉnh tọa độ ảnh trong bản debug, không thay thế luồng ghi GPS thật.
+
+**Nội dung còn cần hoàn thiện:** [NoiDungThuyetMinhDinhDocLap.java](app/src/main/java/com/example/app_ck/NoiDungThuyetMinhDinhDocLap.java) mới có bài riêng cho ID 1 và 4; 23 điểm còn lại trả về mẫu giới thiệu kèm thông báo đang cập nhật. Có đủ marker và phát được TTS chưa đồng nghĩa đủ bài thuyết minh đã kiểm chứng. Nội dung các địa điểm còn lại cũng cần đối chiếu tư liệu, kiểm tra phát âm và ghi nguồn.
+
+## 8. Demo tự động và GPS thật
+
+[ThamQuanTuDong.java](app/src/main/java/com/example/app_ck/ThamQuanTuDong.java) dùng chung cho 5 màn hình thông qua `NguonThamQuanTuDong`. Bảng **Hướng dẫn theo vị trí** có hai luồng riêng.
+
+### Demo
+
+1. Mở chi tiết → bắt đầu tham quan → bấm **Chạy demo**.
+2. Nhãn hiển thị **DEMO · Vị trí mô phỏng**. Ứng dụng mô phỏng đến marker, chờ ổn định rồi đọc bài tương ứng.
+3. Đọc xong chờ khoảng 1,8 giây rồi chuyển sang điểm kế tiếp; có nút chuyển mốc demo để bỏ qua bài đang đọc.
+4. Chọn điểm/tầng thủ công, dừng AUTO hoặc rời màn hình sẽ dừng demo.
+
+Demo dùng tọa độ mô phỏng trong bộ nhớ, không xin quyền vị trí và không lưu các tọa độ này làm GPS thật. Tuyến demo lần lượt đi qua các điểm của từng địa điểm; cần TTS tiếng Việt để nghe và tự chuyển bài sau khi đọc xong.
+
+### GPS thật
+
+1. Bấm **GPS thật**, bật dịch vụ vị trí và cấp quyền vị trí chính xác. Giao diện hướng dẫn mở cài đặt nếu bị từ chối quyền hoặc tắt định vị.
+2. Theo dõi vĩ độ, kinh độ, sai số và khoảng cách tới địa điểm. Chế độ này không chấp nhận vị trí được đánh dấu giả lập.
+3. Có sẵn mốc giới thiệu chung, bán kính **250 m** quanh tọa độ đại diện của từng địa điểm. Vào vùng hợp lệ và đủ ổn định sẽ phát giới thiệu chung.
+4. Muốn AUTO theo marker: đến đúng vị trí thực, chọn marker/tầng trên sơ đồ → chờ GPS tốt → chọn bán kính → **Ghi GPS tại mốc đang chọn** → kiểm tra và xác nhận lưu.
+5. Lần sau bật GPS thật, chọn đúng tầng và tới gần mốc đã ghi để tự chọn marker/phát bài. Mốc cụ thể được ưu tiên hơn giới thiệu chung.
+
+Marker chưa được khảo sát không có sẵn GPS riêng. Các lựa chọn bán kính là **20/30/40/60/80 m**, mặc định **40 m**; bảng GPS chấp nhận bán kính 15–100 m. Chỉ ghi khi còn gần địa điểm: tối đa 1,5 km, riêng quần thể Côn Đảo 8 km. Ghi lại cùng marker cập nhật tọa độ cũ.
+
+### Điều kiện và giới hạn
+
+[BoChonDiemTuDong.java](app/src/main/java/com/example/app_ck/BoChonDiemTuDong.java) chỉ nhận vị trí hợp lệ, sai số **≤25 m**, tuổi **≤15 giây**, thời điểm tăng dần; cần ổn định trong vùng ít nhất **2,5 giây**. Cả khoảng cách cộng sai số phải nằm trong bán kính phát. Nếu hai mốc quá gần để phân biệt bằng sai số, bộ chọn không tự đoán điểm.
+
+Mỗi marker chỉ tự phát một lần trong một lượt AUTO; có thể nghe lại thủ công hoặc bắt đầu lượt mới. GPS không xác định tầng, vì vậy Dinh/Bảo tàng cần chọn tầng. Rời màn hình dừng TTS, callback và cập nhật vị trí; quay lại cần bật chế độ lại. Chưa có dịch vụ AUTO chạy nền hoặc tiến độ tham quan lưu lâu dài.
+
+**Chưa khảo sát thực địa toàn bộ 71 marker.** Demo và kiểm thử logic không chứng minh GPS trong nhà phân biệt chính xác từng phòng.
+
+## 9. Đăng ký, đăng nhập và khôi phục
+
+| Luồng | Hành vi |
+| --- | --- |
+| Welcome → Bắt đầu | Vào trang chủ với trạng thái khách |
+| Welcome → Đăng nhập | Đăng nhập thành công vào trang chủ, hủy quay lại Welcome |
+| Đăng ký | Tạo tài khoản cục bộ, cấp mã khôi phục; quay lại đăng nhập với tên đã điền |
+| Đăng nhập từ chức năng | Trả kết quả về màn hình gọi và tiếp tục thao tác phù hợp |
+| Quên mật khẩu | Dùng tên đăng nhập + mã khôi phục + mật khẩu mới; đổi mã khôi phục sau thành công |
+| Đăng xuất | Xác nhận rồi xóa phiên, giữ hồ sơ và yêu thích trong SQLite |
+
+Tên đăng nhập gồm 3–30 ký tự chữ ASCII, số hoặc dấu gạch dưới, được chuẩn hóa chữ thường/bỏ khoảng trắng đầu cuối. Mật khẩu tối thiểu 8 ký tự, cần khớp xác nhận.
+
+Mật khẩu và mã khôi phục được băm bằng `PBKDF2WithHmacSHA1`, 120.000 vòng, đầu ra 256 bit, salt ngẫu nhiên 16 byte. Phiên đăng nhập dùng `SharedPreferences` qua `PhienDangNhap`, không lưu mật khẩu rõ. Mã khôi phục chỉ hiển thị để người dùng lưu; mã cũ hết hiệu lực sau khôi phục/đổi mật khẩu.
+
+Đăng nhập hiện dùng **tên đăng nhập**, chưa dùng email như Word. Email hồ sơ là thông tin liên hệ tùy chọn, chưa xác minh, không duy nhất và không dùng gửi mã khôi phục. Tài khoản cũ thiếu mã có thể đổi mật khẩu sau đăng nhập để nhận mã mới.
+
+## 10. Yêu thích và hồ sơ cá nhân
+
+**Yêu thích:** khách mở tab được chuyển sang đăng nhập; nếu hủy sẽ thấy giao diện yêu cầu đăng nhập. Tài khoản đã đăng nhập xem thẻ ảnh/tên/danh mục/địa chỉ của các điểm mình lưu, mở chi tiết hoặc bỏ lưu. Khóa ghép tài khoản–địa điểm ngăn lưu trùng. Đăng nhập để tiếp tục lưu từ chi tiết không vô tình xóa một điểm đã lưu trước đó. Chưa lưu thời điểm thêm yêu thích.
+
+**Cá nhân:** khách có nút đăng nhập/đăng ký; sau đăng nhập hiển thị tên, `@tên_đăng_nhập`, avatar chữ cái, số yêu thích thực và tổng địa điểm. Chưa có ảnh đại diện tải lên hoặc số lượt tham quan từ lịch sử.
+
+| Chức năng | Xử lý |
+| --- | --- |
+| Thông tin cá nhân | Sửa họ tên tối đa 80 ký tự, email tùy chọn tối đa 254 ký tự và kiểm tra định dạng; tên đăng nhập giữ nguyên |
+| Đổi mật khẩu | Kiểm tra mật khẩu hiện tại, mật khẩu mới khác cũ, đủ độ dài và khớp xác nhận; đổi salt/hash và mã khôi phục |
+| Sau đổi mật khẩu | Giữ phiên hiện tại, hiển thị mã khôi phục mới để sao lưu |
+| Đăng xuất | Có xác nhận; chuyển giao diện khách, không xóa dữ liệu tài khoản |
+| Thông tin ứng dụng | Giải thích dữ liệu cục bộ và mã khôi phục |
+
+Biểu mẫu dùng `BieuMauTaiKhoanActivity`, ghi nhớ ID tài khoản đang sửa và kiểm tra lại phiên trước khi lưu. Hồ sơ được lưu trong SQLite v12, đọc lại khi mở màn hình.
+
+## 11. Thanh điều hướng dùng chung
+
+[view_thanh_dieu_huong_duoi.xml](app/src/main/res/layout/view_thanh_dieu_huong_duoi.xml) và [ThanhDieuHuongDuoi.java](app/src/main/java/com/example/app_ck/ThanhDieuHuongDuoi.java) dùng cho Trang chủ, Yêu thích, Cá nhân và Khám phá/Gợi ý.
+
+| Thứ tự | Tab | Đích đến |
+| ---: | --- | --- |
+| 1 | Khám phá | Danh sách tìm kiếm/lọc địa điểm |
+| 2 | Yêu thích | Bộ sưu tập của tài khoản hoặc yêu cầu đăng nhập |
+| 3 | Trang chủ | Nút nổi ở giữa, trở về `MainActivity` |
+| 4 | Cá nhân | Hồ sơ và thao tác tài khoản |
+| 5 | Gợi ý | Chế độ gợi ý trong `KhamPhaActivity` |
+
+Tab đang chọn có màu/chữ đậm và trạng thái hỗ trợ đọc màn hình. Điều hướng tái sử dụng màn hình phù hợp, tránh xếp chồng nhiều bản sao khi đổi tab. `BaseActivity` xử lý khoảng đệm thanh trạng thái/điều hướng hệ thống; nút tài khoản đầu trang chủ cũng mở Cá nhân.
+
+## 12. SQLite và nâng cấp dữ liệu
+
+Helper chính: [TaiKhoanDb.java](app/src/main/java/com/example/app_ck/TaiKhoanDb.java). Tên tệp **`du_lich_tai_khoan.db`**, phiên bản hiện tại **12**.
+
+| Bảng | Mục đích |
+| --- | --- |
+| `tai_khoan` | Tên đăng nhập, salt/hash mật khẩu, hash mã khôi phục, họ tên và email |
+| `yeu_thich` | Liên kết tài khoản–địa điểm, khóa chính ghép |
+| `dia_diem` | Năm địa điểm, mô tả, danh mục, ảnh và tọa độ |
+| `khu_vuc` | Sáu khu vực của Dinh Độc Lập |
+| `diem_tham_quan` | 25 marker Dinh Độc Lập, tọa độ ảnh và liên kết khu vực |
+| `thuyet_minh` | Nội dung thuyết minh các điểm Dinh Độc Lập |
+| `gps_diem_tham_quan` | GPS marker theo `(dia_diem_id, marker_id)`, tầng, bán kính, sai số, thời điểm ghi |
+
+Bảng riêng được tạo khi mở màn hình tương ứng: `bao_tang_marker`; `dai_noi_hue_diem`/`dai_noi_hue_toa_do`; `con_dao_diem`/`con_dao_toa_do`; `van_mieu_diem`/`van_mieu_toa_do`. Vì vậy chưa mở các tour thì Database Inspector có thể chưa thấy các bảng này.
+
+Các mốc nâng cấp đáng chú ý:
+
+| Phiên bản | Thay đổi |
+| --- | --- |
+| v2–v6 | Mã khôi phục, địa điểm, khu vực/marker, thuyết minh, danh mục |
+| v7–v9 | Bổ sung dữ liệu và dọn địa điểm đã ngừng sử dụng; v9 loại dữ liệu Làng Văn hóa |
+| v10 | Bổ sung Đại Nội Huế với ID 2 |
+| v11 | Đồng bộ tọa độ 5 địa điểm, thêm bảng GPS marker |
+| v12 | Thêm `ho_ten`, `email`; kiểm tra cột trước khi thêm, giữ dữ liệu tài khoản/yêu thích/GPS |
+
+Dữ liệu seed dùng cách chèn tránh ghi đè dữ liệu đã tồn tại ở các phần tương ứng. Do đó sửa bài thuyết minh trong Java không bảo đảm tự cập nhật bài đã lưu trên máy cũ; cần migration cập nhật nội dung có chủ đích. Không xóa dữ liệu ứng dụng khi cần giữ tài khoản, yêu thích và mốc GPS đã ghi.
+
+Database Inspector báo **`(closed)` / No Databases Available** khi kết nối SQLite không còn mở trong tiến trình đang quan sát. Chạy bản debug, chọn đúng thiết bị/tiến trình, mở màn hình có truy cập CSDL và refresh; trạng thái này không tự chứng minh tệp DB đã bị mất.
+
+## 13. Đối chiếu báo cáo Word
+
+Báo cáo mô tả **8 nhóm, 37 use case con**. Bảng dưới đánh giá theo mã nguồn hiện tại; các yêu cầu về lịch sử, tài khoản và phạm vi AUTO được xét riêng, không tính tỷ lệ hoàn thành từ số màn hình hoặc số test.
+
+### Ước lượng tiến độ tổng thể
+
+**Toàn bộ dự án hiện đạt khoảng 60% so với Word; phần còn lại ước tính khoảng 40%.** Nếu chỉ xét luồng người dùng chính, không tính quản trị, mức độ hiện thực khoảng 75–80%; con số này không thay thế tỷ lệ tổng thể.
+
+Căn cứ đánh giá:
+
+- Trong 37 use case con, **12 use case quản trị (UC08.1–UC08.12)** và **lịch sử tham quan (UC07.4)** chưa được triển khai.
+- **24 use case còn lại đã có phần hiện thực hoặc luồng chính**, tương đương khoảng 65% số use case có chức năng liên quan. Đây không phải 24 use case đã hoàn thành đầy đủ.
+- Các phần đã có vẫn còn khác biệt hoặc thiếu so với Word: tài khoản theo email, phạm vi tìm kiếm Gần tôi, AUTO cấp địa điểm chính và ghi lịch sử khi nghe. Ngoài ra cần hoàn thiện nội dung thuyết minh và kiểm chứng GPS thực địa.
+- Vì vậy dùng mốc **khoảng 60%** để theo dõi tiến độ hiện tại. Mức này là đánh giá định tính, không phải phép tính có trọng số khối lượng cho từng use case; cần cập nhật sau mỗi đợt triển khai và nghiệm thu.
+
+### Trạng thái từng use case
+
+| Use case | Trạng thái và phần cần bổ sung |
+| --- | --- |
+| UC01.1 – Đăng ký | Có luồng thật; chưa đăng ký họ tên/email bắt buộc và email duy nhất theo Word |
+| UC01.2 – Đăng nhập | Có xác thực cục bộ; chưa đăng nhập email, kiểm tra vai trò/trạng thái khóa |
+| UC01.3 – Đăng xuất | Có xác nhận, xóa phiên và giữ yêu thích; chưa có lịch sử để kiểm chứng bảo toàn |
+| UC01.4 – Quên mật khẩu | Có khôi phục bằng mã; khác luồng nhận diện tài khoản bằng email trong Word |
+| UC02.1 – Danh sách | Có danh sách 5 địa điểm và mở chi tiết |
+| UC02.2 – Tìm kiếm | Có tìm không dấu; phạm vi tìm giữa trang chủ/bản đồ/Khám phá chưa hoàn toàn giống nhau |
+| UC02.3 – Lọc | Có lọc danh mục; cần thống nhất tổ hợp tìm kiếm, danh mục và trạng thái rỗng |
+| UC02.4 – Gần vị trí | Có khoảng cách/sắp xếp; thiếu giới hạn phạm vi tìm kiếm theo BR02.4-4 |
+| UC03.1 – Chi tiết | Có luồng chính; cần hoàn thiện nội dung, ảnh và nguồn thông tin |
+| UC03.2 – Bắt đầu tham quan | Có mở đúng sơ đồ của cả 5 địa điểm |
+| UC04.1 – Bản đồ khu vực | Có OSM, 5 marker, thu phóng và vị trí |
+| UC04.2 – Chọn marker | Có thẻ thông tin và mở chi tiết |
+| UC04.3 – Sơ đồ nội bộ | Có 5 sơ đồ, chọn marker, tầng và thu phóng; cần nghiệm thu vị trí từng marker |
+| UC05.1 – Vị trí hiện tại | Có xin quyền/định vị; cần kiểm thử thêm mất quyền, vị trí cũ, GPS yếu |
+| UC05.2 – Khoảng cách | Có đường chim bay; cần kiểm soát độ mới vị trí nhất quán giữa các màn hình |
+| UC05.3 – Chỉ đường | Có mở Google Maps ngoài; cần kiểm thử thiết bị không có ứng dụng bản đồ |
+| UC06.1 – Bật/tắt AUTO | Có trong màn hình tham quan; chưa có điều phối AUTO theo dõi toàn bộ địa điểm ở cấp ứng dụng |
+| UC06.2 – AUTO tại điểm chính | Có vùng phát giới thiệu cho từng tour đang mở; thiếu lịch sử, bán kính theo dữ liệu từng địa điểm và lựa chọn giữa nhiều địa điểm chính |
+| UC06.3 – Nghe tại điểm chính | Có nghe/dừng/phát lại; chưa ghi lịch sử MANUAL |
+| UC06.4 – Nghe điểm thành phần | Có chọn điểm và TTS; chưa ghi lịch sử, còn nội dung mẫu |
+| UC06.5 – Điều khiển | Có phát/dừng/phát lại; cần nghiệm thu tránh phát chồng giữa các màn hình và vòng đời |
+| UC07.1 – Thêm yêu thích | Có theo tài khoản, chống trùng, tiếp tục lưu sau đăng nhập |
+| UC07.2 – Danh sách yêu thích | Có chặn khách, thẻ dữ liệu thật, rỗng và mở chi tiết |
+| UC07.3 – Xóa yêu thích | Có bỏ lưu theo tài khoản và cập nhật danh sách |
+| UC07.4 – Lịch sử | Chưa có bảng dữ liệu, ghi nhận lượt nghe hoặc màn hình lịch sử |
+| UC08.1–UC08.4 | Chưa có quản trị xem/thêm/sửa/xóa địa điểm |
+| UC08.5–UC08.7 | Chưa có quản trị thêm/sửa/xóa điểm thành phần |
+| UC08.8 | Chưa có màn hình quản trị cập nhật thuyết minh |
+| UC08.9–UC08.12 | Chưa có quản trị danh sách/tìm/chi tiết/khóa–mở khóa tài khoản |
+
+**Phạm vi cần chốt theo Word:** BR06 giới hạn AUTO ở điểm du lịch chính; BR10 yêu cầu chọn thủ công điểm thành phần. GPS theo marker là phần mở rộng đã làm thêm, không phải điều kiện bắt buộc để đạt BR10. Cần thống nhất lại đặc tả và UI nếu giữ phần mở rộng; không lấy demo marker làm bằng chứng đã đạt AUTO cấp địa điểm chính.
+
+Word cho phép phát/dừng/phát lại, điều chỉnh tốc độ nếu được hỗ trợ; không mặc định bắt buộc pause/resume. Các tính năng AI, lập chuyến đi, backend hoặc Google Maps SDK không tự trở thành yêu cầu bắt buộc của đồ án.
+
+## 15. Các bước tiếp theo để hoàn thành luồng chính
+
+Thứ tự dưới đây ưu tiên hoàn thiện luồng người dùng theo Word, sau đó hoàn thành phạm vi quản trị. Mỗi bước cần có dữ liệu thật và tiêu chí nghiệm thu trước khi đánh dấu xong.
+
+| Bước | Công việc | Điều kiện hoàn thành |
+| ---: | --- | --- |
+| 1 | Chốt bảng ánh xạ Word–mã nguồn: tài khoản email, AUTO điểm chính, GPS marker mở rộng, cách khôi phục | Mỗi khác biệt có quyết định rõ: sửa app hoặc cập nhật đặc tả được nhóm thống nhất |
+| 2 | Hoàn thiện 71 bài thuyết minh và dữ liệu địa điểm | Không còn bài mẫu; đúng tên/ID/ảnh/tầng, có nguồn; thiết kế migration cho máy đã cài |
+| 3 | Thêm lịch sử và điểm ghi nhận TTS dùng chung | Lưu tài khoản, PlaceID, PointID tùy chọn, thời gian, AUTO/MANUAL khi lượt phát thực sự bắt đầu; tránh ghi trùng callback |
+| 4 | Xây màn hình Lịch sử từ Cá nhân | Danh sách mới nhất, rỗng, chặn khách, chỉ dữ liệu đúng tài khoản; bấm mở đúng địa điểm/điểm thành phần |
+| 5 | Hoàn thiện AUTO cấp địa điểm chính | Bán kính lưu theo địa điểm, xét các địa điểm hợp lệ, chọn gần nhất, không lặp/phát chồng, có lịch sử và dừng đúng vòng đời |
+| 6 | Hoàn thiện Gần tôi và bộ lọc | Có bán kính tìm kiếm, kiểm soát vị trí cũ, kết hợp từ khóa/danh mục, xử lý từ chối quyền và không có kết quả |
+| 7 | Đồng bộ tài khoản theo đặc tả đã chốt | Nếu giữ yêu cầu Word: email bắt buộc/duy nhất, họ tên khi đăng ký, đăng nhập email; khôi phục vẫn phải có cơ chế xác minh |
+| 8 | Hoàn thiện trạng thái UI và TTS | Loading/rỗng/lỗi/retry rõ ràng; nghe/dừng/phát lại nhất quán; đổi màn hình/xoay màn hình không phát chồng |
+| 9 | Nghiệm thu GPS và sơ đồ trên thiết bị | Thử vào/ra vùng, GPS yếu/cũ, nhiều vùng giao nhau, dừng AUTO; ghi rõ phần chưa khảo sát; chọn tầng thủ công |
+| 10 | Bổ sung vai trò và trạng thái tài khoản | Migration giữ dữ liệu, kiểm tra quyền tại nơi đọc/ghi; tài khoản khóa không đăng nhập; không tự khóa ADMIN đang dùng |
+| 11 | Thực hiện đủ quản trị UC08.1–UC08.12 | CRUD địa điểm/điểm/bài đọc; tìm/xem/khóa tài khoản; xác nhận xóa và xử lý liên kết để không có dữ liệu mồ côi |
+| 12 | Kiểm thử hồi quy, hoàn thiện báo cáo và bàn giao | Chạy build/unit/thiết bị, kiểm tra cài mới và nâng cấp; cập nhật Word, ảnh minh chứng và trạng thái từng UC theo kết quả thật |
+
+Phần lịch sử nên định danh điểm bằng **cả PlaceID và PointID**, vì ID marker có thể trùng giữa các địa điểm. Không tự gán lịch sử nghe của khách cho tài khoản đăng nhập sau đó. Khóa quyền quản trị phải được kiểm tra trong xử lý nghiệp vụ, ngoài việc ẩn nút trên UI.
+
+## 16. Kịch bản nghiệm thu đề xuất
+
+Các kịch bản này là danh sách cần chạy khi hoàn thiện, không phải tuyên bố tất cả đã đạt.
+
+| Mã | Kịch bản | Kết quả cần đạt |
+| --- | --- | --- |
+| LC01 | Welcome → Bắt đầu; Welcome → đăng nhập/hủy | Đúng đích đến và Back, không tạo phiên giả |
+| LC02 | Đăng ký, trùng tên, mật khẩu sai, khôi phục và mã cũ | Kiểm tra đầu vào; mật khẩu/mã cũ mất hiệu lực sau đổi |
+| LC03 | Đổi 5 tab, đăng nhập/đăng xuất từ Cá nhân | Tab chọn đúng, không chồng màn hình, yêu thích đúng tài khoản |
+| LC04 | Tìm không dấu, lọc và Gần tôi khi có/không có GPS | Kết quả đúng, xử lý rỗng/lỗi và vị trí cũ; bán kính theo đặc tả sau hoàn thiện |
+| LC05 | Mở cả 5 địa điểm từ thẻ, bản đồ, yêu thích | Tên/ảnh/ID/tọa độ và Activity tham quan thống nhất |
+| LC06 | Chọn điểm/tầng và phóng–thu cả 5 sơ đồ | Marker vẫn bấm đúng, nội dung/TTS theo đúng điểm |
+| LC07 | Demo từng địa điểm, chuyển mốc, dừng/rời màn hình | Không phát chồng, không ghi GPS mô phỏng, dừng đúng |
+| LC08 | GPS thật vào/ra vùng, sai số lớn, hai mốc gần nhau | Chỉ phát khi đủ điều kiện; không đoán tầng/phòng hoặc lặp liên tục |
+| LC09 | Ghi GPS đúng/sai vị trí, mở lại ứng dụng | Chặn dữ liệu cũ/giả lập/xa địa điểm; mốc hợp lệ lưu đúng site/marker/tầng |
+| LC10 | Nghe AUTO/MANUAL rồi mở Lịch sử sau khi triển khai | Đúng tài khoản, thời gian, chế độ, ID; mở lại đúng nội dung |
+| LC11 | Sửa hồ sơ, email sai, đổi mật khẩu, xoay màn hình | Chỉ ghi tài khoản sở hữu; lưu đúng hồ sơ và mã mới |
+| LC12 | USER vào quản trị, ADMIN sửa/xóa/khóa sau khi triển khai | Chặn sai quyền, xử lý liên kết và trạng thái khóa đúng |
+| LC13 | Cài mới và nâng cấp DB cũ có yêu thích/GPS/hồ sơ | Đủ dữ liệu mới, không mất dữ liệu cần giữ; các luồng trên vẫn hoạt động |
+
+Mỗi lần nghiệm thu nên lưu phiên bản mã nguồn, thiết bị/API, dữ liệu thử, đạt/chưa đạt và ảnh/log minh chứng. Chỉ đánh dấu hoàn thành UC sau khi cả luồng chính và ngoại lệ liên quan đã được kiểm tra.
+
+## 17. Cấu trúc mã nguồn và quy tắc cập nhật
+
+```text
+app/src/main/
+├── AndroidManifest.xml
+├── java/com/example/app_ck/
+│   ├── MainActivity, WelcomeActivity, KhamPhaActivity
+│   ├── BanDoActivity, ChiTietDiaDiemActivity
+│   ├── ThamQuanActivity và 4 Activity tham quan còn lại
+│   ├── DangNhapActivity, DangKyActivity, QuenMatKhauActivity
+│   ├── CaNhanActivity, SuaHoSoActivity, DoiMatKhauActivity
+│   ├── YeuThichActivity, ThanhDieuHuongDuoi, BaseActivity
+│   ├── TaiKhoanDb, PhienDangNhap, HoSoTaiKhoan, DiaDiem
+│   ├── ThamQuanTuDong, NguonThamQuanTuDong, BoChonDiemTuDong
+│   ├── KhoToaDoThamQuan, SoDoThuPhongLayout, GoiYDiaDiem
+│   └── DuLieuDinhDocLap, NoiDungThuyetMinhDinhDocLap
+└── res/
+    ├── layout/       # Màn hình, thẻ và thành phần dùng chung
+    ├── drawable/     # Ảnh địa điểm, sơ đồ, icon, nền giao diện
+    └── values/       # Chuỗi, màu, theme, kích thước và ID
+app/src/test/         # Unit test JVM
+app/src/androidTest/  # Kiểm thử thiết bị, UI và migration
 ```
 
-Cài mới dự kiến `user_version = 8`, `dia_diem` có 5 hàng ID 0–4; số lượng điểm và các bảng riêng được mô tả ở mục 3–4. Việc cập nhật README lần này chỉ sửa tài liệu, không sửa các lỗi hoặc test cũ nêu trên.
+Khi thêm/sửa địa điểm, cần kiểm tra đồng thời ID trong SQLite, ánh xạ Activity, ảnh, sơ đồ, bản đồ, yêu thích và TTS. Khi thay đổi cấu trúc/nội dung đã lưu, bổ sung migration và kiểm thử nâng cấp. Tài nguyên ảnh có thể được nạp động qua tên drawable; không kết luận ảnh không dùng chỉ từ việc thiếu tham chiếu `@drawable` trong XML.
+

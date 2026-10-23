@@ -9,11 +9,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class DangKyActivity extends BaseActivity {
     private EditText ten, matKhau, nhapLai;
+    private String maDaTao, tenDaTao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dang_ky);
+        apDungKhoangTrongHeThong();
 
         ten = findViewById(R.id.dkTenDangNhap);
         matKhau = findViewById(R.id.dkMatKhau);
@@ -25,6 +27,11 @@ public class DangKyActivity extends BaseActivity {
         nutDangKy.setOnClickListener(v -> dangKy());
         nutDangNhap.setOnClickListener(v -> finish());
         nutQuayLai.setOnClickListener(v -> finish());
+        if (savedInstanceState != null) {
+            maDaTao = savedInstanceState.getString("ma_da_tao");
+            tenDaTao = savedInstanceState.getString("ten_da_tao");
+            if (maDaTao != null) hienMaKhoiPhuc();
+        }
     }
 
     private void dangKy() {
@@ -50,13 +57,9 @@ public class DangKyActivity extends BaseActivity {
         String maKhoiPhuc = TaiKhoanDb.taoMaKhoiPhuc();
         try (TaiKhoanDb db = new TaiKhoanDb(this)) {
             if (db.dangKy(t, m, maKhoiPhuc)) {
-                new AlertDialog.Builder(this)
-                        .setTitle("Đăng ký thành công")
-                        .setMessage("Mã khôi phục tài khoản của bạn:\n\n" + maKhoiPhuc
-                                + "\n\nHãy lưu mã này ở nơi an toàn để dùng khi quên mật khẩu. Không chia sẻ mã với người khác.")
-                        .setCancelable(false)
-                        .setPositiveButton("Tôi đã lưu mã", (dialog, which) -> finish())
-                        .show();
+                maDaTao = maKhoiPhuc;
+                tenDaTao = t;
+                hienMaKhoiPhuc();
             } else {
                 ten.setError("Tên đăng nhập đã tồn tại hoặc không thể tạo tài khoản");
                 ten.requestFocus();
@@ -64,5 +67,24 @@ public class DangKyActivity extends BaseActivity {
         } catch (Exception e) {
             Toast.makeText(this, "Không thể đăng ký. Vui lòng thử lại.", Toast.LENGTH_LONG).show();
         }
+    }
+    private void hienMaKhoiPhuc() {
+        AlertDialog hopThoai = new AlertDialog.Builder(this)
+                .setTitle("Đăng ký thành công")
+                .setMessage("Mã khôi phục tài khoản của bạn:\n\n" + maDaTao
+                        + "\n\nHãy lưu mã này để dùng khi quên mật khẩu. Sau đó đăng nhập bằng tài khoản vừa tạo.")
+                .setCancelable(false)
+                .setPositiveButton("Tôi đã lưu mã", (dialog, which) -> {
+                    setResult(RESULT_OK, new android.content.Intent()
+                            .putExtra(DangNhapActivity.TEN_DANG_NHAP, tenDaTao));
+                    finish();
+                }).show();
+        ((TextView) hopThoai.findViewById(android.R.id.message)).setTextIsSelectable(true);
+    }
+
+    @Override protected void onSaveInstanceState(Bundle out) {
+        super.onSaveInstanceState(out);
+        out.putString("ma_da_tao", maDaTao);
+        out.putString("ten_da_tao", tenDaTao);
     }
 }

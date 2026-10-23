@@ -3,247 +3,140 @@ package com.example.app_ck;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class YeuThichActivity extends BaseActivity {
+    private LinearLayout danhSach;
+    private final ActivityResultLauncher<Intent> dangNhap = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> hienThi());
 
-    private static final String TAG = "YeuThichActivity";
-    private static final int SO_DIA_DIEM = 5;
-
-    private LinearLayout khung;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    @Override protected void onCreate(Bundle state) {
+        super.onCreate(state);
+        setContentView(R.layout.activity_yeu_thich);
+        apDungKhoangTrongHeThong();
+        danhSach = findViewById(R.id.ytDanhSach);
+        findViewById(R.id.ytQuayLai).setOnClickListener(v -> finish());
+        ThanhDieuHuongDuoi.gan(this, ThanhDieuHuongDuoi.YEU_THICH);
+        findViewById(R.id.ytDangNhap).setOnClickListener(v -> moDangNhap(false));
+        findViewById(R.id.ytDangKy).setOnClickListener(v -> moDangNhap(true));
+        findViewById(R.id.ytKhamPha).setOnClickListener(v -> veTrangChu());
+        findViewById(R.id.ytDangXuat).setOnClickListener(v ->
+                new AlertDialog.Builder(this).setTitle("Đăng xuất?")
+                        .setMessage("Địa điểm đã lưu sẽ được giữ lại trong tài khoản của bạn.")
+                        .setPositiveButton("Đăng xuất", (d, w) -> {
+                            PhienDangNhap.dangXuat(this);
+                            hienThi();
+                        }).setNegativeButton("Hủy", null).show());
+        if (state == null && !PhienDangNhap.daDangNhap(this)) moDangNhap(false);
     }
 
-    @Override
-    protected void onResume() {
+    @Override protected void onResume() {
         super.onResume();
         hienThi();
     }
 
-    private void hienThi() {
-
-        khung = DangNhapActivity.khungGiaoDien(
-                this,
-                "Địa điểm yêu thích",
-                "Danh sách được lưu riêng cho tài khoản của bạn"
-        );
-
-        if (!PhienDangNhap.daDangNhap(this)) {
-
-            DangNhapActivity.nut(
-                    khung,
-                    "Đăng nhập",
-                    () -> startActivity(
-                            new Intent(
-                                    this,
-                                    DangNhapActivity.class
-                            )
-                    )
-            );
-
-            return;
-        }
-
-        TextView taiKhoan = new TextView(this);
-
-        taiKhoan.setText(
-                "Tài khoản: " + PhienDangNhap.ten(this)
-        );
-
-        taiKhoan.setTextSize(14);
-        taiKhoan.setPadding(0, 8, 0, 18);
-
-        khung.addView(taiKhoan);
-
-        ArrayList<Integer> danhSachYeuThich;
-
-        Map<Integer, String> tenTheoId =
-                new HashMap<>();
-
-        try (TaiKhoanDb db = new TaiKhoanDb(this)) {
-
-            danhSachYeuThich =
-                    db.danhSachYeuThich(
-                            PhienDangNhap.id(this)
-                    );
-
-            // Đọc tên của 5 địa điểm từ SQLite.
-            for (DiaDiem diaDiem : db.danhSachDiaDiem()) {
-
-                if (diaDiem.id >= 0
-                        && diaDiem.id < SO_DIA_DIEM
-                        && diaDiem.ten != null) {
-
-                    tenTheoId.put(
-                            diaDiem.id,
-                            diaDiem.ten
-                    );
-                }
-            }
-
-        } catch (Exception e) {
-
-            Log.e(
-                    TAG,
-                    "Không đọc được danh sách yêu thích",
-                    e
-            );
-
-            Toast.makeText(
-                    this,
-                    "Không thể tải danh sách yêu thích.",
-                    Toast.LENGTH_LONG
-            ).show();
-
-            return;
-        }
-
-        int soDiaDiemHopLe = 0;
-
-        for (int idDiaDiem : danhSachYeuThich) {
-
-            final String tenDiaDiem =
-                    tenTheoId.get(idDiaDiem);
-
-            if (tenDiaDiem == null
-                    || tenDiaDiem.trim().isEmpty()) {
-                continue;
-            }
-
-            soDiaDiemHopLe++;
-
-            // Mở trang chi tiết địa điểm.
-            DangNhapActivity.nut(
-                    khung,
-                    "♥  " + tenDiaDiem,
-                    () -> {
-
-                        Intent intent = new Intent(
-                                this,
-                                ChiTietDiaDiemActivity.class
-                        );
-
-                        intent.putExtra(
-                                "viTriDiaDiem",
-                                idDiaDiem
-                        );
-
-                        startActivity(intent);
-                    }
-            );
-
-            // Xóa địa điểm khỏi danh sách yêu thích.
-            DangNhapActivity.nut(
-                    khung,
-                    "Bỏ yêu thích: " + tenDiaDiem,
-                    () -> xacNhanBoYeuThich(
-                            idDiaDiem,
-                            tenDiaDiem
-                    )
-            );
-        }
-
-        if (soDiaDiemHopLe == 0) {
-
-            TextView trong = new TextView(this);
-
-            trong.setText(
-                    "Bạn chưa lưu địa điểm nào."
-            );
-
-            trong.setPadding(
-                    0,
-                    30,
-                    0,
-                    20
-            );
-
-            khung.addView(trong);
-        }
-
-        // Đăng xuất tài khoản.
-        DangNhapActivity.nut(
-                khung,
-                "Đăng xuất",
-                () -> new AlertDialog.Builder(this)
-                        .setMessage(
-                                "Bạn muốn đăng xuất?"
-                        )
-                        .setPositiveButton(
-                                "Đăng xuất",
-                                (dialog, which) -> {
-
-                                    PhienDangNhap.dangXuat(this);
-                                    hienThi();
-                                }
-                        )
-                        .setNegativeButton(
-                                "Hủy",
-                                null
-                        )
-                        .show()
-        );
+    private void moDangNhap(boolean dangKy) {
+        dangNhap.launch(new Intent(this, DangNhapActivity.class)
+                .putExtra(DangNhapActivity.MO_DANG_KY, dangKy));
     }
 
-    private void xacNhanBoYeuThich(
-            int idDiaDiem,
-            String tenDiaDiem
-    ) {
+    private void veTrangChu() {
+        startActivity(new Intent(this, MainActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
+        finish();
+    }
 
-        new AlertDialog.Builder(this)
-                .setTitle(
-                        "Xóa khỏi yêu thích"
-                )
-                .setMessage(
-                        "Bỏ " + tenDiaDiem
-                                + " khỏi yêu thích?"
-                )
-                .setPositiveButton(
-                        "Bỏ",
-                        (dialog, which) -> {
+    private void chu(int id, String noiDung) {
+        ((TextView) findViewById(id)).setText(noiDung);
+    }
 
-                            try (TaiKhoanDb db =
-                                         new TaiKhoanDb(this)) {
+    private void hienThi() {
+        if (danhSach == null) return;
+        danhSach.removeAllViews();
+        boolean daDangNhap = PhienDangNhap.daDangNhap(this);
+        findViewById(R.id.ytDangXuat).setVisibility(daDangNhap ? View.VISIBLE : View.GONE);
+        findViewById(R.id.ytDangNhap).setVisibility(daDangNhap ? View.GONE : View.VISIBLE);
+        findViewById(R.id.ytDangKy).setVisibility(daDangNhap ? View.GONE : View.VISIBLE);
+        findViewById(R.id.ytKhamPha).setVisibility(daDangNhap ? View.VISIBLE : View.GONE);
+        findViewById(R.id.ytTrangThai).setVisibility(View.VISIBLE);
+        if (!daDangNhap) {
+            chu(R.id.ytTongSo, "Những điểm đến dành riêng cho bạn");
+            chu(R.id.ytTaiKhoan, "Đăng nhập để xem bộ sưu tập");
+            chu(R.id.ytTieuDeTrangThai, "Lưu lại hành trình của bạn");
+            chu(R.id.ytMoTaTrangThai, "Đăng nhập hoặc tạo tài khoản để xem và quản lý các địa điểm yêu thích.");
+            return; // Không đọc danh sách khi chưa đăng nhập.
+        }
 
-                                db.datYeuThich(
-                                        PhienDangNhap.id(this),
-                                        idDiaDiem,
-                                        false
-                                );
+        chu(R.id.ytTaiKhoan, "Tài khoản: " + PhienDangNhap.ten(this));
+        try (TaiKhoanDb db = new TaiKhoanDb(this)) {
+            Map<Integer, DiaDiem> theoId = new HashMap<>();
+            for (DiaDiem d : db.danhSachDiaDiem()) theoId.put(d.id, d);
+            ArrayList<Integer> cacId = db.danhSachYeuThich(PhienDangNhap.id(this));
+            int soLuong = 0;
+            for (int id : cacId) {
+                DiaDiem d = theoId.get(id);
+                if (d == null) continue;
+                themThe(d);
+                soLuong++;
+            }
+            chu(R.id.ytTongSo, soLuong + " địa điểm đã lưu");
+            findViewById(R.id.ytTrangThai).setVisibility(soLuong == 0 ? View.VISIBLE : View.GONE);
+            chu(R.id.ytTieuDeTrangThai, "Chưa có địa điểm yêu thích");
+            chu(R.id.ytMoTaTrangThai, "Chạm vào trái tim ở trang chi tiết để lưu điểm đến cho hành trình tiếp theo.");
+        } catch (Exception e) {
+            Log.e("YeuThichActivity", "Không thể tải yêu thích", e);
+            danhSach.removeAllViews();
+            chu(R.id.ytTongSo, "Chưa tải được bộ sưu tập");
+            chu(R.id.ytTieuDeTrangThai, "Không thể tải danh sách");
+            chu(R.id.ytMoTaTrangThai, "Vui lòng thử tải lại danh sách yêu thích.");
+            chu(R.id.ytKhamPha, "Thử lại");
+            findViewById(R.id.ytKhamPha).setOnClickListener(v -> hienThi());
+            return;
+        }
+        chu(R.id.ytKhamPha, "Khám phá địa điểm");
+        findViewById(R.id.ytKhamPha).setOnClickListener(v -> veTrangChu());
+    }
 
-                                hienThi();
+    private void themThe(DiaDiem d) {
+        View the = getLayoutInflater().inflate(R.layout.item_yeu_thich, danhSach, false);
+        ((TextView) the.findViewById(R.id.ytTenDiaDiem)).setText(d.ten);
+        ((TextView) the.findViewById(R.id.ytDanhMuc)).setText(d.danhMuc);
+        ((TextView) the.findViewById(R.id.ytDiaChi)).setText(d.diaChi);
+        int anh = d.tenAnh == null ? 0 : getResources().getIdentifier(d.tenAnh, "drawable", getPackageName());
+        ((ImageView) the.findViewById(R.id.ytAnhDiaDiem)).setImageResource(
+                anh == 0 ? android.R.drawable.ic_menu_gallery : anh);
+        the.setOnClickListener(v -> startActivity(new Intent(this, ChiTietDiaDiemActivity.class)
+                .putExtra("viTriDiaDiem", d.id)));
+        the.findViewById(R.id.ytBoLuu).setContentDescription("Bỏ yêu thích " + d.ten);
+        the.findViewById(R.id.ytBoLuu).setOnClickListener(v -> xacNhanBo(d));
+        danhSach.addView(the);
+    }
 
-                            } catch (Exception e) {
-
-                                Log.e(
-                                        TAG,
-                                        "Không thể bỏ yêu thích",
-                                        e
-                                );
-
-                                Toast.makeText(
-                                        this,
-                                        "Không thể bỏ yêu thích.",
-                                        Toast.LENGTH_SHORT
-                                ).show();
-                            }
-                        }
-                )
-                .setNegativeButton(
-                        "Hủy",
-                        null
-                )
-                .show();
+    private void xacNhanBo(DiaDiem d) {
+        long taiKhoan = PhienDangNhap.id(this);
+        new AlertDialog.Builder(this).setTitle("Bỏ lưu địa điểm?")
+                .setMessage("Bỏ " + d.ten + " khỏi danh sách yêu thích?")
+                .setPositiveButton("Bỏ lưu", (dialog, which) -> {
+                    if (taiKhoan <= 0 || taiKhoan != PhienDangNhap.id(this)) {
+                        hienThi();
+                        return;
+                    }
+                    try (TaiKhoanDb db = new TaiKhoanDb(this)) {
+                        db.datYeuThich(taiKhoan, d.id, false);
+                        hienThi();
+                    } catch (Exception e) {
+                        Toast.makeText(this, "Không thể bỏ lưu. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                    }
+                }).setNegativeButton("Giữ lại", null).show();
     }
 }
