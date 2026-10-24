@@ -244,6 +244,19 @@
                     android:lineSpacingExtra="5dp"
                     android:textColor="#647568"/>
 
+                <TextView
+                    android:id="@+id/tqNguonThongTin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:gravity="center_vertical"
+                    android:text="Nguồn thông tin chính thức ↗"
+                    android:textColor="#176D53"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
                 <!-- PHAT THUYET MINH -->
                 <TextView
                     android:id="@+id/tqNutPhat"

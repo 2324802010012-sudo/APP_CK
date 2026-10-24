@@ -81,6 +81,7 @@ public class VanMieuThamQuanActivity extends BaseActivity implements HuongDanTou
     private LinearLayout danhSachKhuVuc;
     private ProgressBar tienTrinh;
     private HuongDanTour huongDan;
+    private CauHinhAutoDiSan cauHinhAuto;
     private String luotDoc;
     private final androidx.activity.result.ActivityResultLauncher<String[]> quyenTour =
             registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
@@ -143,9 +144,10 @@ public class VanMieuThamQuanActivity extends BaseActivity implements HuongDanTou
             }
         });
 
+        cauHinhAuto = CauHinhAutoDiSan.vanMieu(tenDiem);
         hienThi();
         huongDan = new HuongDanTour(this, findViewById(R.id.tqKhungHuongDan),
-                CauHinhAutoDiSan.vanMieu(tenDiem));
+                cauHinhAuto);
         caiDatTheoDoiDoc();
         apDungKhoangTrongHeThong();
     }
@@ -175,6 +177,7 @@ public class VanMieuThamQuanActivity extends BaseActivity implements HuongDanTou
                 );
             }
 
+            KhoNoiDungThamQuan.dongBo(db, 4);
             tenDiem.clear();
             moTaDiem.clear();
 
@@ -199,6 +202,7 @@ public class VanMieuThamQuanActivity extends BaseActivity implements HuongDanTou
     private void hienThi() {
         tenKhuVuc.setText(tenDiem.get(viTri));
         moTaKhuVuc.setText(moTaDiem.get(viTri));
+        ganNguonThongTin(4, viTri + 1);
         demKhuVuc.setText("Điểm " + (viTri + 1) + "/" + tenDiem.size());
         tienTrinh.setProgress((viTri + 1) * 100 / tenDiem.size());
 
@@ -233,7 +237,8 @@ public class VanMieuThamQuanActivity extends BaseActivity implements HuongDanTou
             boolean dangChon = i == viTri;
 
             TextView the = new TextView(this);
-            the.setText((i + 1) + ".  " + tenDiem.get(i));
+            the.setText((i + 1) + ".  " + tenDiem.get(i)
+                    + "\n" + cauHinhAuto.nhanCheDo(i + 1));
             the.setTextSize(14);
             the.setTypeface(null, dangChon ? Typeface.BOLD : Typeface.NORMAL);
             the.setTextColor(dangChon ? Color.WHITE : Color.parseColor("#24382D"));

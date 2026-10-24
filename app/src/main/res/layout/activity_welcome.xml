@@ -7,6 +7,7 @@
     android:background="#FBFCF9">
 
     <ScrollView
+        android:id="@+id/cuonTrangChaoMung"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
@@ -15,69 +16,86 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="650dp"
             android:orientation="vertical"
             android:gravity="center_horizontal">
 
-            <!-- HAI ANH DIA DIEM CHUP THAT -->
+            <!-- BAN DO TUONG TAC GIOI THIEU DIA DIEM -->
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="305dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:minHeight="300dp"
                 android:background="@drawable/nen_dau_chao_moi"
                 android:clipChildren="false"
                 android:clipToPadding="false">
 
-                <!-- ANH TRAI: BAO TANG -->
-                <FrameLayout
-                    android:layout_width="145dp"
-                    android:layout_height="202dp"
-                    android:layout_gravity="center"
-                    android:translationX="-68dp"
-                    android:translationY="15dp"
-                    android:rotation="-11"
+                <com.example.app_ck.BanDoChaoMungView
+                    android:id="@+id/banDoChaoMung"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="Bản đồ tương tác các địa điểm tham quan. Kéo để di chuyển, chụm hai ngón để phóng to hoặc thu nhỏ." />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|start"
+                    android:layout_margin="12dp"
+                    android:padding="8dp"
+                    android:background="#EEFBFCF9"
+                    android:text="Khám phá các điểm đến"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#142B25" />
+
+                <LinearLayout
+                    android:layout_width="52dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|end"
+                    android:layout_margin="12dp"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/chaoPhongToBanDo"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:minWidth="0dp"
+                        android:padding="0dp"
+                        android:text="+"
+                        android:textSize="24sp"
+                        android:textColor="#147657"
+                        android:backgroundTint="#FBFCF9"
+                        android:contentDescription="Phóng to bản đồ" />
+
+                    <Button
+                        android:id="@+id/chaoThuNhoBanDo"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:minWidth="0dp"
+                        android:padding="0dp"
+                        android:text="−"
+                        android:textSize="24sp"
+                        android:textColor="#147657"
+                        android:backgroundTint="#FBFCF9"
+                        android:contentDescription="Thu nhỏ bản đồ" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|start"
+                    android:layout_marginBottom="28dp"
                     android:padding="4dp"
-                    android:background="@drawable/nen_khung_anh_trang">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/anh_bao_tang_chung_tich"
-                        android:scaleType="centerCrop"
-                        android:background="@drawable/nen_anh_bo_goc_moi"
-                        android:clipToOutline="true"
-                        android:contentDescription="Ảnh Bảo tàng Chứng tích Chiến tranh" />
-                </FrameLayout>
-
-
-                <!-- ANH CHINH BEN PHAI: DINH DOC LAP -->
-                <FrameLayout
-                    android:layout_width="193dp"
-                    android:layout_height="245dp"
-                    android:layout_gravity="center"
-                    android:translationX="55dp"
-                    android:translationY="12dp"
-                    android:padding="5dp"
-                    android:background="@drawable/nen_khung_anh_trang">
-
-                    <ImageView
-                        android:id="@+id/anhNenChaoMung"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/anh_dinh_doc_lap"
-                        android:scaleType="centerCrop"
-                        android:background="@drawable/nen_anh_bo_goc_moi"
-                        android:clipToOutline="true"
-                        android:contentDescription="Ảnh Dinh Độc Lập" />
-                </FrameLayout>
+                    android:background="#EEFBFCF9"
+                    android:text="© OpenStreetMap contributors"
+                    android:textColor="#24382D"
+                    android:textSize="10sp" />
             </FrameLayout>
 
-            <!-- TEN UNG DUNG -->
-
-            <!-- SONG XANH TRANG TRI: TAI NGUYEN CU -->
+            <!-- SONG XANH NGAN CACH BAN DO VA TIEN ICH -->
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:layout_marginTop="13dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="-28dp"
                 android:src="@drawable/song_trang_tri"
                 android:scaleType="fitXY"
                 android:contentDescription="Sóng xanh trang trí" />
@@ -88,9 +106,10 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="3dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
                 android:baselineAligned="false">
 
                 <LinearLayout
@@ -221,11 +240,11 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="27dp"
+                android:layout_marginTop="16dp"
                 android:orientation="vertical"
                 android:paddingStart="22dp"
                 android:paddingEnd="22dp"
-                android:paddingBottom="18dp">
+                android:paddingBottom="16dp">
 
                 <Button
                     android:id="@+id/btnBatDau"

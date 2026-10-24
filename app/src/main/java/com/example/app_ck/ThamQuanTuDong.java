@@ -8,6 +8,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Build;
+import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -37,7 +39,9 @@ public final class ThamQuanTuDong implements LocationListener {
     private DiaDiem diemDangMoi, diemDemo;
     private AlertDialog hoiThoai;
     private int cheDo, phien, buocDemo;
-    private long lucBuocDemo, lucGpsMoi;
+    private long lucBuocDemo, lucNhanGps;
+    private Location mauGps;
+    private final List<CancellationSignal> yeuCauViTri = new ArrayList<>();
 
     ThamQuanTuDong(MainActivity activity) {
         this.activity = activity;
@@ -86,10 +90,15 @@ public final class ThamQuanTuDong implements LocationListener {
         if (nhanDien != null) nhanDien.huy();
         if (hoiThoai != null) { hoiThoai.dismiss(); hoiThoai = null; }
         hen.removeCallbacksAndMessages(null);
+        for (CancellationSignal yeuCau : yeuCauViTri) yeuCau.cancel();
+        yeuCauViTri.clear();
+        mauGps = null;
         if (viTri != null) viTri.removeUpdates(this);
         if (activity.mayDocGioiThieu() != null) activity.mayDocGioiThieu().stop();
         chu(R.id.autoCheDo, "Chưa bật hướng dẫn");
         chu(R.id.autoViTri, "Đã tắt theo dõi vị trí");
+        chu(R.id.autoKhoangCach, "");
+        bang.findViewById(R.id.autoKhoangCach).setVisibility(View.GONE);
         bang.findViewById(R.id.autoDemoDenGan).setVisibility(View.GONE);
         trangThai(lyDo);
     }
@@ -99,9 +108,14 @@ public final class ThamQuanTuDong implements LocationListener {
         cheDo = loai;
         nhanDien = new BoNhanDienDiaDiem(cacDiem);
         diemDangMoi = null;
-        lucGpsMoi = 0;
+        lucNhanGps = 0;
         bang.findViewById(R.id.autoMoChiTiet).setVisibility(View.GONE);
         chu(R.id.autoCheDo, loai == DEMO ? "DEMO · Vị trí mô phỏng" : "GPS thật · Hướng dẫn theo vị trí");
+        chu(R.id.autoViTri, loai == GPS
+                ? "Đã bật theo dõi · Đang chờ vị trí từ thiết bị…"
+                : "DEMO · Đang chuẩn bị vị trí mô phỏng");
+        bang.findViewById(R.id.autoKhoangCach).setVisibility(loai == GPS ? View.VISIBLE : View.GONE);
+        if (loai == GPS) chu(R.id.autoKhoangCach, "Đang lấy vị trí thật để tính khoảng cách…");
         bang.findViewById(R.id.autoDemoDenGan).setVisibility(loai == DEMO ? View.VISIBLE : View.GONE);
         return true;
     }
@@ -116,6 +130,7 @@ public final class ThamQuanTuDong implements LocationListener {
     private void nhip(int phienNhip) {
         if (phienNhip != phien || cheDo == THU_CONG) return;
         long now = SystemClock.elapsedRealtime();
+        if (cheDo == GPS && mauGps != null) hienThiMauGps(mauGps, now);
         if (cheDo == DEMO && diemDangMoi == null) {
             if (now - lucBuocDemo >= 2000 && buocDemo < KHOANG_CACH_DEMO.length - 1) {
                 buocDemo++;
@@ -126,8 +141,12 @@ public final class ThamQuanTuDong implements LocationListener {
             nhanViTri(diemDemo.viDo + distance / 111195.0, diemDemo.kinhDo, 3, now, now);
         }
         if (cheDo == GPS && !nhanDien.dangChoTraLoi()
-                && (lucGpsMoi == 0 || now - lucGpsMoi > 15000))
-            trangThai("Đang chờ vị trí chính xác. Trong phạm vi 100 m, ứng dụng sẽ hỏi Bắt đầu hoặc Bỏ qua.");
+                && (lucNhanGps == 0 || now - lucNhanGps > 15000)) {
+            nhanDien.capNhat(Double.NaN, 0, Float.NaN, now, now);
+            trangThai(lucNhanGps == 0
+                    ? "Đã bật GPS, chưa nhận được vị trí. Hãy ra nơi thoáng và chờ thiết bị xác định vị trí."
+                    : "Chưa có cập nhật vị trí trong 15 giây. GPS vẫn đang bật; hãy ra nơi thoáng hoặc nghe thủ công.");
+        }
         hen.postDelayed(() -> nhip(phienNhip), 1000);
     }
     void batGps() {
@@ -147,11 +166,28 @@ public final class ThamQuanTuDong implements LocationListener {
         if (!batDau(GPS)) return;
         try {
             viTri.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, this, Looper.getMainLooper());
-            if (viTri.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+            if (viTri.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                 viTri.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, this, Looper.getMainLooper());
+                layViTriMoi(LocationManager.NETWORK_PROVIDER);
+            }
+            layViTriMoi(LocationManager.GPS_PROVIDER);
             trangThai("Đang tìm địa điểm gần nhất trong 5 nơi. Chỉ phát sau khi bạn bấm Bắt đầu.");
             nhip(phien);
         } catch (SecurityException e) { dung("Quyền vị trí đã thay đổi. Bấm GPS thật để cấp lại."); }
+    }
+
+    @SuppressWarnings("MissingPermission")
+    private void layViTriMoi(String nguon) {
+        // Android 7–10 nhận vị trí mới qua requestLocationUpdates ở trên.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return;
+        int phienYeuCau = phien;
+        CancellationSignal huy = new CancellationSignal();
+        yeuCauViTri.add(huy);
+        viTri.getCurrentLocation(nguon, huy, activity.getMainExecutor(), location -> {
+            yeuCauViTri.remove(huy);
+            if (phienYeuCau != phien || cheDo != GPS || activity.isFinishing() || activity.isDestroyed()) return;
+            if (location != null) onLocationChanged(location);
+        });
     }
     void nhanQuyen(boolean coQuyen) {
         if (activity.isFinishing() || activity.isDestroyed()) return;
@@ -168,28 +204,85 @@ public final class ThamQuanTuDong implements LocationListener {
     @Override public void onLocationChanged(Location location) {
         if (cheDo != GPS) return;
         long now = SystemClock.elapsedRealtime();
+        // Không để callback đến muộn ghi đè mẫu mới hơn đang hiển thị.
+        if (mauGps != null && !mauGps.isFromMockProvider()
+                && mauGps.getElapsedRealtimeNanos() > 0
+                && mauGps.getElapsedRealtimeNanos() <= now * 1000000L
+                && now - mauGps.getElapsedRealtimeNanos() / 1000000 <= 15000
+                && location.getElapsedRealtimeNanos() < mauGps.getElapsedRealtimeNanos()) return;
+        lucNhanGps = now;
+        mauGps = new Location(location);
+        hienThiMauGps(location, now);
         if (location.isFromMockProvider() || !location.hasAccuracy()) {
-            lucGpsMoi = 0;
             nhanDien.capNhat(Double.NaN, 0, Float.NaN, now, now);
             trangThai(location.isFromMockProvider() ? "GPS giả lập không dùng ở chế độ thật. Hãy chọn Chạy demo."
                     : "Vị trí chưa có độ chính xác. Đang chờ GPS mới…");
             return;
         }
         long lucDo = location.getElapsedRealtimeNanos() / 1000000;
-        if (lucDo <= now && now - lucDo <= 15000) lucGpsMoi = lucDo;
         nhanViTri(location.getLatitude(), location.getLongitude(), location.getAccuracy(), lucDo, now);
+    }
+
+    private void hienThiMauGps(Location location, long now) {
+        long lucDo = location.getElapsedRealtimeNanos() / 1000000;
+        String tuoi = lucDo <= 0 || lucDo > now ? "không rõ thời điểm đo"
+                : String.format(Locale.ROOT, "đo cách đây %d giây", (now - lucDo) / 1000);
+        String saiSo = location.hasAccuracy() && Float.isFinite(location.getAccuracy())
+                && location.getAccuracy() >= 0
+                ? String.format(Locale.ROOT, "Sai số ±%.0f m", location.getAccuracy())
+                : "Chưa có sai số vị trí";
+        String noiDung = String.format(Locale.ROOT, "Đang theo dõi · %s\nVị trí: %.6f, %.6f\n%s · %s",
+                location.isFromMockProvider() ? "GPS giả lập"
+                        : LocationManager.GPS_PROVIDER.equals(location.getProvider()) ? "Vị trí GPS thiết bị" : "Vị trí thiết bị qua mạng",
+                location.getLatitude(), location.getLongitude(), saiSo, tuoi);
+        boolean coViTriThatMoi = !location.isFromMockProvider() && lucDo > 0 && lucDo <= now
+                && now - lucDo <= 15000 && Double.isFinite(location.getLatitude())
+                && Double.isFinite(location.getLongitude()) && Math.abs(location.getLatitude()) <= 90
+                && Math.abs(location.getLongitude()) <= 180;
+        if (!coViTriThatMoi) {
+            chu(R.id.autoViTri, noiDung + "\nMẫu này không dùng để tính khoảng cách hiện tại.");
+            chu(R.id.autoKhoangCach, "Chờ vị trí thật mới từ thiết bị để cập nhật khoảng cách.");
+            return;
+        }
+        DiaDiem gan = null;
+        double khoangCach = Double.MAX_VALUE;
+        List<DiaDiem> thuTu = new ArrayList<>();
+        for (DiaDiem d : cacDiem) {
+            if (!Double.isFinite(d.viDo) || !Double.isFinite(d.kinhDo)
+                    || Math.abs(d.viDo) > 90 || Math.abs(d.kinhDo) > 180) continue;
+            thuTu.add(d);
+            double kc = khoangCachDen(location, d);
+            if (kc < khoangCach) { khoangCach = kc; gan = d; }
+        }
+        if (gan != null) noiDung += "\nGần nhất: " + gan.ten + " · " + dinhDangKhoangCach(khoangCach);
+        chu(R.id.autoViTri, noiDung);
+        thuTu.sort((a, b) -> Double.compare(khoangCachDen(location, a), khoangCachDen(location, b)));
+        StringBuilder danhSach = new StringBuilder("Khoảng cách đường chim bay từ vị trí thiết bị:");
+        for (DiaDiem d : thuTu) danhSach.append("\n• ").append(d.ten).append(": ")
+                .append(dinhDangKhoangCach(khoangCachDen(location, d)));
+        danhSach.append("\nKhoảng cách phụ thuộc sai số vị trí, không phải chiều dài tuyến đường.");
+        chu(R.id.autoKhoangCach, danhSach.toString());
+    }
+
+    private double khoangCachDen(Location location, DiaDiem diem) {
+        float[] ketQua = new float[1];
+        Location.distanceBetween(location.getLatitude(), location.getLongitude(), diem.viDo, diem.kinhDo, ketQua);
+        return ketQua[0];
+    }
+
+    private String dinhDangKhoangCach(double met) {
+        return met < 1000 ? String.format(Locale.ROOT, "%.0f m", met)
+                : String.format(Locale.ROOT, "%.2f km", met / 1000);
     }
     private void nhanViTri(double lat, double lon, float accuracy, long lucDo, long now) {
         if (nhanDien.dangChoTraLoi()) return;
         DiaDiem den = nhanDien.capNhat(lat, lon, accuracy, lucDo, now);
-        if (cheDo == GPS && nhanDien.ganNhat() != null) {
-            DiaDiem gan = nhanDien.ganNhat();
-            double distance = BoChonDiemTuDong.khoangCach(lat, lon, gan.viDo, gan.kinhDo);
-            chu(R.id.autoViTri, String.format(Locale.ROOT, "GPS: %.6f, %.6f · Sai số ±%.0f m\nGần nhất: %s · %.0f m", lat, lon, accuracy, gan.ten, distance));
-        }
         if (den != null) {
             diemDangMoi = den;
             hienLoiMoi(BoChonDiemTuDong.khoangCach(lat, lon, den.viDo, den.kinhDo));
+        } else if (cheDo == GPS && Float.isFinite(accuracy) && accuracy > 25) {
+            trangThai(String.format(Locale.ROOT,
+                    "GPS đang bật nhưng sai số ±%.0f m, cần ≤25 m để nhận diện. Hãy ra nơi thoáng và chờ vị trí chính xác hơn.", accuracy));
         } else trangThai(nhanDien.trangThai() + " · Bán kính nhận diện 100 m");
     }
     private void hienLoiMoi(double distance) {

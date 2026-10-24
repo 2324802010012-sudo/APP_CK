@@ -1,8 +1,8 @@
-﻿# APP_CK – Ứng dụng hỗ trợ tham quan du lịch
+# APP_CK – Ứng dụng hỗ trợ tham quan du lịch
 
 Ứng dụng Android hỗ trợ tra cứu điểm du lịch, xem bản đồ và sơ đồ tương tác, nghe thuyết minh tiếng Việt, lưu yêu thích và quản lý hồ sơ cá nhân.
 
-**Cập nhật ngày 24/10/2026 theo mã nguồn trong workspace, bao gồm các thay đổi chưa commit.** Hiện có **5 địa điểm, 83 điểm tham quan thành phần, 82 marker trên sơ đồ, 17 Activity và SQLite v12**. Dữ liệu tài khoản và nội dung được lưu cục bộ; chưa có backend, lịch sử tham quan hoặc quản trị.
+**Cập nhật ngày 25/10/2026 theo mã nguồn trong workspace, bao gồm các thay đổi chưa commit.** Hiện có **5 địa điểm, 83 điểm tham quan thành phần, 82 marker trên sơ đồ, 17 Activity và SQLite v12**. Dữ liệu tài khoản và nội dung được lưu cục bộ; chưa có backend, lịch sử tham quan hoặc quản trị.
 
 README mô tả mã nguồn hiện tại. Phần đối chiếu **`Nhom15_BaoCao.docx`** giữ căn cứ đã ghi nhận từ các lần rà soát trước; tệp Word không nằm trong repository và chưa được đọc lại trong đợt cập nhật này. Trạng thái “có luồng chính” bên dưới không đồng nghĩa đã hoàn thành toàn bộ đặc tả hoặc đã kiểm chứng thực địa.
 
@@ -17,6 +17,7 @@ README mô tả mã nguồn hiện tại. Phần đối chiếu **`Nhom15_BaoCao
 - [Phần còn thiếu và các bước hoàn thiện](#15-cac-buoc-tiep-theo-de-hoan-thanh-luong-chinh).
 - [Lỗi và hạn chế ghi nhận khi rà soát](#18-loi-va-han-che-hien-tai).
 - [Bằng chứng kiểm thử và giới hạn xác nhận](#19-trang-thai-kiem-thu).
+- [Bộ nội dung và nguồn thông tin chính thức](#20-noi-dung-va-nguon-thong-tin).
 
 ## 1. Tổng quan và phạm vi
 
@@ -25,7 +26,7 @@ README mô tả mã nguồn hiện tại. Phần đối chiếu **`Nhom15_BaoCao
 | Tên / phiên bản | APP_CK / `1.0`, versionCode `1` |
 | Namespace / applicationId | `com.example.app_ck` |
 | Giao diện | Android Java, XML, một số sơ đồ và thẻ dựng bằng Java/Canvas |
-| Dữ liệu | SQLite trên thiết bị, dữ liệu khởi tạo từ mã nguồn |
+| Dữ liệu | SQLite trên thiết bị; sơ đồ khởi tạo từ Java, bài giới thiệu từ các lớp Java ngoại tuyến có nguồn |
 | Bản đồ | OpenStreetMap qua osmdroid; chỉ đường bằng URL Google Maps |
 | Giọng đọc | TTS tiếng Việt; khung nghe thủ công tổng hợp ra tệp tạm rồi phát bằng MediaPlayer để tua/tạm dừng |
 | Chế độ tham quan | Welcome → xin vị trí tại trang chủ; GPS/demo nhận diện điểm chính trong 100 m, hỏi Bắt đầu/Bỏ qua; Côn Đảo, Đại Nội Huế và Văn Miếu có thêm AUTO chọn lọc; Dinh/Bảo tàng nghe thủ công |
@@ -72,6 +73,8 @@ Lệnh PowerShell tại thư mục gốc:
 Các lệnh kiểm thử thiết bị/cài đặt cần thiết bị hoặc emulator đã kết nối và cho phép ADB. Cài lại bản debug sau kiểm thử nếu bộ chạy đã gỡ ứng dụng. APK debug nằm tại `app/build/outputs/apk/debug/app-debug.apk`.
 
 Bản đồ hiện tại không cần Google Maps API key. Tile bản đồ chưa cache cần Internet. Demo không cần quyền vị trí; GPS thật cần bật dịch vụ vị trí và cấp **Vị trí chính xác**. Không yêu cầu quyền vị trí nền hoặc bộ nhớ ngoài. Nghe khi không có mạng cần giọng tiếng Việt đã cài trên máy; giọng đọc yêu cầu mạng vẫn có thể phụ thuộc kết nối.
+
+Welcome dùng bản đồ OpenStreetMap tương tác thay ảnh nền: hiển thị 5 điểm đến từ SQLite, chạm marker để xem tên/địa chỉ, kéo để di chuyển, chụm hai ngón hoặc dùng nút +/− để thu phóng (mức 4–19). Lần mở đầu căn khung theo các điểm đến; tái tạo màn hình giữ tâm và mức zoom. Chạm ngoài vùng bản đồ vẫn cuộn trang để tới các nút Bắt đầu/Đăng nhập. Nền bản đồ chưa cache cần Internet; bản đồ Welcome không yêu cầu vị trí người dùng. Mã: `WelcomeActivity.java`, `BanDoChaoMungView.java`, `activity_welcome.xml`.
 
 ## 4. Năm địa điểm và nguồn tọa độ
 
@@ -137,7 +140,7 @@ Bản đồ dùng osmdroid, tile `https://tile.openstreetmap.org/`, có nhãn ng
 
 Trang chi tiết hỗ trợ mô tả mở rộng/thu gọn, lưu/bỏ yêu thích theo tài khoản, nghe/dừng giới thiệu, xem ảnh và bắt đầu tour. Hiện mỗi địa điểm có một ảnh chính, chưa có bộ sưu tập ảnh/phim tư liệu đầy đủ; giờ mở cửa cần đối chiếu nguồn cập nhật. Mở chi tiết thông thường không tự phát âm thanh; ngoại lệ là đã xác nhận **Bắt đầu** trong lời mời vị trí ở mục 8.
 
-**Giới hạn thẻ điểm nổi bật:** mở đúng Activity địa điểm chưa bảo đảm chọn đúng điểm thành phần. Bảo tàng truyền `viTriKhuVuc` nhưng tour đọc `idMarker`; Côn Đảo và Văn Miếu chưa truyền ID điểm từ thẻ. Các thẻ này hiện mở về điểm mặc định của tour. Thẻ “Cổng chính và khuôn viên” tại Dinh Độc Lập mở điểm đầu tiên là Phòng Nội các. Nhãn “Nghe giới thiệu” trên thẻ hiện chỉ mở tour, chưa mở khung nghe tương ứng. Đây là các vấn đề cần sửa, không phải chức năng đã nghiệm thu.
+**Thẻ điểm thành phần:** danh sách lấy đầy đủ 25/13/10/19/16 tên từ bộ nội dung có nguồn, truyền `idMarker` tương ứng tới đúng Activity. Nhãn “Nghe giới thiệu” trên thẻ hiện mở tour tại điểm đã chọn; người dùng tiếp tục mở khung thuyết minh để nghe.
 
 Mã chính: [BanDoActivity.java](app/src/main/java/com/example/app_ck/BanDoActivity.java), [ChiTietDiaDiemActivity.java](app/src/main/java/com/example/app_ck/ChiTietDiaDiemActivity.java), [KhoToaDoThamQuan.java](app/src/main/java/com/example/app_ck/KhoToaDoThamQuan.java).
 
@@ -172,7 +175,7 @@ ID điểm thành phần là ID trong từng tour, có thể trùng giữa các 
 
 Văn Miếu đã căn lại 16 marker theo tâm số trên ảnh hiện tại **1672×941**, chuyển các tọa độ mặc định của ảnh 1129×643 trên bản đã cài. Giữ marker tròn nền xanh, viền/số trắng, điểm chọn vàng; kích thước theo tỷ lệ ảnh (bán kính 16 px trên ảnh gốc), cùng thu/phóng với sơ đồ. Các tọa độ đã chỉnh thủ công trong bản debug được giữ nguyên; nhấn giữ vẫn lưu được vị trí mới.
 
-**Nội dung còn cần hoàn thiện:** [NoiDungThuyetMinhDinhDocLap.java](app/src/main/java/com/example/app_ck/NoiDungThuyetMinhDinhDocLap.java) mới có bài riêng cho ID 1 và 4; 23 điểm còn lại trả về mẫu giới thiệu kèm thông báo đang cập nhật. Có đủ marker và phát được TTS chưa đồng nghĩa đủ bài thuyết minh đã kiểm chứng. Nội dung các địa điểm còn lại cũng cần đối chiếu tư liệu, kiểm tra phát âm và ghi nguồn.
+**Nội dung tham quan:** đã bổ sung bài cho 5 địa điểm lớn và 83 điểm thành phần tại [DuLieuNoiDungThamQuan.java](app/src/main/java/com/example/app_ck/DuLieuNoiDungThamQuan.java), với giới thiệu, điểm đáng chú ý, gợi ý tham quan và nguồn chính thức. Bỏ mẫu “đang cập nhật” của 23 điểm Dinh. Mục nguồn có thể mở tại trang chi tiết, tour và khung nghe. Những điểm chưa có hồ sơ chính thức riêng được ghi rõ giới hạn, không tự thêm niên đại hay câu chuyện chưa xác minh. Xem [bảng đối chiếu từng điểm](docs/nguon_noi_dung.md) và mục 20.
 
 <a id="8-luong-chinh-tu-ban-do-den-thuyet-minh"></a>
 ## 8. Luồng chính từ bản đồ đến thuyết minh
@@ -239,6 +242,10 @@ Khối **Hướng dẫn theo vị trí** nằm dưới hàng **Thuyết minh –
 
 Điều kiện hiện tại: sai số **≤25 m**, tuổi vị trí **≤15 giây**, mẫu đo khác thời điểm, ổn định **ít nhất 2,5 giây**, **khoảng cách + sai số ≤100 m**. Vị trí bị đánh dấu giả lập không dùng trong GPS thật. Đang chờ câu trả lời không mở chồng lời mời; đồng ý sẽ dừng theo dõi trang chủ trước khi sang chi tiết.
 
+**Trạng thái GPS trên trang chủ:** bật GPS thật hiển thị đang theo dõi/chờ vị trí ngay; khi nhận mẫu sẽ hiển thị tọa độ, sai số, tuổi mẫu tại lúc nhận và địa điểm gần nhất để tham khảo, kể cả khi chưa đủ điều kiện phát. Sai số lớn được báo bằng số mét cụ thể; quá 15 giây không có callback sẽ báo đang chờ cập nhật, không ghi đã tắt GPS. Dòng “Đã tắt theo dõi vị trí” chỉ hiện khi thực sự dừng hướng dẫn. Các thông tin tham khảo không bỏ qua bộ lọc nhận diện hoặc tự phát âm thanh.
+
+**Vị trí thật và khoảng cách:** GPS thật đăng ký cập nhật GPS/network của thiết bị; Android 11 trở lên còn yêu cầu vị trí hiện tại bằng `getCurrentLocation`. Hiển thị nguồn vị trí, tọa độ, sai số và tuổi mẫu được làm mới theo thời gian. Từ mẫu thật mới trong 15 giây, ứng dụng dùng `Location.distanceBetween` tính khoảng cách đường chim bay tới cả 5 địa điểm và sắp xếp gần đến xa, hiển thị m/km. Khoảng cách dựa trên tọa độ thiết bị và tọa độ WGS84 địa điểm trong SQLite, không lấy các bước 500/300/150/90 m của demo. Mẫu cũ không ghi đè mẫu mới; vị trí giả lập, tọa độ lỗi hoặc mẫu đã quá 15 giây không được trình bày là khoảng cách hiện tại. Mẫu có sai số lớn vẫn xem được khoảng cách kèm sai số nhưng không kích hoạt AUTO. Đây là khoảng cách ước tính theo dữ liệu định vị, không phải độ dài đường đi hoặc cam kết chính xác tuyệt đối. Rời màn hình/Dừng hủy cả theo dõi liên tục và yêu cầu vị trí hiện tại đang chờ.
+
 Trang chi tiết tiêu thụ cờ xác nhận một lần; Dừng/rời trang hủy yêu cầu đang chờ, xoay/quay lại không tự đọc lại. Nút **Mở chi tiết địa điểm** sau khi Bỏ qua chỉ mở trang, không mang xác nhận phát.
 
 ### 8.4. Demo nhận diện địa điểm lớn tại trang chủ
@@ -250,6 +257,8 @@ Demo ghi rõ **DEMO · Vị trí mô phỏng**, không cần quyền vị trí, 
 ### 8.5. Bật AUTO và demo toàn tuyến bên trong tour
 
 Chỉ **Côn Đảo, Đại Nội Huế và Văn Miếu** có nút **Bật AUTO**. Mở tour chưa tự phát hoặc tự bật GPS. Bấm nút mở bảng chọn gọn gồm **Demo – Chạy demo AUTO toàn tuyến** và **GPS thật – Bật AUTO bằng GPS thật**. Không có nút Demo thường hoặc Tùy chọn điểm AUTO; cấu hình điểm AUTO do mã nguồn quản lý, nghe thủ công luôn có sẵn trên sơ đồ.
+
+**AUTO có chọn lọc, thống nhất với Côn Đảo:** danh sách điểm của Huế/Văn Miếu ghi rõ **Có hỗ trợ AUTO · Luôn nghe thủ công được** hoặc **Nghe thủ công**. Khối bật AUTO hiển thị số điểm được phép trong tour; bảng chọn GPS liệt kê các điểm sẽ được xét. Cấu hình dùng chung cho nhãn và bộ nhận diện, có cờ cho phép riêng cho từng điểm: có tọa độ chưa đủ để tự bật AUTO. Các mốc hiện có giữ nguyên: Huế 7/10, Văn Miếu 3/16. Điểm không phân biệt được bằng GPS vẫn chọn thủ công; không bật nhận diện phòng hoặc tầng tại Dinh Độc Lập/Bảo tàng. AUTO địa điểm chính tại trang chủ vẫn xét cả 5 nơi và hỏi xác nhận trước khi đọc như mục 8.3.
 
 | Tour | Số điểm demo toàn tuyến | Điểm AUTO GPS | Điểm thường trong demo | Bán kính GPS | Bước khoảng cách demo |
 | --- | ---: | ---: | ---: | ---: | --- |
@@ -354,11 +363,11 @@ Danh sách AUTO dùng cấu hình cố định trong [CauHinhAutoConDao.java](ap
 - [Trại Phú Hưng](https://trungtambaotonditichquocgiacondao.vn/di-tich-trai-phu-hung-trai-8/)
 - [Trại 9](https://www.condao.com.vn/vi/news/tai-nguyen-du-lich/nha-tu-con-dao-2750.html)
 - [Khu điều tra – Phòng điều tra](https://trungtambaotonditichquocgiacondao.vn/di-tich-khu-dieu-tra/)
-- [Cầu Ma Thiên Lãnh](https://www.condao.com.vn/vi/news/tai-nguyen-du-lich/nha-tu-con-dao-2750.html)
-- [Khu biệt lập Chuồng Bò](https://condao.com.vn/vi/news/Tin-tuc/khu-di-tich-chuong-bo-con-dao-979.html)
+- [Cầu Ma Thiên Lãnh](https://trungtambaotonditichquocgiacondao.vn/di-tich-cau-ma-thien-lanh/)
+- [Khu biệt lập Chuồng Bò](https://trungtambaotonditichquocgiacondao.vn/di-tich-khu-biet-lap-chuong-bo/)
 - [Sở Lò Vôi](https://trungtambaotonditichquocgiacondao.vn/di-tich-so-lo-voi/)
 - [Nhà Công Quán](https://condao.com.vn/vi/news/di-tich-lich-su/diem-tham-quan-di-tich-nha-cong-quan-con-dao-74.html)
-- [Nghĩa trang Hàng Dương](https://www.condao.com.vn/vi/news/tai-nguyen-du-lich/nha-tu-con-dao-2750.html)
+- [Nghĩa trang Hàng Dương](https://trungtambaotonditichquocgiacondao.vn/nghia-trang-hang-duong-cd/)
 - [Chuồng Cọp Pháp](https://trungtambaotonditichquocgiacondao.vn/di-tich-chuong-cop-phap/)
 
 ## 9. Đăng ký, đăng nhập và khôi phục
@@ -420,6 +429,7 @@ Helper chính: [TaiKhoanDb.java](app/src/main/java/com/example/app_ck/TaiKhoanDb
 | `khu_vuc` | Sáu khu vực của Dinh Độc Lập |
 | `diem_tham_quan` | 25 marker Dinh Độc Lập, tọa độ ảnh và liên kết khu vực |
 | `thuyet_minh` | Nội dung thuyết minh các điểm Dinh Độc Lập |
+| `phien_ban_noi_dung` | Phiên bản nội dung Java đã áp dụng; khóa -1 cho 5 bài tổng quan, 0–4 cho các tour |
 | `gps_diem_tham_quan` | Dữ liệu GPS marker từ luồng cũ, được giữ khi nâng cấp; không dùng để tự phát trong luồng hiện tại |
 
 Bảng riêng được tạo khi mở màn hình tương ứng: `bao_tang_marker`; `dai_noi_hue_diem`/`dai_noi_hue_toa_do`; `con_dao_diem`/`con_dao_toa_do`; `van_mieu_diem`/`van_mieu_toa_do`. Vì vậy chưa mở các tour thì Database Inspector có thể chưa thấy các bảng này.
@@ -434,7 +444,7 @@ Các mốc nâng cấp đáng chú ý:
 | v11 | Đồng bộ tọa độ 5 địa điểm, thêm bảng GPS marker |
 | v12 | Thêm `ho_ten`, `email`; kiểm tra cột trước khi thêm, giữ dữ liệu tài khoản/yêu thích/GPS |
 
-Phần lớn dữ liệu seed chèn tránh ghi đè bản ghi đã có. Ngoại lệ có chủ đích: marker Huế cập nhật lại tọa độ ảnh; Văn Miếu chỉ chuyển tọa độ mặc định cũ, giữ điểm đã căn thủ công; Côn Đảo nâng phiên bản nội dung riêng bằng `KhoDuLieuConDao` (hiện `phien_ban=2`). Các tọa độ WGS84 AUTO của Huế/Văn Miếu/Côn Đảo nằm trong các lớp cấu hình Java, không lấy từ `x/y` ảnh hoặc bảng GPS marker cũ. Do đó sửa bài thuyết minh trong Java không bảo đảm tự cập nhật bài đã lưu trên máy cũ; cần migration cập nhật nội dung có chủ đích. Không xóa dữ liệu ứng dụng khi cần giữ tài khoản, yêu thích và mốc GPS đã ghi.
+Phần lớn dữ liệu sơ đồ seed chèn tránh ghi đè bản ghi đã có. Marker Huế cập nhật tọa độ ảnh; Văn Miếu chuyển tọa độ mặc định cũ và giữ điểm đã căn thủ công; `KhoDuLieuConDao` duy trì cấu trúc trại giam (hiện `phien_ban=2`). Nội dung bài viết chính thức được `KhoNoiDungThamQuan` cập nhật sau seed từ lớp Java `DuLieuNoiDungThamQuan`, theo bảng `phien_ban_noi_dung`: khóa -1 cho giới thiệu 5 nơi, khóa 0–4 cho từng tour. Chỉ sửa cột mô tả, giao dịch hoàn tất mới đánh dấu phiên bản. Các tọa độ WGS84 AUTO nằm trong lớp cấu hình riêng, không lấy từ tọa độ ảnh. Khi sửa nội dung Java, tăng `PHIEN_BAN` trong `DuLieuNoiDungThamQuan`; không xóa dữ liệu ứng dụng để nhận bài mới.
 
 Database Inspector báo **`(closed)` / No Databases Available** khi kết nối SQLite không còn mở trong tiến trình đang quan sát. Chạy bản debug, chọn đúng thiết bị/tiến trình, mở màn hình có truy cập CSDL và refresh; trạng thái này không tự chứng minh tệp DB đã bị mất.
 
@@ -452,7 +462,7 @@ Database Inspector báo **`(closed)` / No Databases Available** khi kết nối 
 | UC02.2 – Tìm kiếm | Có tìm không dấu; phạm vi tìm giữa trang chủ/bản đồ/Khám phá chưa hoàn toàn giống nhau |
 | UC02.3 – Lọc | Có lọc danh mục; cần thống nhất tổ hợp tìm kiếm, danh mục và trạng thái rỗng |
 | UC02.4 – Gần vị trí | Có khoảng cách/sắp xếp; thiếu giới hạn phạm vi tìm kiếm theo BR02.4-4 |
-| UC03.1 – Chi tiết | Có luồng chính; cần hoàn thiện nội dung, ảnh và nguồn thông tin |
+| UC03.1 – Chi tiết | Có bài và nguồn cho 5 địa điểm lớn, đầy đủ thẻ điểm thành phần; ảnh vẫn là ảnh tổng quan |
 | UC03.2 – Bắt đầu tham quan | Có mở đúng sơ đồ của cả 5 địa điểm |
 | UC04.1 – Bản đồ khu vực | Có OSM, 5 marker, thu phóng và vị trí |
 | UC04.2 – Chọn marker | Có thẻ thông tin và mở chi tiết |
@@ -515,12 +525,12 @@ Style hộp thoại đã đặt cả `colorSurface` và **`colorSurfaceContainer
 
 Thứ tự dưới đây ưu tiên hoàn thiện luồng người dùng theo Word, sau đó hoàn thành phạm vi quản trị. Mỗi bước cần có dữ liệu thật và tiêu chí nghiệm thu trước khi đánh dấu xong.
 
-**Việc cần xử lý trước khi nghiệm thu luồng hiện có:** sửa ánh xạ thẻ chi tiết sang ID điểm; hoàn thiện 23 bài còn mẫu của Dinh Độc Lập và migration nội dung; bổ sung timeout TTS cho AUTO/demo và xử lý ngắt tai nghe khi đang chuẩn bị. Tiếp theo hoàn thiện lịch sử, Gần tôi và kiểm chứng GPS thực địa. Chi tiết căn cứ nằm tại mục 18.
+**Việc cần xử lý trước khi nghiệm thu luồng hiện có:** đã bổ sung đủ bài, nguồn, cập nhật nội dung tại chỗ và ánh xạ ID thẻ chi tiết. Cần bổ sung hồ sơ chuyên biệt cho các điểm có ghi chú giới hạn; kiểm tra phát âm; bổ sung timeout TTS cho AUTO/demo và xử lý ngắt tai nghe khi đang chuẩn bị. Tiếp theo hoàn thiện lịch sử, Gần tôi và kiểm chứng GPS thực địa. Chi tiết căn cứ nằm tại mục 18.
 
 | Bước | Công việc | Điều kiện hoàn thành |
 | ---: | --- | --- |
 | 1 | Chốt bảng ánh xạ Word–mã nguồn: tài khoản email, lời mời nghe tại điểm chính, marker thủ công, cách khôi phục | Mỗi khác biệt có quyết định rõ: sửa app hoặc cập nhật đặc tả được nhóm thống nhất |
-| 2 | Hoàn thiện 83 bài thuyết minh và dữ liệu địa điểm | Không còn bài mẫu; đúng tên/ID/ảnh/tầng, có nguồn; thiết kế migration cho máy đã cài |
+| 2 | Bổ sung chiều sâu cho các bài chưa có hồ sơ chuyên biệt | Đã có đủ 83 bài, nguồn và migration; ưu tiên hồ sơ riêng các phòng Dinh, phòng chức năng bảo tàng và nhãn Hậu hồ; kiểm tra phát âm |
 | 3 | Thêm lịch sử và điểm ghi nhận TTS dùng chung | Lưu tài khoản, PlaceID, PointID tùy chọn, thời gian, AUTO/MANUAL khi lượt phát thực sự bắt đầu; tránh ghi trùng callback |
 | 4 | Xây màn hình Lịch sử từ Cá nhân | Danh sách mới nhất, rỗng, chặn khách, chỉ dữ liệu đúng tài khoản; bấm mở đúng địa điểm/điểm thành phần |
 | 5 | Nghiệm thu và hoàn thiện hướng dẫn vị trí tại trang chủ | Đã có xét cả 5 nơi, chọn gần nhất, Bắt đầu/Bỏ qua và dừng theo vòng đời; tiếp tục thêm lịch sử, cấu hình bán kính từng nơi và kiểm tra thực địa |
@@ -576,6 +586,7 @@ app/src/main/
 │   ├── HuongDanConDao, CauHinhAutoConDao, KhoDuLieuConDao, BoNhanDienDiemThanhPhan
 │   ├── HuongDanTour, CauHinhAutoDiSan
 │   ├── KhungNgheThuyetMinh, DoanAmThanh
+│   ├── DuLieuNoiDungThamQuan, KhoNoiDungThamQuan, NguonThongTin
 │   ├── KhoToaDoThamQuan, SoDoThuPhongLayout, GoiYDiaDiem
 │   └── DuLieuDinhDocLap, NoiDungThuyetMinhDinhDocLap
 └── res/
@@ -595,7 +606,7 @@ Các vấn đề dưới đây được xác định bằng đọc mã nguồn; 
 
 | Vấn đề | Hành vi / ảnh hưởng | File liên quan |
 | --- | --- | --- |
-| Thẻ chi tiết chưa chọn đúng điểm thành phần | Bảo tàng mở marker mặc định 10; Côn Đảo mở Trại Phú Hải; Văn Miếu mở Phương Đình – Hồ Văn. Thẻ cổng Dinh mở Phòng Nội các | [ChiTietDiaDiemActivity.java](app/src/main/java/com/example/app_ck/ChiTietDiaDiemActivity.java), [BaoTangThamQuanActivity.java](app/src/main/java/com/example/app_ck/BaoTangThamQuanActivity.java), [ThamQuanActivity.java](app/src/main/java/com/example/app_ck/ThamQuanActivity.java), hai Activity tour Côn Đảo/Văn Miếu |
+| Thẻ chi tiết chưa mở ngay trình nghe | Đã truyền đúng ID điểm và hiển thị đủ danh sách; nhãn Nghe giới thiệu vẫn mở tour, cần bấm Mở khung thuyết minh để nghe | [ChiTietDiaDiemActivity.java](app/src/main/java/com/example/app_ck/ChiTietDiaDiemActivity.java) |
 | Chưa giữ lựa chọn khi tái tạo màn hình | Các tour chưa lưu riêng điểm, tầng và zoom đang xem; lựa chọn quay về giá trị ban đầu hoặc Intent ban đầu. Dừng AUTO/âm thanh khi rời màn hình vẫn là hành vi có chủ đích | 5 Activity tham quan |
 | Chọn điểm làm đặt lại sơ đồ | Bảo tàng gọi lại `setTang()` cả khi vẫn cùng tầng, đặt lại zoom và giải mã ảnh; Dinh/Côn Đảo/Văn Miếu dựng lại khung sơ đồ khi đổi điểm | `BaoTangThamQuanActivity`, `ThamQuanActivity`, `ConDaoThamQuanActivity`, `VanMieuThamQuanActivity` |
 | Tiến trình chưa phản ánh hoàn thành | ProgressBar tính theo chỉ số điểm đang chọn; chọn điểm cuối có thể hiện 100% dù chưa nghe các điểm trước | 5 Activity tham quan |
@@ -604,10 +615,48 @@ Các vấn đề dưới đây được xác định bằng đọc mã nguồn; 
 | Ngắt tai nghe lúc chuẩn bị chưa được xử lý đầy đủ | `tamDung()` chỉ xử lý player đã chuẩn bị và đang phát; yêu cầu phát sau tổng hợp vẫn còn nếu rút tai nghe trước lúc phát | [KhungNgheThuyetMinh.java](app/src/main/java/com/example/app_ck/KhungNgheThuyetMinh.java) |
 | Ràng buộc SQLite còn thiếu | Helper chưa chủ động bật thực thi khóa ngoại; `yeu_thich.dia_diem_id` chưa tham chiếu `dia_diem`; `datYeuThich()` chưa tự kiểm tra bản ghi liên quan và không trả kết quả ghi | [TaiKhoanDb.java](app/src/main/java/com/example/app_ck/TaiKhoanDb.java) |
 | Mô hình dữ liệu tour phân tán | Dinh dùng bảng khu vực/điểm/thuyết minh, các tour khác tạo bảng riêng trong màn hình. `layDiemDinhDocLap()` chưa lọc theo địa điểm khi đọc bảng điểm chung; cần xử lý trước khi mở rộng bảng này | `TaiKhoanDb`, các Activity tour, [KhoDuLieuConDao.java](app/src/main/java/com/example/app_ck/KhoDuLieuConDao.java) |
-| Nội dung đã lưu không tự đổi theo Java | Nhiều seed dùng `CONFLICT_IGNORE`; sửa bài trong mã không cập nhật bản ghi đã có. Cần phiên bản nội dung và migration, không yêu cầu xóa dữ liệu người dùng | `TaiKhoanDb`, dữ liệu khởi tạo của các tour |
+| Nguồn chuyên biệt chưa đủ ở một số điểm | Đã có bài và nguồn cho toàn bộ điểm; một số phòng, nhãn điều hướng chỉ đối chiếu được tổng quan. Cần hồ sơ hiện vật/biển giới thiệu để bổ sung thông tin sâu; ghi chú phạm vi có trong ứng dụng | `DuLieuNoiDungThamQuan.java`, `docs/nguon_noi_dung.md` |
 | Xử lý nặng còn trên luồng giao diện | PBKDF2, nhiều truy vấn/seed SQLite và giải mã ảnh chạy từ sự kiện UI; có nguy cơ chậm trên thiết bị yếu, chưa có số đo hiệu năng trong đợt rà soát | Các Activity tài khoản, `TaiKhoanDb`, các Activity tham quan |
 
-Các phần còn thiếu về chức năng gồm lịch sử, quản trị/phân quyền, tài khoản email theo Word, bán kính Gần tôi và nội dung thuyết minh hoàn chỉnh. Chưa có backend, đồng bộ đa thiết bị hoặc hướng dẫn chạy nền; các phần này chỉ trở thành yêu cầu bắt buộc khi phạm vi đồ án đã chốt yêu cầu.
+Các phần còn thiếu về chức năng gồm lịch sử, quản trị/phân quyền, tài khoản email theo Word và bán kính Gần tôi. Bài tham quan đã phủ đủ điểm nhưng vẫn cần bổ sung hồ sơ chuyên biệt cho các mục có ghi chú giới hạn và kiểm tra phát âm thực tế. Chưa có backend, đồng bộ đa thiết bị hoặc hướng dẫn chạy nền; các phần này chỉ trở thành yêu cầu bắt buộc khi phạm vi đồ án đã chốt yêu cầu.
 
 <a id="19-trang-thai-kiem-thu"></a>
+
+## 19. Trạng thái kiểm thử
+
+**Trạng thái ngày 25/10/2026:** sau khi chuyển nội dung và nguồn sang các lớp Java, đã build APK debug, chạy 37 unit test và 5 ca kiểm thử nội dung/nguồn trên Samsung SM-A536E, Android 15. Báo cáo `KhungNgheFlowTest` và lint là kết quả từ lượt trước; chưa chạy lại toàn bộ suite hoặc GPS thực địa.
+
+| Báo cáo | Kết quả đã ghi nhận | Giới hạn |
+| --- | --- | --- |
+| Unit test JVM | 37 test, 0 failure, 0 error; gồm một test mẫu `addition_isCorrect` | Có kiểm tra dữ liệu Java khớp toàn bộ nội dung/nguồn trước chuyển đổi, danh sách AUTO từng tour và trường hợp có tọa độ nhưng không được phép AUTO; không thay thế kiểm thử thiết bị hoặc GPS thực địa |
+| Biên dịch và đóng gói | `assembleDebug`, `testDebugUnitTest`, `assembleDebugAndroidTest` thành công | Bản debug, chưa xác nhận release |
+| Nội dung/nguồn trên thiết bị | 5 test mới đạt, gồm 3 ca `NoiDungThamQuanTest` và 2 ca `NguonThongTinFlowTest`; SM-A536E / Android 15 | Kiểm tra đủ bài/nguồn, cập nhật lặp, giữ dữ liệu khác, hoàn tác lỗi, thẻ chi tiết và hộp nguồn ở 5 tour; không xác nhận mọi dữ kiện lịch sử bằng test tự động |
+| Bản đồ Welcome | 2 test `BanDoChaoMungTest` đạt trên SM-A536E / Android 15; đã xem giao diện và thử nút phóng to trên máy | Kiểm tra 5 marker, nút thu/phóng, kéo bản đồ không cuộn trang và giữ tâm/zoom khi tái tạo; log `build/kiem_tra_ban_do_welcome_thiet_bi.log` |
+| Trình nghe trên thiết bị – lượt trước | 3 test của `KhungNgheFlowTest`, 0 failure, 0 error, trên SM-A536E / Android 15 | Chưa chạy lại ba ca âm thanh này sau thay đổi nội dung; chưa chứng minh toàn bộ suite đạt |
+| Lint debug | 0 error, 410 warning | Kết quả từ lượt trước; cảnh báo không đồng nghĩa 410 lỗi chức năng |
+
+Nguồn báo cáo khi đã được tạo cục bộ: `app/build/test-results/testDebugUnitTest/`, `app/build/reports/tests/testDebugUnitTest/`, `app/build/outputs/androidTest-results/connected/debug/`, `app/build/reports/androidTests/connected/debug/` và `app/build/reports/lint-results-debug.txt`. Các thư mục build không được bàn giao như mã nguồn; bản clone mới có thể chưa có chúng.
+
+Lượt 5 test nội dung sau chuyển đổi chạy qua `adb shell am instrument -w -r -e class com.example.app_ck.NoiDungThamQuanTest,com.example.app_ck.NguonThongTinFlowTest com.example.app_ck.test/androidx.test.runner.AndroidJUnitRunner`, kết quả `OK (5 tests)`, thời gian 24,514 giây. Log cục bộ: `build/kiem_tra_du_lieu_java_thiet_bi.log`. Kiểm tra hộp nguồn gọi listener của nút trong test rồi xác nhận cửa sổ hiển thị đúng bài; chưa thay thế kiểm tra thao tác chạm trên mọi kích thước màn hình.
+
+Mã kiểm thử còn bao phủ tài khoản/yêu thích, migration, điều hướng, marker, zoom/pan và AUTO/demo trong `app/src/test` và `app/src/androidTest`. Sự tồn tại của test không đồng nghĩa test đã chạy đạt trong phiên bản đang đọc. Các ca bơm mẫu `Location` xác minh bộ lọc, không chứng minh tọa độ tham chiếu hoặc độ chính xác GPS tại di tích.
+
+**Môi trường đóng gói:** Gradle Wrapper không truy cập được file khóa cache tại `D:\Gradle`. Lượt kiểm tra mới dùng Gradle đã cài, cache ghi riêng trong `build/bo_nho_gradle`, `build/bo_nho_du_an` và cache dependency chỉ đọc tại `D:\Gradle\caches`. Đã khắc phục trở ngại ký debug bằng bản sao khóa debug hiện có trong thư mục build (không đưa vào Git) và tham số signing khi chạy Gradle; không tạo khóa mới. `assembleDebug`, `testDebugUnitTest`, `assembleDebugAndroidTest` hoàn tất. APK được cài đè giữ dữ liệu trên Samsung SM-A536E để kiểm tra nội dung. Điều này không thay thế kiểm chứng GPS thực địa hoặc nghiệm thu toàn bộ ứng dụng.
+
+<a id="20-noi-dung-va-nguon-thong-tin"></a>
+
+## 20. Nội dung và nguồn thông tin
+
+**Cập nhật triển khai ngày 25/10/2026:** nội dung và nguồn được khai báo trực tiếp bằng Java. Giao diện dùng Android Views/XML theo Empty Views Activity; SQLite tiếp tục lưu dữ liệu trên thiết bị.
+
+Bộ nội dung đối chiếu ngày 24/10/2026 gồm **5 bài tổng quan và 83 bài điểm thành phần**: Dinh Độc Lập 25, Bảo tàng Chứng tích Chiến tranh 13, Đại Nội Huế 10, Côn Đảo 19, Văn Miếu 16. Mỗi bài có giới thiệu, điểm đáng chú ý, gợi ý tham quan và danh sách nguồn; những điểm thiếu hồ sơ chuyên biệt có ghi chú phạm vi xác minh ngay trong bài và hộp nguồn.
+
+- [Dữ liệu Java](app/src/main/java/com/example/app_ck/DuLieuNoiDungThamQuan.java): 63 mục nguồn từ đơn vị quản lý di tích/bảo tàng, Sở Du lịch Huế, Cục Di sản văn hóa, Cục Du lịch Quốc gia Việt Nam và Bộ VHTTDL.
+- [Bảng nguồn theo từng điểm](docs/nguon_noi_dung.md): tên bài, URL và phạm vi thông tin; dùng để rà soát và bổ sung tư liệu về sau.
+- [KhoNoiDungThamQuan.java](app/src/main/java/com/example/app_ck/KhoNoiDungThamQuan.java): nạp ngoại tuyến, định dạng bài, cập nhật SQLite theo phiên bản. Cài đè không yêu cầu xóa dữ liệu để nhận bài mới.
+- [NguonThongTin.java](app/src/main/java/com/example/app_ck/NguonThongTin.java): mở danh sách bài nguồn, cơ quan và ngày đối chiếu từ trang chi tiết, tour và khung nghe. URL không đưa vào giọng đọc.
+
+Thông tin được diễn đạt lại; đây không phải bản thuyết minh đã được đơn vị quản lý phê duyệt. Gợi ý quan sát, cách đi và ứng xử do ứng dụng biên soạn. Một số phòng Dinh chưa có bài riêng được đối chiếu; Phòng họp, Cổng ra là điểm chức năng/điều hướng; nhãn Hậu hồ chưa xác định được tên hồ chính thức tương ứng. Các điểm này có hướng dẫn và nguồn bối cảnh, không tự gán niên đại, sự kiện hoặc danh mục hiện vật.
+
+Nội dung đã phân biệt công trình Thái Học xây lại năm 1999–2000, quá trình phục hồi Cần Chánh và tính ước lệ của tên Cầu tàu 914. Giờ, vé, lịch biểu diễn và tình trạng mở phòng phải kiểm tra ở kênh chính thức; ứng dụng không cập nhật website trực tiếp. Có thể đọc toàn bộ bài ngoại tuyến, mở nguồn cần kết nối và trình duyệt.
 

@@ -175,6 +175,18 @@
                 android:clickable="true"
                 android:focusable="true"/>
 
+            <TextView
+                android:id="@+id/nguonChiTiet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:gravity="center_vertical"
+                android:text="Nguồn thông tin chính thức ↗"
+                android:textColor="#176D53"
+                android:textSize="14sp"
+                android:clickable="true"
+                android:focusable="true"/>
+
             <!-- BON TIEN ICH: BAN DO, CHI DUONG, THUYET MINH, YEU THICH -->
             <LinearLayout
                 android:layout_width="match_parent"

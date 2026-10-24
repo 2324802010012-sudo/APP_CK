@@ -93,6 +93,7 @@ final class KhungNgheThuyetMinh {
         });
         dialog.setOnDismissListener(d->{if(!dialog.isShowing())donLuot();});
         view.findViewById(R.id.ngheDong).setOnClickListener(v->dong());
+        view.findViewById(R.id.ngheNguonThongTin).setOnClickListener(v -> activity.moNguonThongTin());
         view.findViewById(R.id.nghePhatTamDung).setOnClickListener(v->{
             if (daChuanBi && player!=null && player.isPlaying()) tamDung("Đã tạm dừng"); else phat();
         });

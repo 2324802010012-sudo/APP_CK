@@ -5,11 +5,14 @@
     android:layout_height="wrap_content" android:layout_marginTop="16dp"
     android:padding="16dp" android:orientation="vertical" android:background="@drawable/nen_tq_the">
     <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="Thuyết minh tự động" android:textSize="17sp"
+        android:text="Tự động thuyết minh theo vị trí" android:textSize="17sp"
         android:textStyle="bold" android:textColor="#24382D" />
     <TextView android:id="@+id/tourCheDo" android:layout_width="match_parent"
         android:layout_height="wrap_content" android:layout_marginTop="4dp"
         android:text="Thủ công · Chưa bật AUTO" android:textSize="13sp" android:textColor="#526456" />
+    <TextView android:id="@+id/tourPhamVi" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="8dp"
+        android:textSize="13sp" android:textColor="#526456" />
     <com.google.android.material.button.MaterialButton android:id="@+id/tourBatAuto"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:minHeight="48dp" android:text="Bật AUTO" android:textAllCaps="false"

@@ -184,6 +184,7 @@ public class ThamQuanActivity extends BaseActivity {
         DuLieuDinhDocLap.DiemThamQuan diem = diemDinh.get(viTriKhuVuc);
         tenKhuVuc.setText(diem.ten);
         moTaKhuVuc.setText(layMoTaDinh(diem));
+        ganNguonThongTin(0, diem.id);
         demKhuVuc.setText("Điểm số " + diem.id + "/25");
 
         tienTrinh.setProgress((viTriKhuVuc + 1) * 100 / soDiem);

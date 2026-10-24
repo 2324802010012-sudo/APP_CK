@@ -145,6 +145,13 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
         // DOC THONG TIN DIA DIEM TU SQLITE TRUOC KHI HIEN THI
         taiChiTietTuSQLite();
+        // Dùng đầy đủ danh mục điểm của bộ nội dung, cùng ID với các sơ đồ.
+        java.util.List<DuLieuNoiDungThamQuan.Bai> cacDiem = KhoNoiDungThamQuan.lay(viTri, 0).cacDiem;
+        DIEM[viTri] = new String[cacDiem.size()];
+        for (int i = 0; i < cacDiem.size(); i++) {
+            DIEM[viTri][i] = cacDiem.get(i).ten;
+        }
+        findViewById(R.id.nguonChiTiet).setOnClickListener(v -> NguonThongTin.hien(this, viTri, 0));
 
         // Ưu tiên ảnh Đại Nội Huế nếu đã thêm vào res/drawable.
         if (viTri == 2) {
@@ -173,14 +180,9 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                 .setText("▣  1/1");
 
         ((TextView) findViewById(R.id.gioMoCua))
-                .setText("◷  Xem giờ tham quan");
+                .setText("◷  Thông tin tham quan ↗");
 
-        findViewById(R.id.gioMoCua).setOnClickListener(v ->
-                thongBao(
-                        "Vui lòng kiểm tra giờ mở cửa " +
-                                "trên kênh chính thức trước khi đến."
-                )
-        );
+        findViewById(R.id.gioMoCua).setOnClickListener(v -> NguonThongTin.hien(this, viTri, 0));
 
         // Quay lại
         findViewById(R.id.nutQuayLai)
@@ -632,6 +634,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                 return;
         }
 
+        intent.putExtra("idMarker", chiSo + 1);
         startActivity(intent);
     }
 

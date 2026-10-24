@@ -57,6 +57,9 @@ final class HuongDanTour implements LocationListener {
         for (CauHinhAutoDiSan.Diem d : cauHinh.cacDiem) if (d.choPhepAuto) cacDiem.add(d);
         bang = activity.getLayoutInflater().inflate(R.layout.view_auto_tour, cha, false);
         cha.addView(bang);
+        ((TextView) bang.findViewById(R.id.tourPhamVi)).setText(
+                "AUTO có chọn lọc · " + cacDiem.size() + "/" + cauHinh.cacDiem.size()
+                + " điểm trong " + cauHinh.ten + ". Bạn luôn có thể chọn bất kỳ điểm nào trên sơ đồ để nghe thủ công.");
         viTri = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
         tuyChonView = activity.getLayoutInflater().inflate(R.layout.sheet_auto_tour, cha, false);
         chonCheDo = new com.google.android.material.bottomsheet.BottomSheetDialog(activity);
@@ -65,7 +68,10 @@ final class HuongDanTour implements LocationListener {
                 "Tự đi qua đủ " + cauHinh.cacDiem.size() + " điểm " + cauHinh.ten
                 + ": AUTO tự phát, điểm thường hiện thông báo chọn nghe hoặc bỏ qua. Không cần quyền vị trí.");
         ((TextView) tuyChonView.findViewById(R.id.tourMoTaGps)).setText(
-                "Tự phát tại " + cacDiem.size() + " điểm ngoài trời khi GPS đủ chính xác. Các điểm còn lại chọn marker để nghe. Tọa độ tham chiếu cần kiểm chứng tại di tích.");
+                "Chỉ tự phát tại " + cacDiem.size() + " điểm được cấu hình trong " + cauHinh.ten
+                + ": " + cauHinh.tenCacDiemTuDong() + ".\n\n"
+                + "Vị trí phải đủ chính xác và ổn định. Nếu không phân biệt được các điểm, hãy chọn điểm trên sơ đồ để nghe. "
+                + "Các điểm còn lại nghe thủ công. Tọa độ tham chiếu cần kiểm chứng tại di tích.");
         chonCheDo.setOnShowListener(d -> chonCheDo.getBehavior().setState(
                 com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED));
         tuyChonView.findViewById(R.id.tourGps).setOnClickListener(v -> { chonCheDo.dismiss(); batGps(); });
@@ -89,10 +95,7 @@ final class HuongDanTour implements LocationListener {
     }
 
     private List<BoChonDiemTuDong.Moc> cacMoc() {
-        List<BoChonDiemTuDong.Moc> ds = new ArrayList<>();
-        for (CauHinhAutoDiSan.Diem d : cacDiem) if (duocBat(d))
-            ds.add(new BoChonDiemTuDong.Moc(d.id, -1, d.lat, d.lon, d.banKinh));
-        return ds;
+        return cauHinh.cacMocTuDong();
     }
 
     private void chu(int id, String value) {

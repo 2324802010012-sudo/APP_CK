@@ -36,6 +36,11 @@
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" android:text="Câu chuyện điểm đến"
                 android:textSize="15sp" android:textStyle="bold" android:textColor="#24382D" />
+            <TextView android:id="@+id/ngheNguonThongTin" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:minHeight="48dp"
+                android:gravity="center_vertical" android:text="Nguồn thông tin chính thức ↗"
+                android:textSize="14sp" android:textColor="#176D53"
+                android:clickable="true" android:focusable="true" />
             <TextView android:id="@+id/ngheNoiDung" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:layout_marginTop="8dp"
                 android:paddingBottom="12dp" android:textSize="14sp" android:lineSpacingExtra="5dp"

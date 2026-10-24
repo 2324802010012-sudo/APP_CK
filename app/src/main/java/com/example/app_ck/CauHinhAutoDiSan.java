@@ -13,10 +13,13 @@ final class CauHinhAutoDiSan {
         final float banKinh;
         final boolean choPhepAuto;
 
-        Diem(int id, String ten, double lat, double lon, float banKinh, String nguon) {
+        Diem(int id, String ten, boolean choPhepAuto, double lat, double lon, float banKinh, String nguon) {
             this.id = id; this.ten = ten; this.lat = lat; this.lon = lon;
             this.banKinh = banKinh; this.nguon = nguon;
-            choPhepAuto = Double.isFinite(lat) && Double.isFinite(lon) && !nguon.isEmpty();
+            // Có tọa độ chưa đủ để bật AUTO: điểm phải được cho phép riêng.
+            this.choPhepAuto = choPhepAuto && Double.isFinite(lat) && Double.isFinite(lon)
+                    && Math.abs(lat) <= 90 && Math.abs(lon) <= 180
+                    && Float.isFinite(banKinh) && banKinh > 0 && nguon != null && !nguon.isEmpty();
         }
     }
 
@@ -30,11 +33,36 @@ final class CauHinhAutoDiSan {
         for (int i = 0; i < tenDiem.size(); i++) {
             int index = -1;
             for (int j = 0; j < ids.length; j++) if (ids[j] == i + 1) index = j;
-            ds.add(index < 0 ? new Diem(i + 1, tenDiem.get(i), Double.NaN, Double.NaN, radius, "")
-                    : new Diem(i + 1, tenDiem.get(i), gps[index][0], gps[index][1], radius,
+            ds.add(index < 0 ? new Diem(i + 1, tenDiem.get(i), false, Double.NaN, Double.NaN, radius, "")
+                    : new Diem(i + 1, tenDiem.get(i), true, gps[index][0], gps[index][1], radius,
                     "https://www.openstreetmap.org/way/" + ways[index]));
         }
         cacDiem = Collections.unmodifiableList(ds);
+    }
+
+    boolean choPhepAuto(int id) {
+        for (Diem d : cacDiem) if (d.id == id) return d.choPhepAuto;
+        return false;
+    }
+
+    String nhanCheDo(int id) {
+        return choPhepAuto(id) ? "Có hỗ trợ AUTO · Luôn nghe thủ công được" : "Nghe thủ công";
+    }
+
+    List<BoChonDiemTuDong.Moc> cacMocTuDong() {
+        List<BoChonDiemTuDong.Moc> ds = new ArrayList<>();
+        for (Diem d : cacDiem) if (d.choPhepAuto)
+            ds.add(new BoChonDiemTuDong.Moc(d.id, -1, d.lat, d.lon, d.banKinh));
+        return ds;
+    }
+
+    String tenCacDiemTuDong() {
+        StringBuilder ten = new StringBuilder();
+        for (Diem d : cacDiem) if (d.choPhepAuto) {
+            if (ten.length() > 0) ten.append(", ");
+            ten.append(d.ten);
+        }
+        return ten.toString();
     }
 
     static CauHinhAutoDiSan hue(List<String> tenDiem) {

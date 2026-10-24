@@ -174,6 +174,7 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanT
     private LinearLayout danhSachThe;
     private SoDoView soDo;
     private HuongDanTour huongDan;
+    private CauHinhAutoDiSan cauHinhAuto;
     private String luotDoc;
     private final androidx.activity.result.ActivityResultLauncher<String[]> quyenTour =
             registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
@@ -211,12 +212,13 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanT
                 break;
             }
         }
+        cauHinhAuto = CauHinhAutoDiSan.hue(danhSachTen);
         caiDatNut();
         khoiTaoTTS();
         taoGiaoDienSoDo();
         hienThiDiem();
         huongDan = new HuongDanTour(this, findViewById(R.id.tqKhungHuongDan),
-                CauHinhAutoDiSan.hue(danhSachTen));
+                cauHinhAuto);
         caiDatTheoDoiDoc();
         apDungKhoangTrongHeThong();
     }
@@ -262,6 +264,7 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanT
                 // Tọa độ marker do ứng dụng quản lý: cập nhật cả máy đã lưu tọa độ ảnh vuông cũ.
                 db.insertWithOnConflict(BANG_TOA_DO, null, viTri, SQLiteDatabase.CONFLICT_REPLACE);
             }
+            KhoNoiDungThamQuan.dongBo(db, 2);
             danhSachId.clear();
             danhSachTen.clear();
             danhSachMoTa.clear();
@@ -373,6 +376,7 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanT
         if (danhSachId.isEmpty()) return;
         tenKhuVuc.setText(danhSachTen.get(viTriHienTai));
         moTaKhuVuc.setText(danhSachMoTa.get(viTriHienTai));
+        ganNguonThongTin(2, danhSachId.get(viTriHienTai));
         demKhuVuc.setText("Điểm " + (viTriHienTai + 1) + "/" + danhSachId.size());
         tienTrinh.setProgress((viTriHienTai + 1) * 100 / danhSachId.size());
         nutTruoc.setEnabled(viTriHienTai > 0);
@@ -386,7 +390,8 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanT
             final int chiSo = i;
             boolean duocChon = i == viTriHienTai;
             TextView the = new TextView(this);
-            the.setText(danhSachId.get(i) + ".  " + danhSachTen.get(i));
+            the.setText(danhSachId.get(i) + ".  " + danhSachTen.get(i)
+                    + "\n" + cauHinhAuto.nhanCheDo(danhSachId.get(i)));
             the.setTextColor(duocChon ? Color.WHITE : Color.parseColor("#24382D"));
             the.setTypeface(null, duocChon ? Typeface.BOLD : Typeface.NORMAL);
             the.setTextSize(14);

@@ -16,6 +16,13 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
     private static final String DB = "du_lich_tai_khoan.db";
     private static final int VERSION = 12;
     public TaiKhoanDb(Context context) { super(context, DB, null, VERSION); }
+    @Override public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (!db.isReadOnly()) {
+            KhoNoiDungThamQuan.dongBoGioiThieu(db);
+            KhoNoiDungThamQuan.dongBo(db, 0);
+        }
+    }
     @Override public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE tai_khoan (id INTEGER PRIMARY KEY AUTOINCREMENT, ten_dang_nhap TEXT NOT NULL UNIQUE, muoi TEXT NOT NULL, mat_khau_bam TEXT NOT NULL, ma_khoi_phuc_bam TEXT)");
         db.execSQL("CREATE TABLE yeu_thich (tai_khoan_id INTEGER NOT NULL, dia_diem_id INTEGER NOT NULL, PRIMARY KEY(tai_khoan_id,dia_diem_id), FOREIGN KEY(tai_khoan_id) REFERENCES tai_khoan(id))");

@@ -45,6 +45,73 @@ public class BanDoVaGpsThamQuanTest {
         return scenario;
     }
 
+    @Test public void gpsSaiSoLonVanHienDangTheoDoiVaKhongMoLoiMoi() {
+        try (ActivityScenario<MainActivity> scenario = moTrangChu()) {
+            scenario.onActivity(a -> {
+                try {
+                    java.lang.reflect.Field field = BaseActivity.class.getDeclaredField("thamQuanTuDong");
+                    field.setAccessible(true);
+                    ThamQuanTuDong bo = (ThamQuanTuDong) field.get(a);
+                    // Chỉ bơm callback; không thay đổi GPS/quyền trên thiết bị.
+                    java.lang.reflect.Method batDau = ThamQuanTuDong.class.getDeclaredMethod("batDau", int.class);
+                    batDau.setAccessible(true);
+                    assertEquals(true, batDau.invoke(bo, ThamQuanTuDong.GPS));
+                    TextView viTri = a.findViewById(R.id.autoViTri);
+                    TextView trangThai = a.findViewById(R.id.autoTrangThai);
+                    assertTrue(viTri.getText().toString().contains("Đã bật theo dõi"));
+                    android.location.Location l = new android.location.Location("gps");
+                    l.setLatitude(KhoToaDoThamQuan.TOA_DO[0][0]);
+                    l.setLongitude(KhoToaDoThamQuan.TOA_DO[0][1]);
+                    l.setAccuracy(100);
+                    l.setElapsedRealtimeNanos(android.os.SystemClock.elapsedRealtimeNanos());
+                    bo.onLocationChanged(l);
+                    assertTrue(viTri.getText().toString().contains("Đang theo dõi"));
+                    assertTrue(viTri.getText().toString().contains("Sai số ±100 m"));
+                    TextView khoangCach = a.findViewById(R.id.autoKhoangCach);
+                    assertTrue(khoangCach.getText().toString().contains("Dinh Độc Lập: 0 m"));
+                    assertTrue(khoangCach.getText().toString().contains("đường chim bay"));
+                    try (TaiKhoanDb db = new TaiKhoanDb(a)) {
+                        for (DiaDiem d : db.danhSachDiaDiem())
+                            assertTrue(khoangCach.getText().toString().contains(d.ten + ": "));
+                    }
+                    assertTrue(trangThai.getText().toString().contains("cần ≤25 m"));
+                    java.lang.reflect.Field nhanDien = ThamQuanTuDong.class.getDeclaredField("nhanDien");
+                    nhanDien.setAccessible(true);
+                    assertFalse(((BoNhanDienDiaDiem) nhanDien.get(bo)).dangChoTraLoi());
+                    java.lang.reflect.Field phien = ThamQuanTuDong.class.getDeclaredField("phien");
+                    phien.setAccessible(true);
+                    java.lang.reflect.Method nhip = ThamQuanTuDong.class.getDeclaredMethod("nhip", int.class);
+                    nhip.setAccessible(true);
+                    nhip.invoke(bo, phien.getInt(bo));
+                    assertTrue(trangThai.getText().toString().contains("cần ≤25 m"));
+
+                    l.setAccuracy(3);
+                    l.setElapsedRealtimeNanos(android.os.SystemClock.elapsedRealtimeNanos() - 20000000000L);
+                    String viTriMoi = viTri.getText().toString();
+                    bo.onLocationChanged(l);
+                    assertEquals("Mẫu cũ không ghi đè mẫu mới", viTriMoi, viTri.getText().toString());
+                    // Khi chỉ có mẫu cũ, không trình bày khoảng cách đó là hiện tại.
+                    bo.dung("Bắt đầu lại kiểm thử");
+                    batDau.invoke(bo, ThamQuanTuDong.GPS);
+                    bo.onLocationChanged(l);
+                    assertTrue(viTri.getText().toString().contains("đo cách đây"));
+                    assertTrue(trangThai.getText().toString().contains("Vị trí cũ"));
+                    assertFalse(khoangCach.getText().toString().contains("Dinh Độc Lập: 0 m"));
+                    assertFalse(((BoNhanDienDiaDiem) nhanDien.get(bo)).dangChoTraLoi());
+                    if (android.os.Build.VERSION.SDK_INT >= 31) {
+                        l.setElapsedRealtimeNanos(android.os.SystemClock.elapsedRealtimeNanos());
+                        l.setMock(true);
+                        bo.onLocationChanged(l);
+                        assertTrue(trangThai.getText().toString().contains("GPS giả lập"));
+                        assertFalse(khoangCach.getText().toString().contains("Dinh Độc Lập: 0 m"));
+                    }
+                    bo.dung("Kết thúc kiểm thử");
+                    assertEquals("Đã tắt theo dõi vị trí", viTri.getText().toString());
+                } catch (ReflectiveOperationException e) { throw new AssertionError(e); }
+            });
+        }
+    }
+
     @Test public void demoCaNamDiaDiemTuTrangChuHoiTruocKhiPhat() {
         try (ActivityScenario<MainActivity> scenario = moTrangChu()) {
             for (int id = 0; id < 5; id++) {

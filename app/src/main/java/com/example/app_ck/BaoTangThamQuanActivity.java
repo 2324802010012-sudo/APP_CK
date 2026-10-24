@@ -57,6 +57,7 @@ public class BaoTangThamQuanActivity extends BaseActivity {
         try {
             SQLiteDatabase db=dbHelper.getWritableDatabase();
             khoiTaoDuLieuNeuChuaCo(db);
+            KhoNoiDungThamQuan.dongBo(db, 1);
             docDuLieu(db);
         } catch(Exception ex) {
             android.util.Log.e("BAO_TANG_SQLITE", "Khong tai duoc marker", ex);
@@ -221,6 +222,7 @@ public class BaoTangThamQuanActivity extends BaseActivity {
         cur = hienTai();
         tieuDe.setText(cur == null ? "" : cur.id + ". " + cur.ten);
         moTa.setText(cur == null ? "" : cur.noiDung);
+        if (cur != null) ganNguonThongTin(1, cur.id);
         demKhuVuc.setText("Điểm " + idDangChon + "/13");
         tienTrinh.setProgress(idDangChon * 100 / 13);
         nutTruoc.setEnabled(idDangChon > 1);

@@ -105,6 +105,7 @@ public class ConDaoThamQuanActivity extends BaseActivity {
         try (TaiKhoanDb helper = new TaiKhoanDb(this)) {
             SQLiteDatabase db = helper.getWritableDatabase();
             KhoDuLieuConDao.dongBo(db);
+            KhoNoiDungThamQuan.dongBo(db, 3);
 
             try (Cursor cursor = db.rawQuery(
                     "SELECT id, ten, mo_ta FROM " + TEN_BANG + " ORDER BY id ASC",
@@ -138,6 +139,7 @@ public class ConDaoThamQuanActivity extends BaseActivity {
         int soDiem = danhSachId.size();
         tenKhuVuc.setText(danhSachTen.get(viTriHienTai));
         moTaKhuVuc.setText(danhSachMoTa.get(viTriHienTai));
+        ganNguonThongTin(3, danhSachId.get(viTriHienTai));
         demKhuVuc.setText("Điểm " + (viTriHienTai + 1) + "/" + soDiem);
         tienTrinh.setProgress((viTriHienTai + 1) * 100 / soDiem);
         nutTruoc.setEnabled(viTriHienTai > 0);
@@ -149,23 +151,6 @@ public class ConDaoThamQuanActivity extends BaseActivity {
 
     private void taoDanhSachDiem() {
         danhSachKhuVuc.removeAllViews();
-        CauHinhAutoConDao.Diem diem = CauHinhAutoConDao.tim(danhSachId.get(viTriHienTai));
-        if (diem != null) {
-            TextView nguon = new TextView(this);
-            nguon.setText("Nguồn thuyết minh ↗");
-            nguon.setTextSize(13);
-            nguon.setTextColor(Color.parseColor("#4F7C5A"));
-            nguon.setPadding(dp(4), dp(12), dp(4), dp(12));
-            nguon.setOnClickListener(v -> {
-                android.content.Intent moNguon = new android.content.Intent(android.content.Intent.ACTION_VIEW,
-                        android.net.Uri.parse(diem.nguonNoiDung));
-                try { startActivity(moNguon); }
-                catch (android.content.ActivityNotFoundException e) {
-                    Toast.makeText(this, "Chưa có trình duyệt để mở nguồn.", Toast.LENGTH_SHORT).show();
-                }
-            });
-            danhSachKhuVuc.addView(nguon);
-        }
         AnhSoDoThamQuan.themSoDo(
                 this,
                 danhSachKhuVuc,

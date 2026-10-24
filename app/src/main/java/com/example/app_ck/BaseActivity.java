@@ -11,7 +11,21 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 public class BaseActivity extends AppCompatActivity {
     private KhungNgheThuyetMinh khungNghe;
+    private int diaDiemNguon = -1, diemNguon;
 
+    protected void ganNguonThongTin(int diaDiem, int diem) {
+        diaDiemNguon = diaDiem;
+        diemNguon = diem;
+        android.view.View nut = findViewById(R.id.tqNguonThongTin);
+        if (nut != null) {
+            nut.setVisibility(android.view.View.VISIBLE);
+            nut.setOnClickListener(v -> moNguonThongTin());
+        }
+    }
+
+    void moNguonThongTin() {
+        if (diaDiemNguon >= 0) NguonThongTin.hien(this, diaDiemNguon, diemNguon);
+    }
     /** Màn hình con dừng AUTO/TTS trước khi mở trình nghe thủ công. */
     protected void dungAmThanhThamQuan() {}
 

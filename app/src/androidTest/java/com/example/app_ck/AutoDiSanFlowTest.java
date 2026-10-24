@@ -109,6 +109,33 @@ public class AutoDiSanFlowTest {
             assertEquals("Bật AUTO",chu(s,R.id.tourBatAuto));
         }
     }
+    @Test public void hienThiRoDiemAutoVaThuCongTrenCaHaiTour() {
+        kiemTraNhanCheDo(DaiNoiHueThamQuanActivity.class);
+        kiemTraNhanCheDo(VanMieuThamQuanActivity.class);
+    }
+
+    private <T extends BaseActivity> void kiemTraNhanCheDo(Class<T> cls) {
+        try (ActivityScenario<T> s = ActivityScenario.launch(cls)) {
+            CauHinhAutoDiSan tour = config(s);
+            assertTrue(chu(s, R.id.tourPhamVi).contains(
+                    tour.cacMocTuDong().size() + "/" + tour.cacDiem.size()));
+            for (CauHinhAutoDiSan.Diem d : tour.cacDiem) {
+                onView(withText(d.id + ".  " + d.ten + "\n" + tour.nhanCheDo(d.id)))
+                        .check(androidx.test.espresso.assertion.ViewAssertions.matches(
+                                isDescendantOfA(withId(R.id.tqDanhSachKhuVuc))));
+            }
+            s.onActivity(a -> {
+                a.findViewById(R.id.tourBatAuto).performClick();
+                android.view.View sheet = (android.view.View) truong(truong(a, "huongDan"), "tuyChonView");
+                String moTa = ((TextView) sheet.findViewById(R.id.tourMoTaGps)).getText().toString();
+                for (CauHinhAutoDiSan.Diem d : tour.cacDiem)
+                    if (d.choPhepAuto) assertTrue(moTa.contains(d.ten));
+                assertEquals("Thủ công · Chưa bật AUTO",
+                        ((TextView) a.findViewById(R.id.tourCheDo)).getText().toString());
+            });
+        }
+    }
+
     @Test public void hueDemoDu10DiemChoDocXongVaHoiThuCong() { demo(DaiNoiHueThamQuanActivity.class); }
     @Test public void vanMieuDemoDu16DiemChoDocXongVaHoiThuCong() { demo(VanMieuThamQuanActivity.class); }
 
