@@ -31,7 +31,7 @@ public class YeuThichActivity extends BaseActivity {
         findViewById(R.id.ytDangKy).setOnClickListener(v -> moDangNhap(true));
         findViewById(R.id.ytKhamPha).setOnClickListener(v -> veTrangChu());
         findViewById(R.id.ytDangXuat).setOnClickListener(v ->
-                new AlertDialog.Builder(this).setTitle("Đăng xuất?")
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(this).setTitle("Đăng xuất?")
                         .setMessage("Địa điểm đã lưu sẽ được giữ lại trong tài khoản của bạn.")
                         .setPositiveButton("Đăng xuất", (d, w) -> {
                             PhienDangNhap.dangXuat(this);
@@ -124,7 +124,7 @@ public class YeuThichActivity extends BaseActivity {
 
     private void xacNhanBo(DiaDiem d) {
         long taiKhoan = PhienDangNhap.id(this);
-        new AlertDialog.Builder(this).setTitle("Bỏ lưu địa điểm?")
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this).setTitle("Bỏ lưu địa điểm?")
                 .setMessage("Bỏ " + d.ten + " khỏi danh sách yêu thích?")
                 .setPositiveButton("Bỏ lưu", (dialog, which) -> {
                     if (taiKhoan <= 0 || taiKhoan != PhienDangNhap.id(this)) {

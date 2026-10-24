@@ -1,0 +1,45 @@
+<resources>
+    <style name="ThemeOverlay.APP_CK.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">#4F7C5A</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorSurfaceContainerHigh">#FFFFFF</item>
+        <item name="colorOnSurface">#24382D</item>
+        <item name="colorOnSurfaceVariant">#647568</item>
+        <item name="android:textColorPrimary">#24382D</item>
+        <item name="android:textColorSecondary">#647568</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.APP_CK.Dialog</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.APP_CK.Dialog.Positive</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.APP_CK.Dialog.Negative</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.APP_CK.Dialog.Negative</item>
+    </style>
+    <style name="ShapeAppearance.APP_CK.Dialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">24dp</item>
+    </style>
+    <style name="Widget.APP_CK.Dialog.Positive" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">#4F7C5A</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:layout_marginStart">8dp</item>
+    </style>
+    <style name="Widget.APP_CK.Dialog.Negative" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">#4F7C5A</item>
+        <item name="backgroundTint">#EEF4EA</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+    <style name="ThemeOverlay.APP_CK.Player" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="colorPrimary">#4F7C5A</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#24382D</item>
+        <item name="bottomSheetStyle">@style/Widget.APP_CK.PlayerSheet</item>
+    </style>
+    <style name="Widget.APP_CK.PlayerSheet" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.APP_CK.Dialog</item>
+        <item name="backgroundTint">#FFFFFF</item>
+    </style>
+</resources>

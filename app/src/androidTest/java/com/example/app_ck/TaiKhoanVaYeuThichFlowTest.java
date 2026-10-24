@@ -3,7 +3,6 @@ package com.example.app_ck;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.TextView;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;

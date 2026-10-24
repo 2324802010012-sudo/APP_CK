@@ -6,35 +6,19 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
-public class ThamQuanActivity extends BaseActivity implements NguonThamQuanTuDong {
-    @Override public int idDiaDiemTuDong() { return 0; }
-    @Override public java.util.List<NguonThamQuanTuDong.Diem> cacDiemTuDong() {
-        java.util.List<NguonThamQuanTuDong.Diem> ds = new java.util.ArrayList<>();
-        for (DuLieuDinhDocLap.DiemThamQuan d : diemDinh)
-            ds.add(new NguonThamQuanTuDong.Diem(d.id, d.ten, d.tang));
-        return ds;
-    }
-    @Override public int idDiemDangChon() { return diemDinh.get(viTriKhuVuc).id; }
-    @Override public void chonDiemTuDong(int id) {
-        for (int i = 0; i < diemDinh.size(); i++) if (diemDinh.get(i).id == id) { chuyenKhuVuc(i); return; }
-    }
-    @Override public TextToSpeech mayDocTuDong() { return tts; }
-    @Override public boolean sanSangTuDong() { return ttsSanSang; }
+public class ThamQuanActivity extends BaseActivity {
     // Màn hình này chỉ phụ trách 25 Marker Dinh Độc Lập.
     // Bảo tàng sử dụng màn hình riêng với 13 Marker.
 
@@ -62,11 +46,9 @@ public class ThamQuanActivity extends BaseActivity implements NguonThamQuanTuDon
     private final List<DuLieuDinhDocLap.DiemThamQuan>
             diemDinh = new ArrayList<>();
 
-    private TextView tenKhuVuc, moTaKhuVuc, demKhuVuc, nutTruoc, nutTiep, nutPhat;
+    private TextView tenKhuVuc, moTaKhuVuc, demKhuVuc, nutTruoc, nutTiep;
     private LinearLayout danhSachKhuVuc;
     private ProgressBar tienTrinh;
-    private TextToSpeech tts;
-    private boolean ttsSanSang = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,23 +114,13 @@ public class ThamQuanActivity extends BaseActivity implements NguonThamQuanTuDon
         demKhuVuc = findViewById(R.id.tqDemKhuVuc);
         nutTruoc = findViewById(R.id.tqNutTruoc);
         nutTiep = findViewById(R.id.tqNutTiep);
-        nutPhat = findViewById(R.id.tqNutPhat);
         danhSachKhuVuc = findViewById(R.id.tqDanhSachKhuVuc);
         tienTrinh = findViewById(R.id.tqTienTrinh);
         findViewById(R.id.tqNutQuayLai).setOnClickListener(v -> finish());
         nutTruoc.setOnClickListener(v -> chuyenKhuVuc(viTriKhuVuc - 1));
         nutTiep.setOnClickListener(v -> chuyenKhuVuc(viTriKhuVuc + 1));
-        nutPhat.setOnClickListener(v -> phatThuyetMinh());
-        findViewById(R.id.tqNutDung).setOnClickListener(v -> dungThuyetMinh());
 
         tangDangXem = diemDinh.get(viTriKhuVuc).tang - 1;
-        tts = new TextToSpeech(this, trangThai -> {
-            if (trangThai == TextToSpeech.SUCCESS && tts != null) {
-                int ketQua = tts.setLanguage(new Locale("vi", "VN"));
-                ttsSanSang = ketQua != TextToSpeech.LANG_MISSING_DATA
-                        && ketQua != TextToSpeech.LANG_NOT_SUPPORTED;
-            }
-        });
         hienThiKhuVuc();
     }
 
@@ -208,7 +180,6 @@ public class ThamQuanActivity extends BaseActivity implements NguonThamQuanTuDon
     }
 
     private void hienThiKhuVuc() {
-        thongBaoDoiDiemThamQuan();
         int soDiem = diemDinh.size();
         DuLieuDinhDocLap.DiemThamQuan diem = diemDinh.get(viTriKhuVuc);
         tenKhuVuc.setText(diem.ten);
@@ -220,7 +191,7 @@ public class ThamQuanActivity extends BaseActivity implements NguonThamQuanTuDon
         nutTiep.setEnabled(viTriKhuVuc < soDiem - 1);
         nutTruoc.setAlpha(viTriKhuVuc > 0 ? 1f : .35f);
         nutTiep.setAlpha(viTriKhuVuc < soDiem - 1 ? 1f : .35f);
-        nutPhat.setText("▶  Nghe thuyết minh");
+
         danhSachKhuVuc.removeAllViews();
         taoSoDoDinhDocLap();
         taoDanhSachDiemDinh();
@@ -432,68 +403,27 @@ public class ThamQuanActivity extends BaseActivity implements NguonThamQuanTuDon
         viTriKhuVuc = moi;
         tangDangXem = diemDinh.get(moi).tang - 1;
         hienThiKhuVuc();
+        moKhungThuyetMinh(false);
     }
 
-    private void phatThuyetMinh() {
 
-        if (tts == null || !ttsSanSang) {
-            Toast.makeText(
-                    this,
-                    "Thiết bị chưa hỗ trợ giọng đọc tiếng Việt hoặc đang khởi tạo.",
-                    Toast.LENGTH_LONG
-            ).show();
-            return;
-        }
-
-        String noiDung;
-        DuLieuDinhDocLap.DiemThamQuan d = diemDinh.get(viTriKhuVuc);
-        try (TaiKhoanDb db = new TaiKhoanDb(this)) {
-            noiDung = db.layThuyetMinhTheoId(d.id);
-        } catch (Exception e) {
-            android.util.Log.e("ThamQuanActivity",
-                    "Lỗi đọc thuyết minh SQLite", e);
-            noiDung = null;
-        }
-        if (noiDung == null || noiDung.trim().isEmpty()) {
-            Toast.makeText(this, "Marker chưa có nội dung thuyết minh.",
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Phát giọng nói tiếng Việt
-        tts.speak(
-                noiDung,
-                TextToSpeech.QUEUE_FLUSH,
-                null,
-                "dinh_doc_lap_" + viTriKhuVuc
-        );
-    }
 
 
     // Dừng thuyết minh
     private void dungThuyetMinh() {
-        if (tts != null) {
-            tts.stop();
-        }
+        dongKhungThuyetMinh();
     }
 
     // Dừng giọng đọc khi rời màn hình
+    @Override protected void dungAmThanhThamQuan() {
+
+        dungThuyetMinh();
+    }
+
     @Override
     protected void onStop() {
         dungThuyetMinh();
         super.onStop();
-    }
-
-    // Giải phóng Text-to-Speech
-    @Override
-    protected void onDestroy() {
-        if (tts != null) {
-            tts.stop();
-            tts.shutdown();
-            tts = null;
-        }
-
-        super.onDestroy();
     }
 
     // NAP 25 MARKER TU CO SO DU LIEU SQLITE

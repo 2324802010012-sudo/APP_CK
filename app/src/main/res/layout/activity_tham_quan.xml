@@ -127,6 +127,12 @@
                 android:textSize="13sp"
                 android:textColor="#7C8B7D"/>
 
+            <LinearLayout
+                android:id="@+id/tqKhungHuongDan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
             <!-- THE TIEN TRINH -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -233,6 +239,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:text="Thông tin giới thiệu về khu vực tham quan."
+                    android:visibility="gone"
                     android:textSize="14sp"
                     android:lineSpacingExtra="5dp"
                     android:textColor="#647568"/>
@@ -244,7 +251,7 @@
                     android:layout_height="54dp"
                     android:layout_marginTop="20dp"
                     android:gravity="center"
-                    android:text="▶   Nghe thuyết minh"
+                    android:text="♫  Mở khung thuyết minh"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#FFFFFF"
@@ -252,17 +259,7 @@
                     android:clickable="true"
                     android:focusable="true"/>
 
-                <TextView
-                    android:id="@+id/tqNutDung"
-                    android:layout_width="match_parent"
-                    android:layout_height="42dp"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"
-                    android:text="■  Dừng thuyết minh"
-                    android:textSize="14sp"
-                    android:textColor="#4F7C5A"
-                    android:clickable="true"
-                    android:focusable="true"/>
+
             </LinearLayout>
 
             <!-- DIEU HUONG -->

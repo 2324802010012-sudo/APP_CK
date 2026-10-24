@@ -14,7 +14,8 @@ public class WelcomeActivity extends BaseActivity {
         nutBatDau = findViewById(R.id.btnBatDau);
         nutDangNhap = findViewById(R.id.btnDangNhap);
         nutBatDau.setOnClickListener(v -> {
-            Intent chuyenTrang = new Intent(WelcomeActivity.this, MainActivity.class);
+            Intent chuyenTrang = new Intent(WelcomeActivity.this, MainActivity.class)
+                    .putExtra(MainActivity.BAT_DAU_HUONG_DAN, true);
             startActivity(chuyenTrang);
             finish();
         });

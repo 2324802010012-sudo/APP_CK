@@ -5,7 +5,6 @@ import androidx.appcompat.app.AlertDialog;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
 
 public class DangKyActivity extends BaseActivity {
     private EditText ten, matKhau, nhapLai;
@@ -69,7 +68,7 @@ public class DangKyActivity extends BaseActivity {
         }
     }
     private void hienMaKhoiPhuc() {
-        AlertDialog hopThoai = new AlertDialog.Builder(this)
+        AlertDialog hopThoai = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("Đăng ký thành công")
                 .setMessage("Mã khôi phục tài khoản của bạn:\n\n" + maDaTao
                         + "\n\nHãy lưu mã này để dùng khi quên mật khẩu. Sau đó đăng nhập bằng tài khoản vừa tạo.")

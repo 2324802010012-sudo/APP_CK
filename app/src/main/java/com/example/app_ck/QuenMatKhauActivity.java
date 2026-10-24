@@ -5,7 +5,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 public class QuenMatKhauActivity extends BaseActivity {
     private EditText ten, ma, matKhauMoi, xacNhan;
@@ -52,7 +51,7 @@ public class QuenMatKhauActivity extends BaseActivity {
     }
 
     private void hienMaMoi() {
-        AlertDialog hopThoai = new AlertDialog.Builder(this)
+        AlertDialog hopThoai = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle("Đổi mật khẩu thành công")
             .setMessage("Mã khôi phục mới của bạn:\n\n" + maDaDoi + "\n\nHãy lưu mã này ở nơi an toàn. Mã cũ đã hết hiệu lực. Đăng nhập lại bằng mật khẩu mới.")
             .setCancelable(false)

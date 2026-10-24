@@ -10,6 +10,30 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 public class BaseActivity extends AppCompatActivity {
+    private KhungNgheThuyetMinh khungNghe;
+
+    /** Màn hình con dừng AUTO/TTS trước khi mở trình nghe thủ công. */
+    protected void dungAmThanhThamQuan() {}
+
+    protected void moKhungThuyetMinh(boolean phatNgay) {
+        android.widget.TextView ten = findViewById(R.id.tqTenKhuVuc);
+        android.widget.TextView bai = findViewById(R.id.tqMoTaKhuVuc);
+        android.widget.TextView diaDiem = findViewById(R.id.tqTenDiaDiem);
+        android.widget.ImageView anh = findViewById(R.id.tqAnhDiaDiem);
+        if (ten == null || bai == null || isFinishing()) return;
+        dungAmThanhThamQuan();
+        if (khungNghe == null) khungNghe = new KhungNgheThuyetMinh(this);
+        khungNghe.mo(ten.getText().toString(), bai.getText().toString(),
+                diaDiem.getText().toString(), anh.getDrawable(), phatNgay);
+    }
+
+    protected void dongKhungThuyetMinh() { if (khungNghe != null) khungNghe.dong(); }
+
+    @Override protected void onDestroy() {
+        if (khungNghe != null) khungNghe.giaiPhong();
+        super.onDestroy();
+    }
+
     private ThamQuanTuDong thamQuanTuDong;
     private final androidx.activity.result.ActivityResultLauncher<String[]> quyenGpsThamQuan =
             registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
@@ -23,21 +47,31 @@ public class BaseActivity extends AppCompatActivity {
                 android.Manifest.permission.ACCESS_COARSE_LOCATION});
     }
 
-    protected void thongBaoDoiDiemThamQuan() {
-        if (thamQuanTuDong != null) thamQuanTuDong.chonThuCong();
-    }
-
     @Override protected void onPostCreate(@Nullable Bundle state) {
         super.onPostCreate(state);
-        if (!isFinishing() && this instanceof NguonThamQuanTuDong
-                && findViewById(R.id.tqDanhSachKhuVuc) != null) {
+        android.view.View moKhung = findViewById(R.id.tqNutPhat);
+        if (moKhung != null) {
+            moKhung.setOnClickListener(v -> moKhungThuyetMinh(true));
             apDungKhoangTrongHeThong();
-            thamQuanTuDong = new ThamQuanTuDong(this, (NguonThamQuanTuDong) this);
+        }
+        if (!isFinishing() && this instanceof MainActivity
+                && findViewById(R.id.khungThuyetMinhTuDong) != null) {
+            apDungKhoangTrongHeThong();
+            thamQuanTuDong = new ThamQuanTuDong((MainActivity) this);
+            if (state == null && getIntent().getBooleanExtra(MainActivity.BAT_DAU_HUONG_DAN, false)) {
+                getIntent().removeExtra(MainActivity.BAT_DAU_HUONG_DAN);
+                thamQuanTuDong.batGps();
+            }
         }
     }
 
+    protected void dungHuongDanTheoViTri() {
+        if (thamQuanTuDong != null) thamQuanTuDong.dung("Đã dừng hướng dẫn theo vị trí để nghe thủ công.");
+    }
+
     @Override protected void onStop() {
-        if (thamQuanTuDong != null) thamQuanTuDong.dung("Đã tạm dừng AUTO khi rời màn hình. Bấm Demo hoặc GPS thật để tiếp tục.");
+        dongKhungThuyetMinh();
+        if (thamQuanTuDong != null) thamQuanTuDong.dung("Đã dừng theo dõi và giọng đọc khi rời màn hình. Bấm Demo hoặc GPS thật để bắt đầu lượt mới.");
         super.onStop();
     }
     protected void apDungKhoangTrongHeThong() {
@@ -47,7 +81,7 @@ public class BaseActivity extends AppCompatActivity {
             androidx.core.graphics.Insets khoangTrong = insets.getInsets(
                     WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
             int bottom = khoangTrong.bottom;
-            if (findViewById(R.id.navTrangChu) != null) {
+            if (findViewById(R.id.navTrangChu) != null || this instanceof ChiTietDiaDiemActivity) {
                 bottom = Math.max(bottom, insets.getInsetsIgnoringVisibility(
                         WindowInsetsCompat.Type.navigationBars()).bottom);
             }

@@ -32,11 +32,11 @@ public class CaNhanActivity extends BaseActivity {
         ganHang(R.id.cnDoiMatKhau, R.drawable.ui_ic_lock, "Đổi mật khẩu", "Xác thực bằng mật khẩu hiện tại",
                 () -> startActivity(new Intent(this, DoiMatKhauActivity.class)));
         ganHang(R.id.cnHuongDan, R.drawable.ui_ic_route, "Thông tin ứng dụng", "Tài khoản, dữ liệu và mã khôi phục",
-                () -> new AlertDialog.Builder(this).setTitle("APP_CK · Khám phá Việt Nam")
+                () -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(this).setTitle("APP_CK · Khám phá Việt Nam")
                         .setMessage("Khám phá địa điểm, lưu yêu thích và tham quan qua sơ đồ, GPS, thuyết minh.\n\n"
                                 + "Tài khoản và hồ sơ lưu trên thiết bị, chưa đồng bộ giữa các máy. Email liên hệ chưa được xác minh và không dùng để khôi phục mật khẩu. Hãy giữ mã khôi phục được cấp khi đăng ký hoặc đổi mật khẩu.")
                         .setPositiveButton("Đã hiểu", null).show());
-        findViewById(R.id.cnDangXuat).setOnClickListener(v -> new AlertDialog.Builder(this)
+        findViewById(R.id.cnDangXuat).setOnClickListener(v -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("Đăng xuất?").setMessage("Các địa điểm yêu thích và hồ sơ vẫn được giữ trong tài khoản của bạn.")
                 .setPositiveButton("Đăng xuất", (d, w) -> { PhienDangNhap.dangXuat(this); hienThi(); })
                 .setNegativeButton("Ở lại", null).show());

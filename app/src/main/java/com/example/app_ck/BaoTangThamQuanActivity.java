@@ -12,12 +12,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -27,17 +25,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /** Sơ đồ 13 điểm dựa theo ảnh do người dùng cung cấp. Không dùng làm định vị trong nhà. */
-public class BaoTangThamQuanActivity extends BaseActivity implements NguonThamQuanTuDong {
-    @Override public int idDiaDiemTuDong() { return 1; }
-    @Override public java.util.List<NguonThamQuanTuDong.Diem> cacDiemTuDong() {
-        java.util.List<NguonThamQuanTuDong.Diem> cacDiem = new java.util.ArrayList<>();
-        for (Diem d : ds) cacDiem.add(new NguonThamQuanTuDong.Diem(d.id, d.ten, d.tang));
-        return cacDiem;
-    }
-    @Override public int idDiemDangChon() { return idDangChon; }
-    @Override public void chonDiemTuDong(int id) { chon(id); }
-    @Override public TextToSpeech mayDocTuDong() { return tts; }
-    @Override public boolean sanSangTuDong() { return ttsOK; }
+public class BaoTangThamQuanActivity extends BaseActivity {
     private static final String[] TEN_TANG = {"Tầng trệt / Ngoài trời", "Lầu 1", "Lầu 2"};
     private static final int[] ANH = {
             R.drawable.so_do_bao_tang_0,
@@ -59,8 +47,6 @@ public class BaoTangThamQuanActivity extends BaseActivity implements NguonThamQu
     private TextView tieuDe, moTa, demKhuVuc, nutTruoc, nutTiep;
     private ProgressBar tienTrinh;
     private SoDoView soDo;
-    private TextToSpeech tts;
-    private boolean ttsOK=false;
     private TaiKhoanDb dbHelper;
 
     private int dp(float n) { return Math.round(n*getResources().getDisplayMetrics().density); }
@@ -82,12 +68,6 @@ public class BaoTangThamQuanActivity extends BaseActivity implements NguonThamQu
         if(idYeuCau>=1 && idYeuCau<=13) idDangChon=idYeuCau;
         for(Diem d:ds) if(d.id==idDangChon) {tang=d.tang; break;}
         taoGiaoDien();
-        tts=new TextToSpeech(this,status -> {
-            if(status==TextToSpeech.SUCCESS && tts!=null) {
-                int k=tts.setLanguage(new Locale("vi","VN"));
-                ttsOK=(k!=TextToSpeech.LANG_MISSING_DATA && k!=TextToSpeech.LANG_NOT_SUPPORTED);
-            }
-        });
         hienThi();
     }
 
@@ -140,14 +120,6 @@ public class BaoTangThamQuanActivity extends BaseActivity implements NguonThamQu
         return d;
     }
 
-    private LinearLayout theNoiDung(int padding) {
-        LinearLayout box = new LinearLayout(this);
-        box.setOrientation(LinearLayout.VERTICAL);
-        box.setPadding(dp(padding), dp(padding), dp(padding), dp(padding));
-        box.setBackground(nenBoGoc("#FFFFFF", "#E6EDE5", 18));
-        return box;
-    }
-
     // Sử dụng đúng XML tham quan dùng chung cho mọi địa điểm.
     // Giữ nguyên sơ đồ 3 tầng, 13 Marker và dữ liệu SQLite.
     private void taoGiaoDien() {
@@ -171,10 +143,6 @@ public class BaoTangThamQuanActivity extends BaseActivity implements NguonThamQu
 
         findViewById(R.id.tqNutQuayLai)
                 .setOnClickListener(v -> finish());
-        findViewById(R.id.tqNutPhat)
-                .setOnClickListener(v -> phat());
-        findViewById(R.id.tqNutDung)
-                .setOnClickListener(v -> dung());
         nutTruoc.setOnClickListener(v -> chuyenDiem(-1));
         nutTiep.setOnClickListener(v -> chuyenDiem(1));
 
@@ -205,14 +173,6 @@ public class BaoTangThamQuanActivity extends BaseActivity implements NguonThamQu
         danhSach = new LinearLayout(this);
         danhSach.setOrientation(LinearLayout.VERTICAL);
         addMargin(noiDungDanhSach, danhSach, 12);
-    }
-
-    private LinearLayout theNenTq(int padding) {
-        LinearLayout result = new LinearLayout(this);
-        result.setOrientation(LinearLayout.VERTICAL);
-        result.setPadding(dp(padding), dp(padding), dp(padding), dp(padding));
-        result.setBackgroundResource(R.drawable.nen_tq_the);
-        return result;
     }
 
     private void addMargin(LinearLayout parent, View view, int topDp) {
@@ -250,9 +210,9 @@ public class BaoTangThamQuanActivity extends BaseActivity implements NguonThamQu
         dung();idDangChon=id;
         Diem d=hienTai();if(d!=null)tang=d.tang;
         hienThi();
+        moKhungThuyetMinh(false);
     }
     private void hienThi() {
-        thongBaoDoiDiemThamQuan();
         if (soDo == null) return;
         Diem cur = hienTai();
         if (cur != null && cur.tang != tang) {
@@ -290,14 +250,15 @@ public class BaoTangThamQuanActivity extends BaseActivity implements NguonThamQu
         }
         soDo.invalidate();
     }
-    private void phat() {
-        Diem d=hienTai();if(d==null)return;
-        if(tts==null||!ttsOK) {Toast.makeText(this,"Giọng đọc tiếng Việt chưa sẵn sàng.",Toast.LENGTH_SHORT).show();return;}
-        tts.speak(d.ten+". "+d.noiDung,TextToSpeech.QUEUE_FLUSH,null,"bao_tang_"+d.id);
+
+    private void dung() {dongKhungThuyetMinh();}
+    @Override protected void dungAmThanhThamQuan() {
+
+        dung();
     }
-    private void dung() {if(tts!=null)tts.stop();}
+
     @Override protected void onStop(){dung();super.onStop();}
-    @Override protected void onDestroy(){dung();if(tts!=null)tts.shutdown();if(dbHelper!=null)dbHelper.close();super.onDestroy();}
+    @Override protected void onDestroy(){dung();if(dbHelper!=null)dbHelper.close();super.onDestroy();}
 
     private final class SoDoView extends View {
         private Bitmap image;

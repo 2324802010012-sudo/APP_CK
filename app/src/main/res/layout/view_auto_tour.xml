@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tourBangAuto" android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:layout_marginTop="16dp"
+    android:padding="16dp" android:orientation="vertical" android:background="@drawable/nen_tq_the">
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="Thuyết minh tự động" android:textSize="17sp"
+        android:textStyle="bold" android:textColor="#24382D" />
+    <TextView android:id="@+id/tourCheDo" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="4dp"
+        android:text="Thủ công · Chưa bật AUTO" android:textSize="13sp" android:textColor="#526456" />
+    <com.google.android.material.button.MaterialButton android:id="@+id/tourBatAuto"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:minHeight="48dp" android:text="Bật AUTO" android:textAllCaps="false"
+        android:textColor="#FFFFFF" app:backgroundTint="#4F7C5A" app:cornerRadius="14dp" />
+    <TextView android:id="@+id/tourTrangThai" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="4dp"
+        android:visibility="gone" android:textColor="#526456" android:textSize="13sp"
+        android:accessibilityLiveRegion="polite" />
+    <com.google.android.material.button.MaterialButton android:id="@+id/tourBuocDemo"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:minHeight="48dp" android:text="Demo: tiến gần điểm" android:textAllCaps="false"
+        android:textColor="#4F7C5A" android:visibility="gone" app:strokeColor="#4F7C5A" />
+</LinearLayout>

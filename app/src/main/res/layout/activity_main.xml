@@ -251,6 +251,12 @@
                         android:textColor="#35463D"/>
                 </LinearLayout>
             </LinearLayout>
+            <FrameLayout
+                android:id="@+id/khungThuyetMinhTuDong"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="18dp"
+                android:layout_marginTop="14dp" />
             <!-- Danh mục: giữ id cho Java lọc hiện tại -->
             <TextView
                 android:layout_width="match_parent"

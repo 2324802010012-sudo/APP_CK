@@ -30,17 +30,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 
-public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQuanTuDong {
-    @Override public int idDiaDiemTuDong() { return 4; }
-    @Override public java.util.List<NguonThamQuanTuDong.Diem> cacDiemTuDong() {
-        java.util.List<NguonThamQuanTuDong.Diem> ds = new java.util.ArrayList<>();
-        for (int i = 0; i < tenDiem.size(); i++) ds.add(new NguonThamQuanTuDong.Diem(i + 1, tenDiem.get(i), -1));
-        return ds;
-    }
-    @Override public int idDiemDangChon() { return viTri + 1; }
-    @Override public void chonDiemTuDong(int id) { chuyenDiem(id - 1); }
-    @Override public TextToSpeech mayDocTuDong() { return tts; }
-    @Override public boolean sanSangTuDong() { return sanSangDoc; }
+public class VanMieuThamQuanActivity extends BaseActivity implements HuongDanTour.ManHinh {
 
     private static final String[] TEN = {
             "Phương Đình – Hồ Văn",
@@ -90,6 +80,24 @@ public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQu
     private TextView nutTiep;
     private LinearLayout danhSachKhuVuc;
     private ProgressBar tienTrinh;
+    private HuongDanTour huongDan;
+    private String luotDoc;
+    private final androidx.activity.result.ActivityResultLauncher<String[]> quyenTour =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
+                    result -> {
+                        if (huongDan != null) huongDan.nhanQuyen(Boolean.TRUE.equals(
+                                result.get(android.Manifest.permission.ACCESS_FINE_LOCATION)));
+                    });
+
+    @Override public void xinQuyenTour() {
+        quyenTour.launch(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION});
+    }
+
+    private void dungAutoThuCong() {
+        if (huongDan != null) huongDan.dung("Đã chuyển sang nghe thủ công.");
+    }
+
     private TextToSpeech tts;
     private boolean sanSangDoc = false;
     private int viTri = 0;
@@ -117,12 +125,6 @@ public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQu
         nutTruoc.setOnClickListener(v -> chuyenDiem(viTri - 1));
         nutTiep.setOnClickListener(v -> chuyenDiem(viTri + 1));
 
-        findViewById(R.id.tqNutPhat)
-                .setOnClickListener(v -> phatThuyetMinh());
-
-        findViewById(R.id.tqNutDung)
-                .setOnClickListener(v -> dungThuyetMinh());
-
         if (!taiDiemTuSQLite()) {
             Toast.makeText(this, "Không đọc được dữ liệu Văn Miếu từ SQLite.",
                     Toast.LENGTH_LONG).show();
@@ -142,6 +144,10 @@ public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQu
         });
 
         hienThi();
+        huongDan = new HuongDanTour(this, findViewById(R.id.tqKhungHuongDan),
+                CauHinhAutoDiSan.vanMieu(tenDiem));
+        caiDatTheoDoiDoc();
+        apDungKhoangTrongHeThong();
     }
 
     private boolean taiDiemTuSQLite() {
@@ -191,7 +197,6 @@ public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQu
     }
 
     private void hienThi() {
-        thongBaoDoiDiemThamQuan();
         tenKhuVuc.setText(tenDiem.get(viTri));
         moTaKhuVuc.setText(moTaDiem.get(viTri));
         demKhuVuc.setText("Điểm " + (viTri + 1) + "/" + tenDiem.size());
@@ -256,31 +261,70 @@ public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQu
         if (moi < 0 || moi >= tenDiem.size()) {
             return;
         }
+        dungAutoThuCong();
         dungThuyetMinh();
         viTri = moi;
         hienThi();
+        moKhungThuyetMinh(false);
     }
 
-    private void phatThuyetMinh() {
-        if (tts == null || !sanSangDoc) {
-            Toast.makeText(this, "Giọng đọc tiếng Việt chưa sẵn sàng.",
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        String noiDung = tenDiem.get(viTri) + ". " + moTaDiem.get(viTri);
-        tts.speak(noiDung, TextToSpeech.QUEUE_FLUSH,
-                null, "van_mieu_" + (viTri + 1));
+
+    @Override public void hienThiDiemDemo(int id) {
+        if (id < 1 || id > tenDiem.size()) return;
+        dungThuyetMinh();
+        viTri = id - 1;
+        hienThi();
+    }
+
+    @Override public boolean phatDiemTuDong(int id) {
+        if (!sanSangDoc || tts == null || id < 1 || id > tenDiem.size()
+                || !getLifecycle().getCurrentState().isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) return false;
+        hienThiDiemDemo(id);
+        return docDiemHienTai();
+    }
+
+    private boolean docDiemHienTai() {
+        luotDoc = "van_mieu_" + (viTri + 1) + "_" + System.nanoTime();
+        boolean ok = tts.speak(tenDiem.get(viTri) + ". " + moTaDiem.get(viTri),
+                TextToSpeech.QUEUE_FLUSH, null, luotDoc) == TextToSpeech.SUCCESS;
+        if (!ok) luotDoc = null;
+        return ok;
     }
 
     private void dungThuyetMinh() {
-        if (tts != null) {
-            tts.stop();
-        }
+        dongKhungThuyetMinh();
+        luotDoc = null;
+        if (tts != null) tts.stop();
+    }
+
+    @Override public void dungDocTour() { dungThuyetMinh(); }
+
+    private void caiDatTheoDoiDoc() {
+        tts.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {
+            @Override public void onStart(String id) {}
+            @Override public void onDone(String id) { ketThucDoc(id, true); }
+            @Override public void onError(String id) { ketThucDoc(id, false); }
+            @Override public void onError(String id, int maLoi) { ketThucDoc(id, false); }
+        });
+    }
+
+    private void ketThucDoc(String id, boolean thanhCong) {
+        runOnUiThread(() -> {
+            if (isDestroyed() || id == null || !id.equals(luotDoc)) return;
+            luotDoc = null;
+            if (huongDan != null) huongDan.docXong(thanhCong);
+        });
+    }
+
+    @Override protected void dungAmThanhThamQuan() {
+        dungAutoThuCong();
+        dungThuyetMinh();
     }
 
     @Override
     protected void onStop() {
+        if (huongDan != null) huongDan.dung("");
         dungThuyetMinh();
         super.onStop();
     }
@@ -389,27 +433,28 @@ public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQu
                                 "x_ty_le REAL NOT NULL, " +
                                 "y_ty_le REAL NOT NULL)"
                 );
-                // 16 vị trí được đo trên ảnh sơ đồ 1129 x 643 do người dùng cung cấp.
-                // INSERT OR IGNORE giữ nguyên những điểm đã căn lại thủ công.
-                // Các điểm này chỉ phù hợp khi sử dụng đúng ảnh sơ đồ đã gửi.
+                // Tâm các số trên ảnh hiện tại 1672×941; không phải GPS.
+                // Chỉ chuyển tọa độ mặc định cũ, giữ điểm đã chỉnh thủ công trong debug.
                 if ("van_mieu_toa_do".equals(bangToaDo)) {
                     float[][] viTriMau = {
-                            {238f / 1129f, 282f / 643f},
-                            {384f / 1129f, 358f / 643f},
-                            {389f / 1129f, 292f / 643f},
-                            {447f / 1129f, 302f / 643f},
-                            {564f / 1129f, 309f / 643f},
-                            {658f / 1129f, 315f / 643f},
-                            {728f / 1129f, 368f / 643f},
-                            {728f / 1129f, 317f / 643f},
-                            {762f / 1129f, 315f / 643f},
-                            {840f / 1129f, 309f / 643f},
-                            {886f / 1129f, 327f / 643f},
-                            {976f / 1129f, 323f / 643f},
-                            {984f / 1129f, 379f / 643f},
-                            {989f / 1129f, 278f / 643f},
-                            {893f / 1129f, 406f / 643f},
-                            {490f / 1129f, 163f / 643f},
+                            {278f/1672f,414f/941f}, {514f/1672f,534f/941f},
+                            {523f/1672f,427f/941f}, {619f/1672f,440f/941f},
+                            {805f/1672f,457f/941f}, {955f/1672f,463f/941f},
+                            {1067f/1672f,544f/941f}, {1067f/1672f,464f/941f},
+                            {1120f/1672f,466f/941f}, {1246f/1672f,460f/941f},
+                            {1321f/1672f,481f/941f}, {1466f/1672f,477f/941f},
+                            {1483f/1672f,567f/941f}, {1486f/1672f,407f/941f},
+                            {1335f/1672f,618f/941f}, {688f/1672f,218f/941f}
+                    };
+                    float[][] viTriCu = {
+                            {238f/1129f,282f/643f}, {384f/1129f,358f/643f},
+                            {389f/1129f,292f/643f}, {447f/1129f,302f/643f},
+                            {564f/1129f,309f/643f}, {658f/1129f,315f/643f},
+                            {728f/1129f,368f/643f}, {728f/1129f,317f/643f},
+                            {762f/1129f,315f/643f}, {840f/1129f,309f/643f},
+                            {886f/1129f,327f/643f}, {976f/1129f,323f/643f},
+                            {984f/1129f,379f/643f}, {989f/1129f,278f/643f},
+                            {893f/1129f,406f/643f}, {490f/1129f,163f/643f}
                     };
                     db.beginTransaction();
                     try {
@@ -424,6 +469,10 @@ public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQu
                                     cv,
                                     SQLiteDatabase.CONFLICT_IGNORE
                             );
+                            db.update(bangToaDo, cv,
+                                    "id=? AND ABS(x_ty_le-?)<0.00001 AND ABS(y_ty_le-?)<0.00001",
+                                    new String[]{String.valueOf(i+1), String.valueOf(viTriCu[i][0]),
+                                            String.valueOf(viTriCu[i][1])});
                         }
                         db.setTransactionSuccessful();
                     } finally {
@@ -511,10 +560,9 @@ public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQu
                     ChonDiem xuLyChon
             ) {
                 super(context);
-                this.anh = BitmapFactory.decodeResource(
-                        context.getResources(),
-                        anhId
-                );
+                BitmapFactory.Options tuyChonAnh = new BitmapFactory.Options();
+                tuyChonAnh.inScaled = false;
+                this.anh = BitmapFactory.decodeResource(context.getResources(), anhId, tuyChonAnh);
                 this.danhSach = danhSach;
                 this.idHienTai = idHienTai;
                 this.xuLyChon = xuLyChon;
@@ -579,14 +627,15 @@ public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQu
                     float x = vungAnh.left + diem.x * vungAnh.width();
                     float y = vungAnh.top + diem.y * vungAnh.height();
                     boolean chon = diem.id == idHienTai;
+                    float tiLeMarker = vungAnh.width() / 1672f;
                     paint.setColor(Color.WHITE);
-                    canvas.drawCircle(x, y, dp(16), paint);
+                    canvas.drawCircle(x, y, 16f * tiLeMarker, paint);
                     paint.setColor(Color.parseColor(chon ? "#E8A600" : "#087B5A"));
-                    canvas.drawCircle(x, y, dp(13), paint);
+                    canvas.drawCircle(x, y, 13f * tiLeMarker, paint);
                     paint.setColor(Color.WHITE);
                     paint.setTextAlign(Paint.Align.CENTER);
                     paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-                    paint.setTextSize(dp(10));
+                    paint.setTextSize(10f * tiLeMarker);
                     canvas.drawText(
                             String.valueOf(diem.id),
                             x,
@@ -638,7 +687,7 @@ public class VanMieuThamQuanActivity extends BaseActivity implements NguonThamQu
                     return;
                 }
 
-                new AlertDialog.Builder(getContext())
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(getContext())
                         .setTitle("Đặt Marker " + idHienTai)
                         .setMessage("Lưu vị trí đang nhấn cho điểm số "
                                 + idHienTai + " trên ảnh sơ đồ? "

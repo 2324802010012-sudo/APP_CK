@@ -1,147 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="14dp"
-    android:layout_marginBottom="16dp"
-    android:background="@drawable/ui_card">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="14dp"
+    android:layout_marginBottom="16dp" android:background="@drawable/ui_card">
 
-    <!-- TIEU DE -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hướng dẫn theo vị trí"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#20382A" />
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="Hướng dẫn theo vị trí" android:textSize="18sp"
+        android:textStyle="bold" android:textColor="#20382A" />
+    <TextView android:id="@+id/autoCheDo" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="8dp"
+        android:text="Chưa bật hướng dẫn" android:textStyle="bold" android:textColor="#2C7351" />
+    <TextView android:id="@+id/autoTrangThai" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="6dp"
+        android:text="Tự nhận diện điểm đến gần bạn → hỏi Bắt đầu / Bỏ qua → chỉ phát khi bạn xác nhận."
+        android:textSize="13sp" android:textColor="#607467" android:accessibilityLiveRegion="polite" />
+    <TextView android:id="@+id/autoViTri" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="6dp"
+        android:text="Chưa lấy vị trí" android:textSize="12sp" android:textColor="#607467" />
 
-    <!-- CHE DO HOAT DONG -->
-    <TextView
-        android:id="@+id/autoCheDo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Thủ công"
-        android:textStyle="bold"
-        android:textColor="#2C7351" />
-
-    <!-- TRANG THAI HUONG DAN -->
-    <TextView
-        android:id="@+id/autoTrangThai"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="Chọn Demo để trải nghiệm hoặc GPS thật khi đang tham quan."
-        android:textSize="13sp"
-        android:textColor="#607467"
-        android:accessibilityLiveRegion="polite" />
-
-    <!-- VI TRI HIEN TAI -->
-    <TextView
-        android:id="@+id/autoViTri"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="Chưa lấy vị trí"
-        android:textSize="12sp"
-        android:textColor="#607467" />
-
-    <!-- NHOM NUT DIEU KHIEN -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="Chọn điểm đến để chạy demo" android:layout_marginTop="8dp"
+        android:textSize="12sp" android:textColor="#607467" />
+    <Spinner android:id="@+id/autoChonDiaDiemDemo" android:layout_width="match_parent"
+        android:layout_height="48dp" android:contentDescription="Địa điểm mô phỏng" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="horizontal">
-
-        <!-- CHAY DEMO -->
-        <Button
-            android:id="@+id/autoDemo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="48dp"
-            android:text="Chạy demo"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#2C7351" />
-
-        <!-- SU DUNG GPS THAT -->
-        <Button
-            android:id="@+id/autoGps"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="48dp"
-            android:text="GPS thật"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#2C7351" />
-
-        <!-- DUNG TU DONG -->
-        <Button
-            android:id="@+id/autoDung"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="48dp"
-            android:text="Dừng AUTO"
-            android:textAllCaps="false"
-            android:textSize="12sp"
-            android:textColor="#2C7351"
-            android:backgroundTint="#EAF1E8" />
-
+        <Button android:id="@+id/autoDemo" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1" android:minHeight="48dp"
+            android:text="Chạy demo" android:textAllCaps="false" android:textSize="12sp"
+            android:textColor="#FFFFFF" android:backgroundTint="#2C7351" />
+        <Button android:id="@+id/autoGps" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1" android:minHeight="48dp"
+            android:text="GPS thật" android:textAllCaps="false" android:textSize="12sp"
+            android:textColor="#FFFFFF" android:backgroundTint="#2C7351" />
+        <Button android:id="@+id/autoDung" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1" android:minHeight="48dp"
+            android:text="Dừng" android:textAllCaps="false" android:textSize="12sp"
+            android:textColor="#2C7351" android:backgroundTint="#EAF1E8" />
     </LinearLayout>
-
-    <!-- DI CHUYEN TOI MOC DEMO TIEP THEO -->
-    <Button
-        android:id="@+id/autoDemoTiep"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:text="Demo: di chuyển đến mốc tiếp theo"
-        android:textAllCaps="false"
-        android:textSize="12sp"
-        android:visibility="gone"
-        android:backgroundTint="#EAF1E8"
-        android:textColor="#2C7351" />
-
-    <!-- BAN KINH TU DONG PHAT -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Bán kính phát tại mốc đã ghi GPS"
-        android:textSize="12sp"
-        android:textColor="#607467" />
-
-    <!-- CHON BAN KINH -->
-    <Spinner
-        android:id="@+id/autoBanKinh"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:contentDescription="Chọn bán kính tự động phát" />
-
-    <!-- GHI TOA DO GPS -->
-    <Button
-        android:id="@+id/autoGhiGps"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:text="Ghi GPS tại mốc đang chọn"
-        android:textAllCaps="false"
-        android:textSize="12sp"
-        android:backgroundTint="#EAF1E8"
-        android:textColor="#2C7351" />
-
-    <!-- HUONG DAN SU DUNG -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Demo dùng vị trí mô phỏng và không lưu GPS. GPS thật phát giới thiệu khi đến địa điểm; để phát theo từng mốc, đứng đúng mốc rồi ghi GPS. Trong nhà cần chọn đúng tầng; các phòng quá gần nhau nên chọn thủ công."
-        android:textSize="12sp"
-        android:lineSpacingExtra="3dp"
-        android:textColor="#607467" />
-
+    <Button android:id="@+id/autoDemoDenGan" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:minHeight="48dp"
+        android:text="Demo: bước khoảng cách tiếp theo" android:textAllCaps="false"
+        android:textSize="12sp" android:visibility="gone"
+        android:backgroundTint="#EAF1E8" android:textColor="#2C7351" />
+    <Button android:id="@+id/autoMoChiTiet" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:minHeight="48dp"
+        android:text="Mở chi tiết địa điểm" android:visibility="gone" android:textAllCaps="false" android:textSize="13sp"
+        android:backgroundTint="#EAF1E8" android:textColor="#2C7351" />
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="GPS thật nhận diện cả 5 địa điểm khi trang chủ đang mở, bán kính 100 m. Demo mô phỏng 500 → 300 → 150 → 90 m, không dùng GPS thật. Luôn hỏi trước khi phát; các điểm bên trong chọn marker thủ công."
+        android:textSize="12sp" android:lineSpacingExtra="3dp" android:textColor="#607467" />
 </LinearLayout>

@@ -23,7 +23,6 @@ import android.speech.tts.TextToSpeech;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import android.widget.ImageView;
 import android.view.ViewGroup;
@@ -34,6 +33,9 @@ import java.util.Collections;
 import java.util.Locale;
 
 public class MainActivity extends BaseActivity {
+    public static final String BAT_DAU_HUONG_DAN = "com.example.app_ck.BAT_DAU_HUONG_DAN";
+    TextToSpeech mayDocGioiThieu() { return ttsTrangChu; }
+
     private TextToSpeech ttsTrangChu;
     private boolean sanSangThuyetMinh = false;
     private static final int[] ID_DIA_DIEM = {0, 1, 2, 3, 4};
@@ -227,14 +229,14 @@ public class MainActivity extends BaseActivity {
         if (banPhim != null) banPhim.hideSoftInputFromWindow(oTimKiem.getWindowToken(), 0);
         oTimKiem.clearFocus();
         if (ketQua.isEmpty()) {
-            new AlertDialog.Builder(this).setTitle("Kết quả tìm kiếm")
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(this).setTitle("Kết quả tìm kiếm")
                     .setMessage("Không tìm thấy địa điểm phù hợp")
                     .setPositiveButton("Đóng", null).show();
             return;
         }
         String[] danhSach = new String[ketQua.size()];
         for (int i = 0; i < ketQua.size(); i++) danhSach[i] = TEN[ketQua.get(i)];
-        new AlertDialog.Builder(this).setTitle("Kết quả tìm kiếm")
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this).setTitle("Kết quả tìm kiếm")
                 .setItems(danhSach, (dialog, viTri) -> moChiTiet(ID_DIA_DIEM[ketQua.get(viTri)]))
                 .setNegativeButton("Đóng", null).show();
     }
@@ -305,49 +307,9 @@ public class MainActivity extends BaseActivity {
     }
     // HIEN THI DANH SACH DIA DIEM
     private void hienThiDanhSachDiaDiem() {
-        new AlertDialog.Builder(this).setTitle("Khám phá điểm du lịch")
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this).setTitle("Khám phá điểm du lịch")
                 .setItems(TEN, (dialog, viTri) -> moChiTiet(ID_DIA_DIEM[viTri]))
                 .setNegativeButton("Đóng", null).show();
-    }
-
-    // HIEN THI CHI TIET DIA DIEM
-    private void hienThiChiTiet(
-            String tenDiaDiem,
-            String khuVuc,
-            String moTa
-    ) {
-
-        String noiDung =
-                "Tên địa điểm: " + tenDiaDiem
-                        + "\n\nKhu vực: " + khuVuc
-                        + "\n\nGiới thiệu: " + moTa;
-
-        new AlertDialog.Builder(this)
-                .setTitle("Thông tin điểm du lịch")
-                .setMessage(noiDung)
-
-                .setPositiveButton(
-                        "Khám phá",
-                        (hopThoai, nut) -> {
-
-                            hienThongBao(
-                                    "Đã chọn " + tenDiaDiem
-                            );
-                        }
-                )
-
-                .setNeutralButton(
-                        "Thuyết minh",
-                        (hopThoai, nut) -> {
-
-                            hienThongBao(
-                                    "Thuyết minh: " + tenDiaDiem
-                            );
-                        }
-                )
-
-                .setNegativeButton("Đóng", null)
-                .show();
     }
 
     // MENU TAI KHOAN
@@ -523,7 +485,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void hienThiDanhSachGoiY() {
-        new AlertDialog.Builder(this).setTitle("Địa điểm gợi ý")
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this).setTitle("Địa điểm gợi ý")
                 .setItems(TEN, (dialog, viTri) -> moChiTiet(ID_DIA_DIEM[viTri]))
                 .setNegativeButton("Đóng", null).show();
     }
@@ -977,8 +939,9 @@ public class MainActivity extends BaseActivity {
 
     // HIEN THI DANH SACH DIA DIEM CO THUYET MINH
     private void hienThiDanhSachThuyetMinh() {
+        dungHuongDanTheoViTri();
 
-        new AlertDialog.Builder(this)
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("Thuyết minh địa điểm")
                 .setItems(
                         TEN,
@@ -994,6 +957,7 @@ public class MainActivity extends BaseActivity {
 
     // PHAT NOI DUNG MO TA DA LUU TRONG SQLITE
     private void phatThuyetMinh(int viTri) {
+        dungHuongDanTheoViTri();
 
         if (viTri < 0 || viTri >= duLieuDiaDiem.length) {
             hienThongBao("Địa điểm không hợp lệ.");

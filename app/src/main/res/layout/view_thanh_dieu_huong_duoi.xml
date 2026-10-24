@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="96dp"
         android:clipChildren="false"
@@ -30,7 +31,7 @@
                     android:layout_width="23dp"
                     android:layout_height="23dp"
                     android:src="@drawable/bieu_tuong_kham_pha"
-                    android:tint="#6F806F"
+                    app:tint="#6F806F"
                     android:contentDescription="Khám phá"/>
                 <TextView
                     android:layout_width="match_parent"
@@ -86,7 +87,7 @@
                     android:layout_width="23dp"
                     android:layout_height="23dp"
                     android:src="@drawable/bieu_tuong_ca_nhan"
-                    android:tint="#6F806F"
+                    app:tint="#6F806F"
                     android:contentDescription="Cá nhân"/>
                 <TextView
                     android:layout_width="match_parent"
@@ -113,7 +114,7 @@
                     android:layout_width="23dp"
                     android:layout_height="23dp"
                     android:src="@drawable/bieu_tuong_goi_y_nav"
-                    android:tint="#6F806F"
+                    app:tint="#6F806F"
                     android:contentDescription="Gợi ý"/>
                 <TextView
                     android:layout_width="match_parent"
@@ -151,7 +152,7 @@
                         android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:src="@drawable/bieu_tuong_ngoi_nha"
-                        android:tint="#FFFFFF"
+                        app:tint="#FFFFFF"
                         android:contentDescription="Trang chủ"/>
                 </FrameLayout>
             </FrameLayout>

@@ -12,8 +12,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.provider.Settings;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -25,291 +23,202 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** Một bộ điều khiển chung, dùng cùng bộ chọn mốc cho DEMO và GPS thật. Chỉ chạy ở tiền cảnh. */
+/** Theo dõi địa điểm chính tại trang chủ; hỏi xác nhận trước khi đọc. */
 public final class ThamQuanTuDong implements LocationListener {
     static final int THU_CONG = 0, DEMO = 1, GPS = 2;
-    private final BaseActivity activity;
-    private final NguonThamQuanTuDong nguon;
+    private static final int[] KHOANG_CACH_DEMO = {500, 300, 150, 90};
+    private final MainActivity activity;
     private final Handler hen = new Handler(Looper.getMainLooper());
     private final LocationManager viTri;
-    private final List<NguonThamQuanTuDong.Diem> diem;
+    private final List<DiaDiem> cacDiem;
     private final View bang;
-    private final Spinner banKinh;
-    private final DiaDiem diaDiem;
-    private BoChonDiemTuDong boChon = new BoChonDiemTuDong();
-    private List<BoChonDiemTuDong.Moc> mocGps = new ArrayList<>();
-    private Location gpsMoi;
-    private int cheDo, demoIndex, phien;
-    private boolean dangChonTuDong;
-    private String luotDoc;
-    private long lucBatDau, lanDoc;
-    private static final int[] CAC_BAN_KINH = {20, 30, 40, 60, 80};
+    private final Spinner chonDemo;
+    private BoNhanDienDiaDiem nhanDien;
+    private DiaDiem diemDangMoi, diemDemo;
+    private AlertDialog hoiThoai;
+    private int cheDo, phien, buocDemo;
+    private long lucBuocDemo, lucGpsMoi;
 
-    ThamQuanTuDong(BaseActivity activity, NguonThamQuanTuDong nguon) {
+    ThamQuanTuDong(MainActivity activity) {
         this.activity = activity;
-        this.nguon = nguon;
-        diem = nguon.cacDiemTuDong();
         viTri = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-        DiaDiem tim = null;
-        try (TaiKhoanDb db = new TaiKhoanDb(activity)) {
-            for (DiaDiem d : db.danhSachDiaDiem()) if (d.id == nguon.idDiaDiemTuDong()) tim = d;
-        }
-        diaDiem = tim;
-        View danhSach = activity.findViewById(R.id.tqDanhSachKhuVuc);
-        ViewGroup cha = (ViewGroup) danhSach.getParent();
+        try (TaiKhoanDb db = new TaiKhoanDb(activity)) { cacDiem = db.danhSachDiaDiem(); }
+        ViewGroup cha = activity.findViewById(R.id.khungThuyetMinhTuDong);
         bang = activity.getLayoutInflater().inflate(R.layout.view_tham_quan_tu_dong, cha, false);
-        cha.addView(bang, cha.indexOfChild(danhSach));
-        banKinh = bang.findViewById(R.id.autoBanKinh);
-        banKinh.setAdapter(new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item,
-                new String[]{"20 mét", "30 mét", "40 mét", "60 mét", "80 mét"}));
-        banKinh.setSelection(2);
-        banKinh.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                if (cheDo == GPS) taiMocGps();
+        cha.addView(bang);
+        chonDemo = bang.findViewById(R.id.autoChonDiaDiemDemo);
+        List<String> ten = new ArrayList<>();
+        for (DiaDiem d : cacDiem) ten.add(d.ten);
+        chonDemo.setAdapter(new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, ten));
+        chonDemo.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> p, View v, int position, long id) {
+                if (cheDo == DEMO && diemDemo != null && diemDemo.id != cacDiem.get(position).id)
+                    dung("Đã đổi điểm demo. Bấm Chạy demo để bắt đầu tuyến mới.");
             }
-            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+            @Override public void onNothingSelected(android.widget.AdapterView<?> p) {}
         });
         bang.findViewById(R.id.autoDemo).setOnClickListener(v -> batDemo());
         bang.findViewById(R.id.autoGps).setOnClickListener(v -> batGps());
-        bang.findViewById(R.id.autoDung).setOnClickListener(v -> dung("Đã dừng tự động; bạn có thể chọn mốc và nghe thủ công."));
-        bang.findViewById(R.id.autoDemoTiep).setOnClickListener(v -> {
-            if (cheDo == DEMO) { ngatDoc(); demoIndex++; demoTiep(); }
-        });
-        bang.findViewById(R.id.autoGhiGps).setOnClickListener(v -> ghiGps());
-        activity.findViewById(R.id.tqNutPhat).setOnClickListener(v -> {
-            dung("Đang nghe thủ công tại mốc đã chọn.");
-            docNoiDung(noiDungDangChon(), false);
-        });
-        activity.findViewById(R.id.tqNutDung).setOnClickListener(v -> dung("Đã dừng phát và AUTO."));
-        TextToSpeech mayDoc = nguon.mayDocTuDong();
-        if (mayDoc != null) mayDoc.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-            @Override public void onStart(String id) {}
-            @Override public void onDone(String id) {
-                hen.post(() -> {
-                    if (!id.equals(luotDoc)) return;
-                    luotDoc = null;
-                    if (cheDo == DEMO) {
-                        final int phienDoc = phien;
-                        hen.postDelayed(() -> {
-                            if (cheDo == DEMO && phienDoc == phien && luotDoc == null) {
-                                demoIndex++;
-                                demoTiep();
-                            }
-                        }, 1800);
-                    }
-                });
-            }
-            @Override public void onError(String id) {
-                hen.post(() -> {
-                    if (id.equals(luotDoc)) dung("Không phát được giọng đọc. Kiểm tra TTS tiếng Việt rồi thử lại.");
-                });
+        bang.findViewById(R.id.autoDung).setOnClickListener(v -> dung("Đã dừng hướng dẫn theo vị trí và giọng đọc."));
+        bang.findViewById(R.id.autoDemoDenGan).setOnClickListener(v -> {
+            if (cheDo == DEMO && buocDemo < KHOANG_CACH_DEMO.length - 1) {
+                buocDemo++;
+                lucBuocDemo = SystemClock.elapsedRealtime();
             }
         });
+        bang.findViewById(R.id.autoMoChiTiet).setOnClickListener(v -> moChiTiet(false));
+    }
+
+    private void moChiTiet(boolean phatSauXacNhan) {
+        if (diemDangMoi == null) return;
+        int id = diemDangMoi.id;
+        dung("Đang mở chi tiết " + diemDangMoi.ten + ".");
+        activity.startActivity(new Intent(activity, ChiTietDiaDiemActivity.class)
+                .putExtra("viTriDiaDiem", id)
+                .putExtra(ChiTietDiaDiemActivity.PHAT_TU_VI_TRI, phatSauXacNhan));
     }
 
     private void chu(int id, String value) { ((TextView) bang.findViewById(id)).setText(value); }
     private void trangThai(String value) { chu(R.id.autoTrangThai, value); }
-    private int tangDangChon() {
-        for (NguonThamQuanTuDong.Diem d : diem) if (d.id == nguon.idDiemDangChon()) return d.tang;
-        return -1;
-    }
-    private String noiDungDangChon() {
-        return ((TextView) activity.findViewById(R.id.tqTenKhuVuc)).getText() + ". "
-                + ((TextView) activity.findViewById(R.id.tqMoTaKhuVuc)).getText();
-    }
-    private void ngatDoc() {
-        luotDoc = null;
-        if (nguon.mayDocTuDong() != null) nguon.mayDocTuDong().stop();
-    }
     public void dung(String lyDo) {
         phien++;
         cheDo = THU_CONG;
+        if (nhanDien != null) nhanDien.huy();
+        if (hoiThoai != null) { hoiThoai.dismiss(); hoiThoai = null; }
         hen.removeCallbacksAndMessages(null);
         if (viTri != null) viTri.removeUpdates(this);
-        ngatDoc();
-        chu(R.id.autoCheDo, "Thủ công");
-        bang.findViewById(R.id.autoDemoTiep).setVisibility(View.GONE);
+        if (activity.mayDocGioiThieu() != null) activity.mayDocGioiThieu().stop();
+        chu(R.id.autoCheDo, "Chưa bật hướng dẫn");
+        chu(R.id.autoViTri, "Đã tắt theo dõi vị trí");
+        bang.findViewById(R.id.autoDemoDenGan).setVisibility(View.GONE);
         trangThai(lyDo);
     }
-    void chonThuCong() {
-        if (dangChonTuDong) return;
-        if (cheDo == DEMO) dung("Đã chuyển sang thủ công khi bạn chọn mốc trên sơ đồ.");
-        else if (cheDo == GPS) ngatDoc();
-    }
-    private void batDau(int loai) {
+    private boolean batDau(int loai) {
         dung("");
+        if (cacDiem.isEmpty()) { trangThai("Chưa có dữ liệu địa điểm."); return false; }
         cheDo = loai;
-        boChon = new BoChonDiemTuDong();
-        lucBatDau = SystemClock.elapsedRealtime();
-        gpsMoi = null;
-        chu(R.id.autoCheDo, loai == DEMO ? "DEMO · Vị trí mô phỏng" : "GPS thật · AUTO");
-        bang.findViewById(R.id.autoDemoTiep).setVisibility(loai == DEMO ? View.VISIBLE : View.GONE);
+        nhanDien = new BoNhanDienDiaDiem(cacDiem);
+        diemDangMoi = null;
+        lucGpsMoi = 0;
+        bang.findViewById(R.id.autoMoChiTiet).setVisibility(View.GONE);
+        chu(R.id.autoCheDo, loai == DEMO ? "DEMO · Vị trí mô phỏng" : "GPS thật · Hướng dẫn theo vị trí");
+        bang.findViewById(R.id.autoDemoDenGan).setVisibility(loai == DEMO ? View.VISIBLE : View.GONE);
+        return true;
     }
     void batDemo() {
-        if (diem.isEmpty()) { trangThai("Chưa có điểm tham quan để demo."); return; }
-        batDau(DEMO);
-        demoIndex = 0;
-        demoTiep();
+        if (!batDau(DEMO)) return;
+        diemDemo = cacDiem.get(chonDemo.getSelectedItemPosition());
+        buocDemo = 0;
+        lucBuocDemo = SystemClock.elapsedRealtime();
+        trangThai("Mô phỏng đến " + diemDemo.ten + ": 500 → 300 → 150 → 90 m. Chưa phát âm thanh.");
         nhip(phien);
     }
-    private void demoTiep() {
-        if (demoIndex >= diem.size()) { dung("Đã hoàn thành tuyến demo. Bấm Chạy demo để bắt đầu lại."); return; }
-        NguonThamQuanTuDong.Diem d = diem.get(demoIndex);
-        dangChonTuDong = true;
-        try { nguon.chonDiemTuDong(d.id); } finally { dangChonTuDong = false; }
-        chu(R.id.autoViTri, "Mô phỏng đến mốc " + d.id + ": " + d.ten);
-        trangThai("Demo " + (demoIndex + 1) + "/" + diem.size() + " · Đang di chuyển đến mốc…");
-    }
     private void nhip(int phienNhip) {
-        if (cheDo == THU_CONG || phienNhip != phien) return;
+        if (phienNhip != phien || cheDo == THU_CONG) return;
         long now = SystemClock.elapsedRealtime();
-        if (luotDoc != null && now - lanDoc > 180000) {
-            dung("Giọng đọc không phản hồi; hãy kiểm tra TTS và chạy lại.");
-            return;
+        if (cheDo == DEMO && diemDangMoi == null) {
+            if (now - lucBuocDemo >= 2000 && buocDemo < KHOANG_CACH_DEMO.length - 1) {
+                buocDemo++;
+                lucBuocDemo = now;
+            }
+            int distance = KHOANG_CACH_DEMO[buocDemo];
+            chu(R.id.autoViTri, "DEMO · " + diemDemo.ten + " · Còn " + distance + " m\n500 → 300 → 150 → 90 m");
+            nhanViTri(diemDemo.viDo + distance / 111195.0, diemDemo.kinhDo, 3, now, now);
         }
-        if (!nguon.sanSangTuDong() && now - lucBatDau > 30000) {
-            dung("Chưa có giọng đọc tiếng Việt. Kiểm tra cài đặt TTS của thiết bị rồi bật AUTO lại.");
-            return;
-        }
-        if (cheDo == DEMO && demoIndex < diem.size() && luotDoc == null) {
-            NguonThamQuanTuDong.Diem d = diem.get(demoIndex);
-            // Lưới tọa độ chỉ dùng trong RAM cho demo, không ghi vào mốc GPS thật.
-            List<BoChonDiemTuDong.Moc> giaLap = java.util.Collections.singletonList(
-                    new BoChonDiemTuDong.Moc(d.id, d.tang, 0, demoIndex * .002, 40));
-            Integer den = boChon.capNhat(giaLap, d.tang, 0, demoIndex * .002, 3, now, now);
-            if (den != null) phatMoc(den);
-        }
-        if (cheDo == GPS && (gpsMoi == null || now - gpsMoi.getElapsedRealtimeNanos() / 1000000 > 15000)) {
-            trangThai(now - lucBatDau > 30000 ? "Chưa có GPS đủ mới. Ra nơi thoáng, kiểm tra quyền vị trí và GPS."
-                    : "Đang chờ vị trí GPS mới…");
-        }
-        hen.postDelayed(() -> nhip(phienNhip), 1500);
+        if (cheDo == GPS && !nhanDien.dangChoTraLoi()
+                && (lucGpsMoi == 0 || now - lucGpsMoi > 15000))
+            trangThai("Đang chờ vị trí chính xác. Trong phạm vi 100 m, ứng dụng sẽ hỏi Bắt đầu hoặc Bỏ qua.");
+        hen.postDelayed(() -> nhip(phienNhip), 1000);
     }
     void batGps() {
         dung("Đang chuẩn bị GPS thật…");
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             activity.xinQuyenGpsThamQuan();
             return;
         }
         if (viTri == null || !viTri.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            trangThai("Hãy bật dịch vụ vị trí để sử dụng GPS thật.");
-            new AlertDialog.Builder(activity).setTitle("Bật GPS")
-                    .setMessage("Bật vị trí, quay lại và bấm GPS thật.")
-                    .setPositiveButton("Cài đặt vị trí", (d, w) -> activity.startActivity(
-                            new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
+            trangThai("Đã có quyền vị trí. Bật GPS để nhận diện các địa điểm ở gần; demo vẫn dùng được.");
+            hoiThoai = new com.google.android.material.dialog.MaterialAlertDialogBuilder(activity).setTitle("Bật dịch vụ vị trí")
+                    .setMessage("Bật GPS, quay lại trang chủ và bấm GPS thật để tiếp tục.")
+                    .setPositiveButton("Cài đặt vị trí", (d, w) -> activity.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)))
                     .setNegativeButton("Để sau", null).show();
             return;
         }
-        batDau(GPS);
-        taiMocGps();
+        if (!batDau(GPS)) return;
         try {
             viTri.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, this, Looper.getMainLooper());
             if (viTri.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
                 viTri.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, this, Looper.getMainLooper());
-            trangThai("GPS thật đang bật. Chọn đúng tầng trên sơ đồ nếu tham quan trong nhà.");
+            trangThai("Đang tìm địa điểm gần nhất trong 5 nơi. Chỉ phát sau khi bạn bấm Bắt đầu.");
             nhip(phien);
-        } catch (SecurityException e) { dung("Quyền vị trí đã thay đổi. Vui lòng cấp lại quyền GPS chính xác."); }
+        } catch (SecurityException e) { dung("Quyền vị trí đã thay đổi. Bấm GPS thật để cấp lại."); }
     }
     void nhanQuyen(boolean coQuyen) {
+        if (activity.isFinishing() || activity.isDestroyed()) return;
         if (coQuyen) batGps();
         else {
-            trangThai("Chưa được cấp vị trí chính xác. Demo vẫn dùng được.");
-            new AlertDialog.Builder(activity).setTitle("Cần quyền vị trí chính xác")
-                    .setMessage("Bật quyền Vị trí chính xác trong cài đặt ứng dụng để chạy GPS thật.")
-                    .setPositiveButton("Cài đặt ứng dụng", (d, w) -> activity.startActivity(new Intent(
-                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            dung("Chưa có quyền vị trí chính xác. Bạn vẫn có thể khám phá hoặc chạy demo; bấm GPS thật để cấp lại quyền.");
+            hoiThoai = new com.google.android.material.dialog.MaterialAlertDialogBuilder(activity).setTitle("Chưa có quyền vị trí chính xác")
+                    .setMessage("Bạn vẫn dùng được trang chủ và demo. Nếu đã từ chối nhiều lần, hãy cấp quyền trong cài đặt ứng dụng.")
+                    .setPositiveButton("Cài đặt ứng dụng", (d, w) -> activity.startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                             android.net.Uri.parse("package:" + activity.getPackageName()))))
-                    .setNegativeButton("Dùng demo", (d, w) -> batDemo()).show();
+                    .setNegativeButton("Tiếp tục khám phá", null).show();
         }
-    }
-    private void taiMocGps() {
-        try (TaiKhoanDb db = new TaiKhoanDb(activity)) {
-            mocGps = new ArrayList<>();
-            for (BoChonDiemTuDong.Moc m : KhoToaDoThamQuan.doc(db.getReadableDatabase(), nguon.idDiaDiemTuDong())) {
-                mocGps.add(new BoChonDiemTuDong.Moc(m.id, m.tang, m.lat, m.lon,
-                        CAC_BAN_KINH[banKinh.getSelectedItemPosition()]));
-            }
-        }
-        if (diaDiem != null) mocGps.add(new BoChonDiemTuDong.Moc(0, -1, diaDiem.viDo, diaDiem.kinhDo, 250));
     }
     @Override public void onLocationChanged(Location location) {
         if (cheDo != GPS) return;
-        if (location.isFromMockProvider()) { gpsMoi = null; trangThai("Vị trí giả lập không dùng cho GPS thật. Hãy chọn Chạy demo."); return; }
-        gpsMoi = new Location(location);
-        double distance = diaDiem == null ? 0 : BoChonDiemTuDong.khoangCach(location.getLatitude(), location.getLongitude(), diaDiem.viDo, diaDiem.kinhDo);
-        chu(R.id.autoViTri, String.format(Locale.ROOT, "GPS: %.6f, %.6f · Sai số ±%.0f m · Cách địa điểm %.0f m",
-                location.getLatitude(), location.getLongitude(), location.getAccuracy(), distance));
-        if (!location.hasAccuracy()) { trangThai("Chưa xác định được độ chính xác GPS."); return; }
-        if (luotDoc != null) return;
-        Integer den = boChon.capNhat(mocGps, tangDangChon(), location.getLatitude(), location.getLongitude(),
-                location.getAccuracy(), location.getElapsedRealtimeNanos() / 1000000, SystemClock.elapsedRealtime());
-        if (den != null) phatMoc(den);
-        else trangThai(boChon.trangThai + " · " + Math.max(0, mocGps.size() - 1) + " mốc đã ghi GPS");
-    }
-    private boolean docNoiDung(String noiDung, boolean tuDong) {
-        if (!nguon.sanSangTuDong() || nguon.mayDocTuDong() == null) {
-            trangThai("Giọng đọc tiếng Việt chưa sẵn sàng. Kiểm tra cài đặt TTS của thiết bị.");
-            return false;
-        }
-        if (noiDung == null || noiDung.trim().isEmpty()) { trangThai("Mốc chưa có nội dung thuyết minh."); return false; }
-        String id = "auto_" + phien + "_" + SystemClock.elapsedRealtimeNanos();
-        luotDoc = tuDong ? id : null;
-        lanDoc = SystemClock.elapsedRealtime();
-        int result = nguon.mayDocTuDong().speak(noiDung, TextToSpeech.QUEUE_FLUSH, null, id);
-        if (result == TextToSpeech.ERROR) { luotDoc = null; trangThai("Không khởi động được giọng đọc."); return false; }
-        return true;
-    }
-    private void phatMoc(int id) {
-        if (!nguon.sanSangTuDong()) { trangThai("Đang chờ giọng đọc tiếng Việt…"); return; }
-        if (nguon.mayDocTuDong().isSpeaking()) return;
-        String noiDung;
-        if (id == 0) noiDung = diaDiem == null ? "" : diaDiem.ten + ". " + diaDiem.moTa;
-        else {
-            dangChonTuDong = true;
-            try { nguon.chonDiemTuDong(id); } finally { dangChonTuDong = false; }
-            noiDung = noiDungDangChon();
-        }
-        if (docNoiDung(noiDung, true)) {
-            boChon.danhDauDaPhat(id);
-            trangThai(id == 0 ? "Đã đến địa điểm · Đang phát giới thiệu chung"
-                    : "Đã đến mốc " + id + " · Đang phát thuyết minh tự động");
-        }
-    }
-    private void ghiGps() {
         long now = SystemClock.elapsedRealtime();
-        if (cheDo != GPS || gpsMoi == null || !gpsMoi.hasAccuracy() || gpsMoi.getAccuracy() > 25
-                || now - gpsMoi.getElapsedRealtimeNanos() / 1000000 > 15000) {
-            trangThai("Bật GPS thật và đợi vị trí mới có sai số ≤25 m trước khi ghi mốc.");
+        if (location.isFromMockProvider() || !location.hasAccuracy()) {
+            lucGpsMoi = 0;
+            nhanDien.capNhat(Double.NaN, 0, Float.NaN, now, now);
+            trangThai(location.isFromMockProvider() ? "GPS giả lập không dùng ở chế độ thật. Hãy chọn Chạy demo."
+                    : "Vị trí chưa có độ chính xác. Đang chờ GPS mới…");
             return;
         }
-        if (diaDiem == null || BoChonDiemTuDong.khoangCach(gpsMoi.getLatitude(), gpsMoi.getLongitude(),
-                diaDiem.viDo, diaDiem.kinhDo) > (nguon.idDiaDiemTuDong() == 3 ? 8000 : 1500)) {
-            trangThai("Bạn đang ở quá xa địa điểm; không thể ghi GPS cho mốc này.");
-            return;
+        long lucDo = location.getElapsedRealtimeNanos() / 1000000;
+        if (lucDo <= now && now - lucDo <= 15000) lucGpsMoi = lucDo;
+        nhanViTri(location.getLatitude(), location.getLongitude(), location.getAccuracy(), lucDo, now);
+    }
+    private void nhanViTri(double lat, double lon, float accuracy, long lucDo, long now) {
+        if (nhanDien.dangChoTraLoi()) return;
+        DiaDiem den = nhanDien.capNhat(lat, lon, accuracy, lucDo, now);
+        if (cheDo == GPS && nhanDien.ganNhat() != null) {
+            DiaDiem gan = nhanDien.ganNhat();
+            double distance = BoChonDiemTuDong.khoangCach(lat, lon, gan.viDo, gan.kinhDo);
+            chu(R.id.autoViTri, String.format(Locale.ROOT, "GPS: %.6f, %.6f · Sai số ±%.0f m\nGần nhất: %s · %.0f m", lat, lon, accuracy, gan.ten, distance));
         }
-        final int id = nguon.idDiemDangChon(), tang = tangDangChon();
-        final Location lucGhi = new Location(gpsMoi);
-        final int radius = CAC_BAN_KINH[banKinh.getSelectedItemPosition()];
-        new AlertDialog.Builder(activity).setTitle("Ghi GPS mốc " + id + "?")
-                .setMessage("Chỉ xác nhận khi bạn đang đứng đúng vị trí mốc đang chọn và đúng tầng trên sơ đồ. "
-                        + "GPS không tự phân biệt tầng. Bán kính phát: " + radius + " m.")
-                .setPositiveButton("Lưu GPS", (d, w) -> {
-                    if (cheDo != GPS || SystemClock.elapsedRealtime() - lucGhi.getElapsedRealtimeNanos() / 1000000 > 15000) {
-                        trangThai("Vị trí đã cũ. Hãy lấy lại GPS rồi ghi mốc."); return;
-                    }
-                    try (TaiKhoanDb db = new TaiKhoanDb(activity)) {
-                        KhoToaDoThamQuan.luu(db.getWritableDatabase(), nguon.idDiaDiemTuDong(), id, tang,
-                                lucGhi.getLatitude(), lucGhi.getLongitude(), lucGhi.getAccuracy(), radius);
-                        taiMocGps();
-                        trangThai("Đã ghi GPS mốc " + id + ". AUTO sẽ phát khi vào vùng mốc đủ ổn định.");
-                    } catch (Exception e) { trangThai("Không lưu được GPS. Vui lòng thử lại."); }
-                }).setNegativeButton("Hủy", null).show();
+        if (den != null) {
+            diemDangMoi = den;
+            hienLoiMoi(BoChonDiemTuDong.khoangCach(lat, lon, den.viDo, den.kinhDo));
+        } else trangThai(nhanDien.trangThai() + " · Bán kính nhận diện 100 m");
+    }
+    private void hienLoiMoi(double distance) {
+        if (activity.isFinishing() || activity.isDestroyed()) return;
+        final int phienHoi = phien, id = diemDangMoi.id;
+        trangThai("Bạn đang ở gần " + diemDangMoi.ten + ". Đang chờ bạn xác nhận.");
+        bang.findViewById(R.id.autoDemoDenGan).setVisibility(View.GONE);
+        bang.findViewById(R.id.autoMoChiTiet).setVisibility(View.VISIBLE);
+        hoiThoai = new com.google.android.material.dialog.MaterialAlertDialogBuilder(activity).setTitle("Bạn đang ở gần " + diemDangMoi.ten)
+                .setMessage((cheDo == DEMO ? "DEMO · Vị trí mô phỏng\n\n" : "")
+                        + String.format(Locale.ROOT, "Khoảng cách: %.0f m (phạm vi 100 m).\n\n", distance)
+                        + "Bạn có muốn bắt đầu nghe thuyết minh về địa điểm này không?")
+                .setPositiveButton("Bắt đầu", (d, w) -> {
+                    if (phienHoi != phien || !nhanDien.traLoi(id, true)) return;
+                    moChiTiet(true);
+                })
+                .setNegativeButton("Bỏ qua", (d, w) -> boQua(phienHoi, id))
+                .setOnCancelListener(d -> boQua(phienHoi, id)).create();
+        hoiThoai.setCanceledOnTouchOutside(false);
+        hoiThoai.show();
+    }
+    private void boQua(int phienHoi, int id) {
+        if (phienHoi != phien) return;
+        nhanDien.traLoi(id, false);
+        trangThai("Đã bỏ qua " + diemDangMoi.ten + ". Không phát âm thanh và không hỏi lại địa điểm này trong lượt hiện tại.");
     }
     @Override public void onProviderDisabled(String provider) {
         if (cheDo == GPS && LocationManager.GPS_PROVIDER.equals(provider)) dung("GPS đã tắt. Bật lại vị trí và bấm GPS thật.");
     }
     @Override public void onProviderEnabled(String provider) {}
     @Override public void onStatusChanged(String provider, int status, Bundle extras) {}
-    int cheDoHienTai() { return cheDo; }
 }

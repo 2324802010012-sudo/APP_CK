@@ -36,18 +36,7 @@ import java.util.Locale;
  * https://img.vevin.vn/Img/Medias/10-04-2025/So-do-dai-noi.jpg
  * Không phải tọa độ GPS, không được áp dụng với ảnh sơ đồ khác.
  */
-public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonThamQuanTuDong {
-    @Override public int idDiaDiemTuDong() { return 2; }
-    @Override public java.util.List<NguonThamQuanTuDong.Diem> cacDiemTuDong() {
-        java.util.List<NguonThamQuanTuDong.Diem> ds = new java.util.ArrayList<>();
-        for (int i = 0; i < danhSachId.size(); i++) ds.add(
-                new NguonThamQuanTuDong.Diem(danhSachId.get(i), danhSachTen.get(i), -1));
-        return ds;
-    }
-    @Override public int idDiemDangChon() { return danhSachId.get(viTriHienTai); }
-    @Override public void chonDiemTuDong(int id) { chonMarker(id); }
-    @Override public TextToSpeech mayDocTuDong() { return tts; }
-    @Override public boolean sanSangTuDong() { return sanSangDoc; }
+public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanTour.ManHinh {
 
     private static final String BANG_DIEM = "dai_noi_hue_diem";
     private static final String BANG_TOA_DO = "dai_noi_hue_toa_do";
@@ -157,20 +146,20 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonTham
                             "Đây là điểm giới thiệu cảnh quan, không phải một tòa điện riêng biệt."}
     };
 
-    // X/Y từ 0 đến 1, đọc trên đúng ảnh sơ đồ tham quan 512x512 nêu ở đầu file.
-    // Căn theo nhãn/công trình nhìn thấy trên bản vẽ, sai số thị giác vài phần trăm.
-    // Không phải khảo sát GPS; chỉnh sau nếu sử dụng bản ảnh khác.
+    // Căn trên ảnh ngang so_do_dai_noi_hue.jpg (2048×1366), không phải GPS.
+    // Các điểm 1–5, 7–10 theo nhãn/công trình trên ảnh; Thái Bình Lâu
+    // căn theo cụm công trình ở phía bắc Duyệt Thị Đường, cần đối chiếu thực địa.
     private static final float[][] TOA_DO_TREN_SO_DO = {
-            {0.525f, 0.921f}, // 1 Ngọ Môn
-            {0.528f, 0.673f}, // 2 Điện Thái Hòa
-            {0.515f, 0.488f}, // 3 Nền điện Cần Chánh
-            {0.526f, 0.182f}, // 4 Điện Kiến Trung
-            {0.720f, 0.489f}, // 5 Duyệt Thị Đường
-            {0.919f, 0.375f}, // 6 Thái Bình Lâu (phía đông)
-            {0.880f, 0.227f}, // 7 Vườn Cơ Hạ
-            {0.165f, 0.350f}, // 8 Cung Diên Thọ (phía tây)
-            {0.169f, 0.202f}, // 9 Cung Trường Sanh (phía tây bắc)
-            {0.875f, 0.142f}  // 10 Hậu hồ
+            {0.453f, 0.856f}, // 1 Ngọ Môn
+            {0.451f, 0.627f}, // 2 Điện Thái Hòa
+            {0.448f, 0.454f}, // 3 Nền điện Cần Chánh
+            {0.445f, 0.217f}, // 4 Điện Kiến Trung
+            {0.569f, 0.461f}, // 5 Duyệt Thị Đường
+            {0.532f, 0.353f}, // 6 Khu Thái Bình Lâu, vị trí ước lượng trên ảnh
+            {0.694f, 0.351f}, // 7 Vườn Cơ Hạ
+            {0.201f, 0.364f}, // 8 Cung Diên Thọ
+            {0.201f, 0.245f}, // 9 Cung Trường Sanh
+            {0.676f, 0.208f}  // 10 Hậu hồ
     };
 
     private final ArrayList<Integer> danhSachId = new ArrayList<>();
@@ -179,11 +168,29 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonTham
     private final ArrayList<DiemMarker> cacMarker = new ArrayList<>();
 
     private int viTriHienTai = 0;
-    private TextView tenKhuVuc, moTaKhuVuc, demKhuVuc, nutTruoc, nutTiep, nutPhat;
+    private TextView tenKhuVuc, moTaKhuVuc, demKhuVuc, nutTruoc, nutTiep;
     private ProgressBar tienTrinh;
     private LinearLayout khungDanhSach;
     private LinearLayout danhSachThe;
     private SoDoView soDo;
+    private HuongDanTour huongDan;
+    private String luotDoc;
+    private final androidx.activity.result.ActivityResultLauncher<String[]> quyenTour =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
+                    result -> {
+                        if (huongDan != null) huongDan.nhanQuyen(Boolean.TRUE.equals(
+                                result.get(android.Manifest.permission.ACCESS_FINE_LOCATION)));
+                    });
+
+    @Override public void xinQuyenTour() {
+        quyenTour.launch(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION});
+    }
+
+    private void dungAutoThuCong() {
+        if (huongDan != null) huongDan.dung("Đã chuyển sang nghe thủ công.");
+    }
+
     private TextToSpeech tts;
     private boolean sanSangDoc;
 
@@ -208,6 +215,10 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonTham
         khoiTaoTTS();
         taoGiaoDienSoDo();
         hienThiDiem();
+        huongDan = new HuongDanTour(this, findViewById(R.id.tqKhungHuongDan),
+                CauHinhAutoDiSan.hue(danhSachTen));
+        caiDatTheoDoiDoc();
+        apDungKhoangTrongHeThong();
     }
 
     private void anhXa() {
@@ -226,7 +237,6 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonTham
         demKhuVuc = findViewById(R.id.tqDemKhuVuc);
         nutTruoc = findViewById(R.id.tqNutTruoc);
         nutTiep = findViewById(R.id.tqNutTiep);
-        nutPhat = findViewById(R.id.tqNutPhat);
         tienTrinh = findViewById(R.id.tqTienTrinh);
         khungDanhSach = findViewById(R.id.tqDanhSachKhuVuc);
     }
@@ -249,7 +259,8 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonTham
                 viTri.put("id", i + 1);
                 viTri.put("x_ty_le", TOA_DO_TREN_SO_DO[i][0]);
                 viTri.put("y_ty_le", TOA_DO_TREN_SO_DO[i][1]);
-                db.insertWithOnConflict(BANG_TOA_DO, null, viTri, SQLiteDatabase.CONFLICT_IGNORE);
+                // Tọa độ marker do ứng dụng quản lý: cập nhật cả máy đã lưu tọa độ ảnh vuông cũ.
+                db.insertWithOnConflict(BANG_TOA_DO, null, viTri, SQLiteDatabase.CONFLICT_REPLACE);
             }
             danhSachId.clear();
             danhSachTen.clear();
@@ -284,8 +295,6 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonTham
         findViewById(R.id.tqNutQuayLai).setOnClickListener(v -> finish());
         nutTruoc.setOnClickListener(v -> chonChiSo(viTriHienTai - 1));
         nutTiep.setOnClickListener(v -> chonChiSo(viTriHienTai + 1));
-        nutPhat.setOnClickListener(v -> phatTTS());
-        findViewById(R.id.tqNutDung).setOnClickListener(v -> dungTTS());
     }
 
     private void taoGiaoDienSoDo() {
@@ -361,7 +370,6 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonTham
     }
 
     private void hienThiDiem() {
-        thongBaoDoiDiemThamQuan();
         if (danhSachId.isEmpty()) return;
         tenKhuVuc.setText(danhSachTen.get(viTriHienTai));
         moTaKhuVuc.setText(danhSachMoTa.get(viTriHienTai));
@@ -371,7 +379,6 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonTham
         nutTiep.setEnabled(viTriHienTai < danhSachId.size() - 1);
         nutTruoc.setAlpha(viTriHienTai > 0 ? 1f : 0.35f);
         nutTiep.setAlpha(viTriHienTai < danhSachId.size() - 1 ? 1f : 0.35f);
-        nutPhat.setText("▶  Nghe thuyết minh");
         if (soDo != null) soDo.invalidate();
         if (danhSachThe == null) return;
         danhSachThe.removeAllViews();
@@ -398,9 +405,11 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonTham
 
     private void chonChiSo(int chiSo) {
         if (chiSo < 0 || chiSo >= danhSachId.size()) return;
+        dungAutoThuCong();
         dungTTS();
         viTriHienTai = chiSo;
         hienThiDiem();
+        moKhungThuyetMinh(false);
     }
 
     private void chonMarker(int id) {
@@ -478,14 +487,17 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonTham
                 float x = vungAnh.left + diem.x * vungAnh.width();
                 float y = vungAnh.top + diem.y * vungAnh.height();
                 boolean dangChon = diem.id == danhSachId.get(viTriHienTai);
-                but.setShadowLayer(3 * matDo, 0, 2 * matDo, 0x66000000);
+                // Kích thước theo pixel ảnh gốc, cùng biến đổi với ảnh khi zoom/kéo.
+                float tiLeMarker = vungAnh.width() / 2048f;
+                float banKinh = 14f * tiLeMarker;
+                but.setShadowLayer(2 * tiLeMarker, 0, tiLeMarker, 0x66000000);
                 but.setColor(Color.WHITE);
-                canvas.drawCircle(x, y, 19 * matDo / zoom, but);
+                canvas.drawCircle(x, y, banKinh, but);
                 but.clearShadowLayer();
                 but.setColor(Color.parseColor(dangChon ? "#E5A000" : "#087D59"));
-                canvas.drawCircle(x, y, 16 * matDo / zoom, but);
+                canvas.drawCircle(x, y, banKinh * 16f / 19f, but);
                 but.setTextAlign(Paint.Align.CENTER);
-                but.setTextSize(12 * matDo / zoom);
+                but.setTextSize(banKinh * 12f / 19f);
                 but.setTypeface(Typeface.DEFAULT_BOLD);
                 but.setColor(Color.WHITE);
                 canvas.drawText(String.valueOf(diem.id), x,
@@ -610,26 +622,68 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements NguonTham
         });
     }
 
-    private void phatTTS() {
-        if (tts == null || !sanSangDoc) {
-            Toast.makeText(this, "Giọng đọc tiếng Việt chưa sẵn sàng.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        String noiDung = danhSachTen.get(viTriHienTai) + ". " + danhSachMoTa.get(viTriHienTai);
-        tts.speak(noiDung, TextToSpeech.QUEUE_FLUSH, null,
-                "dai_noi_hue_" + danhSachId.get(viTriHienTai));
+
+
+    @Override public void hienThiDiemDemo(int id) {
+        int index = danhSachId.indexOf(id);
+        if (index < 0) return;
+        dungTTS();
+        viTriHienTai = index;
+        hienThiDiem();
+    }
+
+    @Override public boolean phatDiemTuDong(int id) {
+        if (!sanSangDoc || tts == null || !danhSachId.contains(id)
+                || !getLifecycle().getCurrentState().isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) return false;
+        hienThiDiemDemo(id);
+        return docDiemHienTai();
+    }
+
+    private boolean docDiemHienTai() {
+        luotDoc = "hue_" + danhSachId.get(viTriHienTai) + "_" + System.nanoTime();
+        boolean ok = tts.speak(danhSachTen.get(viTriHienTai) + ". " + danhSachMoTa.get(viTriHienTai),
+                TextToSpeech.QUEUE_FLUSH, null, luotDoc) == TextToSpeech.SUCCESS;
+        if (!ok) luotDoc = null;
+        return ok;
     }
 
     private void dungTTS() {
+        dongKhungThuyetMinh();
+        luotDoc = null;
         if (tts != null) tts.stop();
     }
+
+    @Override public void dungDocTour() { dungTTS(); }
 
     private int dp(int giaTri) {
         return Math.round(giaTri * getResources().getDisplayMetrics().density);
     }
 
+    private void caiDatTheoDoiDoc() {
+        tts.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {
+            @Override public void onStart(String id) {}
+            @Override public void onDone(String id) { ketThucDoc(id, true); }
+            @Override public void onError(String id) { ketThucDoc(id, false); }
+            @Override public void onError(String id, int maLoi) { ketThucDoc(id, false); }
+        });
+    }
+
+    private void ketThucDoc(String id, boolean thanhCong) {
+        runOnUiThread(() -> {
+            if (isDestroyed() || id == null || !id.equals(luotDoc)) return;
+            luotDoc = null;
+            if (huongDan != null) huongDan.docXong(thanhCong);
+        });
+    }
+
+    @Override protected void dungAmThanhThamQuan() {
+        dungAutoThuCong();
+        dungTTS();
+    }
+
     @Override
     protected void onStop() {
+        if (huongDan != null) huongDan.dung("");
         dungTTS();
         super.onStop();
     }

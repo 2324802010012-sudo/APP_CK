@@ -54,7 +54,7 @@ public class BoChonDiemTuDongTest {
         assertEquals(111195, BoChonDiemTuDong.khoangCach(0, 0, 1, 0), 2);
     }
     @Test public void demoDiHetTuyenCuaCaNamDiaDiem() {
-        for (int soMoc : new int[]{25, 13, 10, 7, 16}) {
+        for (int soMoc : new int[]{25, 13, 10, 19, 16}) {
             BoChonDiemTuDong b = new BoChonDiemTuDong();
             long now = 1000;
             for (int id = 1; id <= soMoc; id++) {

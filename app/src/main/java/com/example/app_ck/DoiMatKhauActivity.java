@@ -34,7 +34,7 @@ public class DoiMatKhauActivity extends BieuMauTaiKhoanActivity {
         } catch (Exception e) { Toast.makeText(this, "Không thể đổi mật khẩu. Vui lòng thử lại.", Toast.LENGTH_LONG).show(); }
     }
     private void hienMa() {
-        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Đổi mật khẩu thành công")
+        AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this).setTitle("Đổi mật khẩu thành công")
                 .setMessage("Mã khôi phục mới của bạn:\n\n" + maMoi + "\n\nHãy lưu mã này ở nơi an toàn. Mã cũ đã hết hiệu lực.")
                 .setCancelable(false).setPositiveButton("Tôi đã lưu mã", (d, w) -> { setResult(RESULT_OK); finish(); }).show();
         ((TextView) dialog.findViewById(android.R.id.message)).setTextIsSelectable(true);

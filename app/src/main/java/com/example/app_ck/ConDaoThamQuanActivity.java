@@ -28,54 +28,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQuanTuDong {
-    @Override public int idDiaDiemTuDong() { return 3; }
-    @Override public java.util.List<NguonThamQuanTuDong.Diem> cacDiemTuDong() {
-        java.util.List<NguonThamQuanTuDong.Diem> ds = new java.util.ArrayList<>();
-        for (int i = 0; i < danhSachId.size(); i++) ds.add(
-                new NguonThamQuanTuDong.Diem(danhSachId.get(i), danhSachTen.get(i), -1));
-        return ds;
-    }
-    @Override public int idDiemDangChon() { return danhSachId.get(viTriHienTai); }
-    @Override public void chonDiemTuDong(int id) {
-        for (int i = 0; i < danhSachId.size(); i++) if (danhSachId.get(i) == id) { chuyenDiem(i); return; }
-    }
-    @Override public TextToSpeech mayDocTuDong() { return tts; }
-    @Override public boolean sanSangTuDong() { return sanSangDoc; }
+public class ConDaoThamQuanActivity extends BaseActivity {
 
     private static final String TEN_BANG = "con_dao_diem";
-
-    private static final String[][] DU_LIEU_MAU = {
-            {
-                    "Trại Phú Hải",
-                    "Trại Phú Hải là một trong những trại giam tiêu biểu thuộc Hệ thống Nhà tù Côn Đảo, gắn với lịch sử giam giữ và đấu tranh của các tù nhân."
-            },
-            {
-                    "Trại Phú Sơn",
-                    "Trại Phú Sơn là một di tích của hệ thống nhà tù, nơi giới thiệu lịch sử giam giữ và các cuộc đấu tranh tại Côn Đảo."
-            },
-            {
-                    "Trại Phú Tường – Chuồng Cọp Pháp",
-                    "Khu Chuồng Cọp Pháp thuộc Trại Phú Tường, là một địa điểm di tích phản ánh chế độ biệt giam khắc nghiệt."
-            },
-            {
-                    "Trại Phú Bình – Chuồng Cọp Mỹ",
-                    "Trại Phú Bình, còn gọi Chuồng Cọp Mỹ, ghi dấu một giai đoạn trong lịch sử nhà tù Côn Đảo."
-            },
-            {
-                    "Trại Phú An",
-                    "Trại Phú An thuộc quần thể di tích nhà tù, giúp tìm hiểu thêm về quá trình hoạt động của các trại giam."
-            },
-            {
-                    "Nhà Chúa Đảo",
-                    "Nhà Chúa Đảo gắn với bộ máy quản lý đảo và hệ thống nhà tù qua nhiều thời kỳ."
-            },
-            {
-                    "Bảo tàng Côn Đảo",
-                    "Bảo tàng Côn Đảo giới thiệu tư liệu, hình ảnh và hiện vật về lịch sử, thiên nhiên và con người Côn Đảo."
-            }
-    };
-
     private final ArrayList<Integer> danhSachId = new ArrayList<>();
     private final ArrayList<String> danhSachTen = new ArrayList<>();
     private final ArrayList<String> danhSachMoTa = new ArrayList<>();
@@ -86,11 +41,23 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
     private TextView demKhuVuc;
     private TextView nutTruoc;
     private TextView nutTiep;
-    private TextView nutPhat;
     private ProgressBar tienTrinh;
     private LinearLayout danhSachKhuVuc;
     private TextToSpeech tts;
     private boolean sanSangDoc = false;
+    private HuongDanConDao huongDan;
+    private String luotDoc;
+    private final androidx.activity.result.ActivityResultLauncher<String[]> quyenConDao =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
+                    result -> {
+                        if (huongDan != null) huongDan.nhanQuyen(Boolean.TRUE.equals(
+                                result.get(android.Manifest.permission.ACCESS_FINE_LOCATION)));
+                    });
+
+    void xinQuyenConDao() {
+        quyenConDao.launch(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION});
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +83,8 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
         khoiTaoThuyetMinh();
         caiDatSuKien();
         hienThiDiem();
+        huongDan = new HuongDanConDao(this, findViewById(R.id.tqKhungHuongDan));
+        apDungKhoangTrongHeThong();
     }
 
     private void anhXaGiaoDien() {
@@ -128,7 +97,6 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
         demKhuVuc = findViewById(R.id.tqDemKhuVuc);
         nutTruoc = findViewById(R.id.tqNutTruoc);
         nutTiep = findViewById(R.id.tqNutTiep);
-        nutPhat = findViewById(R.id.tqNutPhat);
         tienTrinh = findViewById(R.id.tqTienTrinh);
         danhSachKhuVuc = findViewById(R.id.tqDanhSachKhuVuc);
     }
@@ -136,25 +104,7 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
     private boolean taiDuLieuSQLite() {
         try (TaiKhoanDb helper = new TaiKhoanDb(this)) {
             SQLiteDatabase db = helper.getWritableDatabase();
-            db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS " + TEN_BANG + " (" +
-                            "id INTEGER PRIMARY KEY, " +
-                            "ten TEXT NOT NULL, " +
-                            "mo_ta TEXT NOT NULL)"
-            );
-
-            for (int i = 0; i < DU_LIEU_MAU.length; i++) {
-                ContentValues giaTri = new ContentValues();
-                giaTri.put("id", i + 1);
-                giaTri.put("ten", DU_LIEU_MAU[i][0]);
-                giaTri.put("mo_ta", DU_LIEU_MAU[i][1]);
-                db.insertWithOnConflict(
-                        TEN_BANG,
-                        null,
-                        giaTri,
-                        SQLiteDatabase.CONFLICT_IGNORE
-                );
-            }
+            KhoDuLieuConDao.dongBo(db);
 
             try (Cursor cursor = db.rawQuery(
                     "SELECT id, ten, mo_ta FROM " + TEN_BANG + " ORDER BY id ASC",
@@ -164,6 +114,7 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
                 danhSachTen.clear();
                 danhSachMoTa.clear();
                 while (cursor.moveToNext()) {
+                    if (CauHinhAutoConDao.tim(cursor.getInt(0)) == null) continue;
                     danhSachId.add(cursor.getInt(0));
                     danhSachTen.add(cursor.getString(1));
                     danhSachMoTa.add(cursor.getString(2));
@@ -180,12 +131,10 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
         findViewById(R.id.tqNutQuayLai).setOnClickListener(v -> finish());
         nutTruoc.setOnClickListener(v -> chuyenDiem(viTriHienTai - 1));
         nutTiep.setOnClickListener(v -> chuyenDiem(viTriHienTai + 1));
-        nutPhat.setOnClickListener(v -> phatThuyetMinh());
-        findViewById(R.id.tqNutDung).setOnClickListener(v -> dungThuyetMinh());
+
     }
 
     private void hienThiDiem() {
-        thongBaoDoiDiemThamQuan();
         int soDiem = danhSachId.size();
         tenKhuVuc.setText(danhSachTen.get(viTriHienTai));
         moTaKhuVuc.setText(danhSachMoTa.get(viTriHienTai));
@@ -195,12 +144,28 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
         nutTiep.setEnabled(viTriHienTai < soDiem - 1);
         nutTruoc.setAlpha(viTriHienTai > 0 ? 1f : 0.35f);
         nutTiep.setAlpha(viTriHienTai < soDiem - 1 ? 1f : 0.35f);
-        nutPhat.setText("▶  Nghe thuyết minh");
         taoDanhSachDiem();
     }
 
     private void taoDanhSachDiem() {
         danhSachKhuVuc.removeAllViews();
+        CauHinhAutoConDao.Diem diem = CauHinhAutoConDao.tim(danhSachId.get(viTriHienTai));
+        if (diem != null) {
+            TextView nguon = new TextView(this);
+            nguon.setText("Nguồn thuyết minh ↗");
+            nguon.setTextSize(13);
+            nguon.setTextColor(Color.parseColor("#4F7C5A"));
+            nguon.setPadding(dp(4), dp(12), dp(4), dp(12));
+            nguon.setOnClickListener(v -> {
+                android.content.Intent moNguon = new android.content.Intent(android.content.Intent.ACTION_VIEW,
+                        android.net.Uri.parse(diem.nguonNoiDung));
+                try { startActivity(moNguon); }
+                catch (android.content.ActivityNotFoundException e) {
+                    Toast.makeText(this, "Chưa có trình duyệt để mở nguồn.", Toast.LENGTH_SHORT).show();
+                }
+            });
+            danhSachKhuVuc.addView(nguon);
+        }
         AnhSoDoThamQuan.themSoDo(
                 this,
                 danhSachKhuVuc,
@@ -229,7 +194,15 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
             final int chiSo = i;
             boolean dangChon = i == viTriHienTai;
             TextView the = new TextView(this);
-            the.setText(danhSachId.get(i) + ".  " + danhSachTen.get(i));
+            boolean coAuto = false;
+            for (CauHinhAutoConDao.Diem d : CauHinhAutoConDao.CAC_DIEM)
+                if (d.id == danhSachId.get(i)) coAuto = d.choPhepAuto;
+            int id = danhSachId.get(i);
+            CauHinhAutoConDao.Diem duLieu = CauHinhAutoConDao.tim(id);
+            String nhanSo = duLieu != null && duLieu.soSoDo > 0
+                    ? "Số " + duLieu.soSoDo + " · " : "";
+            the.setText(nhanSo + danhSachTen.get(i)
+                    + (coAuto ? "\nCó hỗ trợ AUTO · Luôn nghe thủ công được" : "\nNghe thủ công"));
             the.setTextSize(14);
             the.setTypeface(null, dangChon ? Typeface.BOLD : Typeface.NORMAL);
             the.setTextColor(dangChon ? Color.WHITE : Color.parseColor("#24382D"));
@@ -252,9 +225,11 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
         if (chiSo < 0 || chiSo >= danhSachId.size()) {
             return;
         }
+        if (huongDan != null) huongDan.dung("Đã chọn điểm thủ công; AUTO tạm dừng. Bấm GPS thật hoặc Demo để bật lại.");
         dungThuyetMinh();
         viTriHienTai = chiSo;
         hienThiDiem();
+        moKhungThuyetMinh(false);
     }
 
     private void khoiTaoThuyetMinh() {
@@ -265,25 +240,57 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
             int ketQua = tts.setLanguage(new Locale("vi", "VN"));
             sanSangDoc = ketQua != TextToSpeech.LANG_MISSING_DATA
                     && ketQua != TextToSpeech.LANG_NOT_SUPPORTED;
+            tts.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {
+                @Override public void onStart(String id) {}
+                @Override public void onDone(String id) { ketThucDoc(id, true); }
+                @Override public void onError(String id) { ketThucDoc(id, false); }
+            });
         });
     }
 
-    private void phatThuyetMinh() {
-        if (tts == null || !sanSangDoc) {
-            Toast.makeText(this, "Giọng đọc tiếng Việt chưa sẵn sàng.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        String noiDung = danhSachTen.get(viTriHienTai)
-                + ". " + danhSachMoTa.get(viTriHienTai);
-        tts.speak(
-                noiDung,
-                TextToSpeech.QUEUE_FLUSH,
-                null,
-                "con_dao_" + danhSachId.get(viTriHienTai)
-        );
+
+
+    private boolean docDiemHienTai() {
+        if (tts == null || !sanSangDoc) return false;
+        luotDoc = "con_dao_" + danhSachId.get(viTriHienTai) + "_" + System.nanoTime();
+        boolean thanhCong = tts.speak(danhSachTen.get(viTriHienTai) + ". " + danhSachMoTa.get(viTriHienTai),
+                TextToSpeech.QUEUE_FLUSH, null, luotDoc) == TextToSpeech.SUCCESS;
+        if (!thanhCong) luotDoc = null;
+        return thanhCong;
     }
 
+    void hienThiDiemDemo(int id) {
+        int chiSo = danhSachId.indexOf(id);
+        if (chiSo < 0) return;
+        dungThuyetMinh();
+        viTriHienTai = chiSo;
+        hienThiDiem();
+    }
+
+    boolean phatDiemTuDong(int id) {
+        if (tts == null || !sanSangDoc || !getLifecycle().getCurrentState().isAtLeast(
+                androidx.lifecycle.Lifecycle.State.RESUMED)) return false;
+        int chiSo = danhSachId.indexOf(id);
+        if (chiSo < 0) return false;
+        dungThuyetMinh();
+        viTriHienTai = chiSo;
+        hienThiDiem();
+        return docDiemHienTai();
+    }
+
+    private void ketThucDoc(String id, boolean thanhCong) {
+        runOnUiThread(() -> {
+            if (id == null || !id.equals(luotDoc) || isDestroyed()) return;
+            luotDoc = null;
+            if (huongDan != null) huongDan.docXong(thanhCong);
+        });
+    }
+
+    void dungDocConDao() { dungThuyetMinh(); }
+
     private void dungThuyetMinh() {
+        dongKhungThuyetMinh();
+        luotDoc = null;
         if (tts != null) {
             tts.stop();
         }
@@ -293,8 +300,14 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
         return (int) (giaTri * getResources().getDisplayMetrics().density + 0.5f);
     }
 
+    @Override protected void dungAmThanhThamQuan() {
+        if (huongDan != null) huongDan.dung("Đã chuyển sang nghe thủ công.");
+        dungThuyetMinh();
+    }
+
     @Override
     protected void onStop() {
+        if (huongDan != null) huongDan.dung("Đã rời màn hình; AUTO và âm thanh đã dừng. Bấm GPS thật hoặc Demo để bắt đầu lượt mới.");
         dungThuyetMinh();
         super.onStop();
     }
@@ -332,21 +345,7 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
             );
         }
 
-        /**
-         * Sáu vị trí có thể đối chiếu bằng số trên ảnh bản đồ quy hoạch
-         * 1366 x 970 do người dùng cung cấp. Tọa độ là vị trí ước lượng
-         * theo tâm ký hiệu trên ảnh, không phải tọa độ GPS/định vị thực địa.
-         * Bảo tàng Côn Đảo không có vị trí xác định trong bản đồ này.
-         */
-        private static final float[][] VI_TRI_TU_SO_DO_GOC = {
-                {1f, 780f / 1366f, 594f / 970f}, // Trại Phú Hải - số 5
-                {2f, 809f / 1366f, 573f / 970f}, // Trại Phú Sơn - số 6
-                {3f, 924f / 1366f, 442f / 970f}, // Phú Tường - số 25
-                {4f, 1114f / 1366f, 243f / 970f}, // Phú Bình - số 29
-                {5f, 1050f / 1366f, 291f / 970f}, // Phú An - số 28
-                {6f, 724f / 1366f, 645f / 970f}  // Nhà Chúa Đảo - số 3
-        };
-
+        /** Vị trí marker lấy từ danh mục đối chiếu ảnh gốc, không suy ra GPS từ pixel. */
         private static void themMarkerCoDoiChieu(
                 SQLiteDatabase db,
                 Activity activity,
@@ -375,11 +374,12 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
                 return;
             }
 
-            for (float[] diem : VI_TRI_TU_SO_DO_GOC) {
+            for (CauHinhAutoConDao.Diem diem : CauHinhAutoConDao.CAC_DIEM) {
+                if (!diem.coMarker()) continue;
                 ContentValues giaTri = new ContentValues();
-                giaTri.put("id", (int) diem[0]);
-                giaTri.put("x_ty_le", diem[1]);
-                giaTri.put("y_ty_le", diem[2]);
+                giaTri.put("id", diem.id);
+                giaTri.put("x_ty_le", diem.xAnh);
+                giaTri.put("y_ty_le", diem.yAnh);
                 db.insertWithOnConflict(
                         "con_dao_toa_do",
                         null,
@@ -473,7 +473,8 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
                         int id = cursor.getInt(0);
                         float x = cursor.getFloat(1);
                         float y = cursor.getFloat(2);
-                        if (id > 0 && x >= 0 && x <= 1 && y >= 0 && y <= 1) {
+                        CauHinhAutoConDao.Diem diem = CauHinhAutoConDao.tim(id);
+                        if (diem != null && diem.coMarker() && x >= 0 && x <= 1 && y >= 0 && y <= 1) {
                             cacDiem.add(new DiemMarker(id, x, y));
                         }
                     }
@@ -598,20 +599,22 @@ public class ConDaoThamQuanActivity extends BaseActivity implements NguonThamQua
                     float x = vungAnh.left + diem.x * vungAnh.width();
                     float y = vungAnh.top + diem.y * vungAnh.height();
                     boolean chon = diem.id == idHienTai;
+                    // Kiểu marker cũ, kích thước nhỏ theo tỷ lệ ảnh hiện tại.
+                    float tiLeSoDo = vungAnh.width() / 1366f;
+                    float banKinh = (chon ? 10f : 8f) * tiLeSoDo;
+                    paint.setStyle(Paint.Style.FILL);
                     paint.setColor(Color.WHITE);
-                    canvas.drawCircle(x, y, dp(16), paint);
+                    canvas.drawCircle(x, y, banKinh, paint);
                     paint.setColor(Color.parseColor(chon ? "#E8A600" : "#087B5A"));
-                    canvas.drawCircle(x, y, dp(13), paint);
+                    canvas.drawCircle(x, y, banKinh * 13f / 16f, paint);
                     paint.setColor(Color.WHITE);
                     paint.setTextAlign(Paint.Align.CENTER);
                     paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-                    paint.setTextSize(dp(10));
-                    canvas.drawText(
-                            String.valueOf(diem.id),
-                            x,
-                            y - (paint.ascent() + paint.descent()) / 2f,
-                            paint
-                    );
+                    paint.setTextSize(banKinh * 10f / 16f);
+                    CauHinhAutoConDao.Diem duLieu = CauHinhAutoConDao.tim(diem.id);
+                    int soHienThi = duLieu == null ? diem.id : duLieu.soSoDo;
+                    canvas.drawText(String.valueOf(soHienThi), x,
+                            y - (paint.ascent() + paint.descent()) / 2f, paint);
                 }
             }
 

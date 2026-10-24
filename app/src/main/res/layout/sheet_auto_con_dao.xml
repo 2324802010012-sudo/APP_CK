@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="24dp" android:background="#F6F8F5">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Chọn chế độ tham quan" android:textSize="21sp"
+            android:textStyle="bold" android:textColor="#24382D" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:text="Demo" android:textSize="17sp"
+            android:textStyle="bold" android:textColor="#24382D" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Tự đi qua đủ 19 điểm: AUTO tự phát, điểm thường hiện thông báo chọn nghe hoặc bỏ qua. Không cần quyền vị trí." android:textSize="13sp" android:textColor="#526456" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/conDaoDemo"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp"
+            android:text="Chạy demo AUTO toàn tuyến" android:textAllCaps="false" android:textColor="#FFFFFF"
+            app:backgroundTint="#4F7C5A" app:cornerRadius="14dp" />
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:layout_marginVertical="16dp" android:background="#DFE7DC" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="GPS thật" android:textSize="17sp" android:textStyle="bold" android:textColor="#24382D" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Dùng vị trí hiện tại để tự phát khi đến gần điểm tham quan."
+            android:textSize="13sp" android:textColor="#526456" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/conDaoGps"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp"
+            android:text="Bật AUTO bằng GPS thật" android:textAllCaps="false" android:textColor="#FFFFFF"
+            app:backgroundTint="#4F7C5A" app:cornerRadius="14dp" />
+    </LinearLayout>
+</ScrollView>

@@ -35,6 +35,8 @@ public final class BoChonDiemTuDong {
             trangThai = "Vị trí cũ hoặc chưa đủ chính xác (cần ≤25 m)";
             return null;
         }
+        // Mất cập nhật quá lâu thì phải chờ ổn định lại từ đầu.
+        if (lanCuoi >= 0 && lucDo - lanCuoi > 15000) ungVien = -1;
         lanCuoi = lucDo;
         Moc gan = null;
         double min = Double.MAX_VALUE, thuHai = Double.MAX_VALUE;
@@ -56,7 +58,7 @@ public final class BoChonDiemTuDong {
         }
         if (gan == null) {
             ungVien = -1;
-            trangThai = "Chưa vào vùng phát của mốc GPS trên tầng đang chọn";
+            trangThai = "Chưa vào vùng nhận diện địa điểm";
             return null;
         }
         if (daPhat.contains(gan.id)) {
