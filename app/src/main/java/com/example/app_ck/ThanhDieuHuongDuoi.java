@@ -26,7 +26,7 @@ public final class ThanhDieuHuongDuoi {
             view.setSelected(i == tabHienTai);
             view.setContentDescription(NHAN[i] + (i == tabHienTai ? ", đang chọn" : ""));
             toMau(view, i == tabHienTai, i == TRANG_CHU);
-            view.setOnClickListener(v -> { if (tab != tabHienTai) mo(activity, tab); });
+            view.setOnClickListener(v -> { if (tab == KHAM_PHA || tab != tabHienTai) mo(activity, tab); });
         }
     }
 
@@ -45,9 +45,14 @@ public final class ThanhDieuHuongDuoi {
     }
 
     public static void mo(BaseActivity activity, int tab) {
-        Class<?> lop = tab == TRANG_CHU ? MainActivity.class : tab == YEU_THICH ? YeuThichActivity.class
+        if (tab == KHAM_PHA && activity instanceof MainActivity) {
+            ((MainActivity)activity).cuonLenTimKiem();
+            return;
+        }
+        Class<?> lop = tab == TRANG_CHU || tab == KHAM_PHA ? MainActivity.class : tab == YEU_THICH ? YeuThichActivity.class
                 : tab == CA_NHAN ? CaNhanActivity.class : KhamPhaActivity.class;
         activity.startActivity(new Intent(activity, lop).putExtra(TAB, tab)
+                .putExtra(MainActivity.CUON_LEN_TIM_KIEM, tab == KHAM_PHA)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
         if (!(activity instanceof MainActivity) && activity.getClass() != lop) activity.finish();
     }

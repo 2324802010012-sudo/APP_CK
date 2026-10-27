@@ -69,10 +69,10 @@ public class CaNhanVaDieuHuongTest {
             onView(withId(R.id.cnTen)).check(matches(withText(ten)));
             onView(withId(R.id.navCaNhan)).check(matches(isSelected()));
             onView(withId(R.id.navKhamPha)).perform(click());
-            onView(withId(R.id.kpSoLuong)).check(matches(withText("5 địa điểm khám phá")));
-            nhap(R.id.kpTimKiem, "chung tich");
-            onView(withId(R.id.kpSoLuong)).check(matches(withText("1 địa điểm khám phá")));
-            onView(withId(R.id.ytTenDiaDiem)).perform(scrollTo(), click());
+            onView(withId(R.id.oTimKiem)).check(matches(isDisplayed()));
+            nhap(R.id.oTimKiem, "chung tich");
+            onView(withId(R.id.nutTimKiem)).perform(click());
+            onView(withText("Bảo tàng Chứng tích Chiến tranh")).inRoot(UiKiemThu.hoiThoai()).perform(click());
             onView(withId(R.id.nutTimYeuThich)).check(matches(withText("♥")));
             androidx.test.espresso.Espresso.pressBack();
             onView(withId(R.id.navGoiY)).perform(click());
@@ -81,6 +81,11 @@ public class CaNhanVaDieuHuongTest {
             onView(withId(R.id.navTrangChu)).perform(click());
             onView(withId(R.id.navTrangChu)).inRoot(androidx.test.espresso.matcher.RootMatchers.withDecorView(
                     hasDescendant(withId(R.id.vungCuonTrangChu)))).check(matches(isSelected()));
+            onView(withId(R.id.oTimKiem)).perform(scrollTo(), replaceText("Hue"), closeSoftKeyboard());
+            onView(withId(R.id.vungCuonTrangChu)).perform(swipeUp(), swipeUp());
+            onView(withId(R.id.navKhamPha)).perform(click());
+            onView(withId(R.id.oTimKiem)).check(matches(isDisplayed()));
+            onView(withId(R.id.oTimKiem)).check(matches(withText("Hue")));
         }
     }
 

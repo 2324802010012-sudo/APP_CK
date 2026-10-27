@@ -24,6 +24,11 @@ import java.util.Locale;
 
 /** AUTO chỉ trong tour Côn Đảo đang mở. Demo không ghi GPS vào dữ liệu thực. */
 final class HuongDanConDao implements LocationListener {
+    boolean dangPhatTuDong() { return cheDo != THU_CONG && dangDoc; }
+
+    String cheDoLichSu() {
+        return cheDo == DEMO ? KhoLichSu.DEMO : cheDo == GPS ? KhoLichSu.AUTO_SUB : KhoLichSu.THU_CONG;
+    }
     private static final int THU_CONG = 0, GPS = 1, DEMO = 2;
     private static final int[] CAC_BUOC = {500, 150, 60, 20};
     private final ConDaoThamQuanActivity activity;

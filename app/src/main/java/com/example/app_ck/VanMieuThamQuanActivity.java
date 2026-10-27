@@ -266,11 +266,15 @@ public class VanMieuThamQuanActivity extends BaseActivity implements HuongDanTou
         if (moi < 0 || moi >= tenDiem.size()) {
             return;
         }
-        dungAutoThuCong();
-        dungThuyetMinh();
-        viTri = moi;
-        hienThi();
-        moKhungThuyetMinh(false);
+        boolean autoDangPhat = huongDan != null && huongDan.dangPhatTuDong();
+        if (autoDangPhat && moi == viTri) return;
+        xacNhanChuyenDiem(autoDangPhat, tenDiem.get(moi), () -> {
+            dungAutoThuCong();
+            dungThuyetMinh();
+            viTri = moi;
+            hienThi();
+            moKhungThuyetMinh(false);
+        });
     }
 
 
@@ -291,13 +295,15 @@ public class VanMieuThamQuanActivity extends BaseActivity implements HuongDanTou
 
     private boolean docDiemHienTai() {
         luotDoc = "van_mieu_" + (viTri + 1) + "_" + System.nanoTime();
+        chuanBiLichSu(luotDoc, 4, viTri + 1, huongDan == null ? KhoLichSu.THU_CONG : huongDan.cheDoLichSu());
         boolean ok = tts.speak(tenDiem.get(viTri) + ". " + moTaDiem.get(viTri),
                 TextToSpeech.QUEUE_FLUSH, null, luotDoc) == TextToSpeech.SUCCESS;
-        if (!ok) luotDoc = null;
+        if (!ok) { luotDoc = null; huyLuotLichSu(); }
         return ok;
     }
 
     private void dungThuyetMinh() {
+        huyLuotLichSu();
         dongKhungThuyetMinh();
         luotDoc = null;
         if (tts != null) tts.stop();
@@ -307,7 +313,7 @@ public class VanMieuThamQuanActivity extends BaseActivity implements HuongDanTou
 
     private void caiDatTheoDoiDoc() {
         tts.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {
-            @Override public void onStart(String id) {}
+            @Override public void onStart(String id) { batDauLichSu(id); }
             @Override public void onDone(String id) { ketThucDoc(id, true); }
             @Override public void onError(String id) { ketThucDoc(id, false); }
             @Override public void onError(String id, int maLoi) { ketThucDoc(id, false); }

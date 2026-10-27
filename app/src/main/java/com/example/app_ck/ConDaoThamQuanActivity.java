@@ -210,11 +210,15 @@ public class ConDaoThamQuanActivity extends BaseActivity {
         if (chiSo < 0 || chiSo >= danhSachId.size()) {
             return;
         }
-        if (huongDan != null) huongDan.dung("Đã chọn điểm thủ công; AUTO tạm dừng. Bấm GPS thật hoặc Demo để bật lại.");
-        dungThuyetMinh();
-        viTriHienTai = chiSo;
-        hienThiDiem();
-        moKhungThuyetMinh(false);
+        boolean autoDangPhat = huongDan != null && huongDan.dangPhatTuDong();
+        if (autoDangPhat && chiSo == viTriHienTai) return;
+        xacNhanChuyenDiem(autoDangPhat, danhSachTen.get(chiSo), () -> {
+            if (huongDan != null) huongDan.dung("Đã chọn điểm thủ công; AUTO tạm dừng. Bấm GPS thật hoặc Demo để bật lại.");
+            dungThuyetMinh();
+            viTriHienTai = chiSo;
+            hienThiDiem();
+            moKhungThuyetMinh(false);
+        });
     }
 
     private void khoiTaoThuyetMinh() {
@@ -226,7 +230,7 @@ public class ConDaoThamQuanActivity extends BaseActivity {
             sanSangDoc = ketQua != TextToSpeech.LANG_MISSING_DATA
                     && ketQua != TextToSpeech.LANG_NOT_SUPPORTED;
             tts.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {
-                @Override public void onStart(String id) {}
+            @Override public void onStart(String id) { batDauLichSu(id); }
                 @Override public void onDone(String id) { ketThucDoc(id, true); }
                 @Override public void onError(String id) { ketThucDoc(id, false); }
             });
@@ -236,11 +240,13 @@ public class ConDaoThamQuanActivity extends BaseActivity {
 
 
     private boolean docDiemHienTai() {
+        // ID của lượt được tạo bên dưới trước khi TTS nhận yêu cầu.
         if (tts == null || !sanSangDoc) return false;
         luotDoc = "con_dao_" + danhSachId.get(viTriHienTai) + "_" + System.nanoTime();
+        chuanBiLichSu(luotDoc, 3, danhSachId.get(viTriHienTai), huongDan == null ? KhoLichSu.THU_CONG : huongDan.cheDoLichSu());
         boolean thanhCong = tts.speak(danhSachTen.get(viTriHienTai) + ". " + danhSachMoTa.get(viTriHienTai),
                 TextToSpeech.QUEUE_FLUSH, null, luotDoc) == TextToSpeech.SUCCESS;
-        if (!thanhCong) luotDoc = null;
+        if (!thanhCong) { luotDoc = null; huyLuotLichSu(); }
         return thanhCong;
     }
 
@@ -274,6 +280,7 @@ public class ConDaoThamQuanActivity extends BaseActivity {
     void dungDocConDao() { dungThuyetMinh(); }
 
     private void dungThuyetMinh() {
+        huyLuotLichSu();
         dongKhungThuyetMinh();
         luotDoc = null;
         if (tts != null) {

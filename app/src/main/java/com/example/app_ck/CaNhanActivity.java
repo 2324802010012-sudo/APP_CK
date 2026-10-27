@@ -29,6 +29,8 @@ public class CaNhanActivity extends BaseActivity {
                 () -> startActivity(new Intent(this, SuaHoSoActivity.class)));
         ganHang(R.id.cnYeuThich, R.drawable.ui_ic_heart, "Địa điểm yêu thích", "Xem bộ sưu tập của bạn",
                 () -> ThanhDieuHuongDuoi.mo(this, ThanhDieuHuongDuoi.YEU_THICH));
+        ganHang(R.id.cnLichSu, R.drawable.ui_ic_history, "Lịch sử nghe", "Xem lại các lượt thuyết minh của bạn",
+                () -> startActivity(new Intent(this, LichSuActivity.class)));
         ganHang(R.id.cnDoiMatKhau, R.drawable.ui_ic_lock, "Đổi mật khẩu", "Xác thực bằng mật khẩu hiện tại",
                 () -> startActivity(new Intent(this, DoiMatKhauActivity.class)));
         ganHang(R.id.cnHuongDan, R.drawable.ui_ic_route, "Thông tin ứng dụng", "Tài khoản, dữ liệu và mã khôi phục",

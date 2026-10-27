@@ -29,7 +29,6 @@ public class YeuThichActivity extends BaseActivity {
         ThanhDieuHuongDuoi.gan(this, ThanhDieuHuongDuoi.YEU_THICH);
         findViewById(R.id.ytDangNhap).setOnClickListener(v -> moDangNhap(false));
         findViewById(R.id.ytDangKy).setOnClickListener(v -> moDangNhap(true));
-        findViewById(R.id.ytKhamPha).setOnClickListener(v -> veTrangChu());
         findViewById(R.id.ytDangXuat).setOnClickListener(v ->
                 new com.google.android.material.dialog.MaterialAlertDialogBuilder(this).setTitle("Đăng xuất?")
                         .setMessage("Địa điểm đã lưu sẽ được giữ lại trong tài khoản của bạn.")
@@ -50,12 +49,6 @@ public class YeuThichActivity extends BaseActivity {
                 .putExtra(DangNhapActivity.MO_DANG_KY, dangKy));
     }
 
-    private void veTrangChu() {
-        startActivity(new Intent(this, MainActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
-        finish();
-    }
-
     private void chu(int id, String noiDung) {
         ((TextView) findViewById(id)).setText(noiDung);
     }
@@ -67,7 +60,7 @@ public class YeuThichActivity extends BaseActivity {
         findViewById(R.id.ytDangXuat).setVisibility(daDangNhap ? View.VISIBLE : View.GONE);
         findViewById(R.id.ytDangNhap).setVisibility(daDangNhap ? View.GONE : View.VISIBLE);
         findViewById(R.id.ytDangKy).setVisibility(daDangNhap ? View.GONE : View.VISIBLE);
-        findViewById(R.id.ytKhamPha).setVisibility(daDangNhap ? View.VISIBLE : View.GONE);
+        findViewById(R.id.ytKhamPha).setVisibility(View.GONE);
         findViewById(R.id.ytTrangThai).setVisibility(View.VISIBLE);
         if (!daDangNhap) {
             chu(R.id.ytTongSo, "Những điểm đến dành riêng cho bạn");
@@ -100,11 +93,10 @@ public class YeuThichActivity extends BaseActivity {
             chu(R.id.ytTieuDeTrangThai, "Không thể tải danh sách");
             chu(R.id.ytMoTaTrangThai, "Vui lòng thử tải lại danh sách yêu thích.");
             chu(R.id.ytKhamPha, "Thử lại");
+            findViewById(R.id.ytKhamPha).setVisibility(View.VISIBLE);
             findViewById(R.id.ytKhamPha).setOnClickListener(v -> hienThi());
             return;
         }
-        chu(R.id.ytKhamPha, "Khám phá địa điểm");
-        findViewById(R.id.ytKhamPha).setOnClickListener(v -> veTrangChu());
     }
 
     private void themThe(DiaDiem d) {

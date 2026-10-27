@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Gravity;
@@ -15,18 +14,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
-import java.util.Locale;
 import java.util.ArrayList;
 import android.util.Log;
 
 public class ChiTietDiaDiemActivity extends BaseActivity {
     public static final String PHAT_TU_VI_TRI = "com.example.app_ck.PHAT_TU_VI_TRI";
+    public static final String CHE_DO_VI_TRI = "com.example.app_ck.CHE_DO_VI_TRI";
     private boolean choPhatTuViTri, dangHienThi;
-    private String luotDoc;
-
-
-    private TextToSpeech tts;
-    private boolean sanSangDoc = false;
     private int viTri;
 
     private TextView nutYeuThich;
@@ -264,48 +258,6 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
         // Tạo danh sách các điểm tham quan nổi bật
         taoTheDiem();
 
-        // Khởi tạo Text-to-Speech tiếng Việt
-        tts = new TextToSpeech(this, trangThai -> {
-            if (trangThai == TextToSpeech.SUCCESS &&
-                    tts != null) {
-
-                int ketQua = tts.setLanguage(
-                        new Locale("vi", "VN")
-                );
-
-                sanSangDoc =
-                        ketQua != TextToSpeech.LANG_MISSING_DATA
-                                &&
-                                ketQua != TextToSpeech.LANG_NOT_SUPPORTED;
-                if (sanSangDoc) phatSauXacNhanViTri();
-                else if (choPhatTuViTri) {
-                    choPhatTuViTri = false;
-                    hienTrangThaiDoc("Chưa có giọng đọc tiếng Việt. Kiểm tra TTS rồi bấm Nghe thuyết minh.");
-                }
-            } else if (choPhatTuViTri) {
-                choPhatTuViTri = false;
-                hienTrangThaiDoc("Không khởi tạo được TTS. Bấm Nghe thuyết minh để thử lại.");
-            }
-        });
-        tts.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {
-            @Override public void onStart(String id) {}
-            @Override public void onDone(String id) {
-                runOnUiThread(() -> {
-                    if (dangHienThi && id != null && id.equals(luotDoc)) {
-                        luotDoc = null;
-                        hienTrangThaiDoc("Đã đọc xong giới thiệu " + TEN[viTri] + ".");
-                    }
-                });
-            }
-            @Override public void onError(String id) {
-                runOnUiThread(() -> {
-                    if (dangHienThi && id != null && id.equals(luotDoc)) {
-                        luotDoc = null;
-                        hienTrangThaiDoc("Không phát được giọng đọc. Kiểm tra TTS và thử lại.");
-                    }
-                });
-            }
-        });
     }
 
     // DONG BO DIA DIEM HIEN TAI TU BANG dia_diem
@@ -447,29 +399,37 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
     }
 
     private void phatSauXacNhanViTri() {
-        if (!choPhatTuViTri || !dangHienThi || !sanSangDoc || isFinishing() || isDestroyed()) return;
+        if (!choPhatTuViTri || !dangHienThi || isFinishing() || isDestroyed()) return;
         choPhatTuViTri = false;
-        docThuyetMinh();
+        docThuyetMinh(KhoLichSu.DEMO.equals(getIntent().getStringExtra(CHE_DO_VI_TRI))
+                ? KhoLichSu.DEMO : KhoLichSu.AUTO_MAIN);
     }
 
     private void docThuyetMinh() {
+        docThuyetMinh(KhoLichSu.THU_CONG);
+    }
+
+    private void docThuyetMinh(String cheDo) {
         choPhatTuViTri = false;
-        if (!sanSangDoc || tts == null) {
-            hienTrangThaiDoc("Giọng đọc tiếng Việt chưa sẵn sàng. Hãy kiểm tra cài đặt TTS.");
-            return;
-        }
-        luotDoc = "chi_tiet_" + viTri + "_" + android.os.SystemClock.elapsedRealtimeNanos();
-        int result = tts.speak(TEN[viTri] + ". " + MO_TA[viTri], TextToSpeech.QUEUE_FLUSH, null, luotDoc);
-        if (result == TextToSpeech.ERROR) {
-            luotDoc = null;
-            hienTrangThaiDoc("Không khởi động được giọng đọc. Bấm Nghe thuyết minh để thử lại.");
-        } else hienTrangThaiDoc("Đang phát giới thiệu " + TEN[viTri] + ".");
+        moTrinhNghe(true, cheDo);
+    }
+
+    @Override protected void moKhungThuyetMinh(boolean phatNgay) {
+        choPhatTuViTri = false;
+        moTrinhNghe(phatNgay, KhoLichSu.THU_CONG);
+    }
+
+    private void moTrinhNghe(boolean phatNgay, String cheDo) {
+        moKhungThuyetMinh(TEN[viTri], MO_TA[viTri], TEN[viTri],
+                ((ImageView) findViewById(R.id.anhChiTiet)).getDrawable(),
+                phatNgay, viTri, 0, cheDo);
+        findViewById(R.id.trangThaiThuyetMinh).setVisibility(android.view.View.GONE);
     }
 
     private void dungThuyetMinh() {
+        huyLuotLichSu();
         choPhatTuViTri = false;
-        luotDoc = null;
-        if (tts != null) tts.stop();
+        dongKhungThuyetMinh();
         TextView status = findViewById(R.id.trangThaiThuyetMinh);
         if (status.getVisibility() == android.view.View.VISIBLE) status.setText("Đã dừng thuyết minh.");
     }
@@ -752,16 +712,4 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
         super.onStop();
     }
 
-    // Giải phóng Text-to-Speech
-    @Override
-    protected void onDestroy() {
-
-        if (tts != null) {
-            tts.stop();
-            tts.shutdown();
-            tts = null;
-        }
-
-        super.onDestroy();
-    }
 }

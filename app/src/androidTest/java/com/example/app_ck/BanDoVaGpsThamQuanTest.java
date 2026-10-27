@@ -138,23 +138,14 @@ public class BanDoVaGpsThamQuanTest {
             doiLoiMoi(scenario);
             onView(withText("Bắt đầu")).inRoot(UiKiemThu.hoiThoai()).perform(click());
             ChiTietDiaDiemActivity chiTiet = doiChiTiet();
-            final java.util.concurrent.atomic.AtomicReference<String> status = new java.util.concurrent.atomic.AtomicReference<>();
-            long deadline = android.os.SystemClock.elapsedRealtime() + 12000;
-            do {
-                androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync(() ->
-                        status.set(((TextView) chiTiet.findViewById(R.id.trangThaiThuyetMinh)).getText().toString()));
-                if (!status.get().contains("Đang chuẩn bị")) break;
-                android.os.SystemClock.sleep(100);
-            } while (android.os.SystemClock.elapsedRealtime() < deadline);
+            onView(withId(R.id.ngheTenDiem)).inRoot(UiKiemThu.hoiThoai())
+                    .check(androidx.test.espresso.assertion.ViewAssertions.matches(withText("Đại Nội Huế")));
             androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
                 assertEquals(2, chiTiet.getIntent().getIntExtra("viTriDiaDiem", -1));
                 assertFalse("Không giữ cờ để tự phát lần sau", chiTiet.getIntent().hasExtra(ChiTietDiaDiemActivity.PHAT_TU_VI_TRI));
                 assertNull(chiTiet.findViewById(R.id.autoGps));
                 assertNull(chiTiet.findViewById(R.id.autoDemo));
                 assertNotNull(chiTiet.findViewById(R.id.nutNgheThuyetMinh));
-                assertTrue(status.get(), status.get().contains("Đang phát giới thiệu Đại Nội Huế")
-                        || status.get().contains("Đã đọc xong giới thiệu Đại Nội Huế")
-                        || status.get().contains("Chưa có giọng đọc tiếng Việt"));
                 chiTiet.finish();
             });
             scenario.onActivity(a -> assertEquals("Chưa bật hướng dẫn",

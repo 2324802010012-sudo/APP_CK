@@ -76,15 +76,18 @@ public final class ThamQuanTuDong implements LocationListener {
     private void moChiTiet(boolean phatSauXacNhan) {
         if (diemDangMoi == null) return;
         int id = diemDangMoi.id;
+        String cheDoLichSu = cheDo == DEMO ? KhoLichSu.DEMO : KhoLichSu.AUTO_MAIN;
         dung("Đang mở chi tiết " + diemDangMoi.ten + ".");
         activity.startActivity(new Intent(activity, ChiTietDiaDiemActivity.class)
                 .putExtra("viTriDiaDiem", id)
-                .putExtra(ChiTietDiaDiemActivity.PHAT_TU_VI_TRI, phatSauXacNhan));
+                .putExtra(ChiTietDiaDiemActivity.PHAT_TU_VI_TRI, phatSauXacNhan)
+                .putExtra(ChiTietDiaDiemActivity.CHE_DO_VI_TRI, cheDoLichSu));
     }
 
     private void chu(int id, String value) { ((TextView) bang.findViewById(id)).setText(value); }
     private void trangThai(String value) { chu(R.id.autoTrangThai, value); }
     public void dung(String lyDo) {
+        activity.huyLuotLichSu();
         phien++;
         cheDo = THU_CONG;
         if (nhanDien != null) nhanDien.huy();

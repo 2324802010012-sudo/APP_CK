@@ -14,7 +14,7 @@ import javax.crypto.spec.PBEKeySpec;
 
 public class TaiKhoanDb extends SQLiteOpenHelper {
     private static final String DB = "du_lich_tai_khoan.db";
-    private static final int VERSION = 12;
+    private static final int VERSION = 14;
     public TaiKhoanDb(Context context) { super(context, DB, null, VERSION); }
     @Override public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
@@ -33,6 +33,7 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
         themMoTaVaDanhMuc(db);
         KhoToaDoThamQuan.nangCap(db);
         nangCapHoSo(db);
+        KhoLichSu.taoBang(db);
     }
 
     @Override
@@ -129,6 +130,8 @@ public class TaiKhoanDb extends SQLiteOpenHelper {
             KhoToaDoThamQuan.nangCap(db);
         }
         if (oldVersion < 12) nangCapHoSo(db);
+        if (oldVersion < 13) KhoLichSu.taoBang(db);
+        else if (oldVersion < 14) KhoLichSu.nangCapTu13(db);
     }
 
 

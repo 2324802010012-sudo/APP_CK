@@ -34,6 +34,7 @@ import java.util.Locale;
 
 public class MainActivity extends BaseActivity {
     public static final String BAT_DAU_HUONG_DAN = "com.example.app_ck.BAT_DAU_HUONG_DAN";
+    public static final String CUON_LEN_TIM_KIEM = "com.example.app_ck.CUON_LEN_TIM_KIEM";
     TextToSpeech mayDocGioiThieu() { return ttsTrangChu; }
 
     private TextToSpeech ttsTrangChu;
@@ -146,6 +147,28 @@ public class MainActivity extends BaseActivity {
         );
     }
 
+    @Override protected void onPostCreate(Bundle state) {
+        super.onPostCreate(state);
+        nhanYeuCauTimKiem();
+    }
+
+    @Override protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        nhanYeuCauTimKiem();
+    }
+
+    private void nhanYeuCauTimKiem() {
+        if (getIntent().getBooleanExtra(CUON_LEN_TIM_KIEM, false)) {
+            getIntent().removeExtra(CUON_LEN_TIM_KIEM);
+            cuonLenTimKiem();
+        }
+    }
+
+    void cuonLenTimKiem() {
+        if (vungCuonTrangChu != null) vungCuonTrangChu.post(() -> vungCuonTrangChu.smoothScrollTo(0, 0));
+    }
+
     // ANH XA CAC THANH PHAN GIAO DIEN
 
     private void anhXaGiaoDien() {
@@ -253,6 +276,7 @@ public class MainActivity extends BaseActivity {
 
         ganSuKien(R.id.nutTaiKhoan, () ->
                 hienThiMenuTaiKhoan());
+        ganSuKien(R.id.nutLichSu, () -> startActivity(new Intent(this, LichSuActivity.class)));
 
 
         ganSuKien(
@@ -935,6 +959,11 @@ public class MainActivity extends BaseActivity {
                     }
                 }
         );
+        ttsTrangChu.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {
+            @Override public void onStart(String id) { batDauLichSu(id); }
+            @Override public void onDone(String id) {}
+            @Override public void onError(String id) {}
+        });
     }
 
     // HIEN THI DANH SACH DIA DIEM CO THUYET MINH
@@ -984,14 +1013,17 @@ public class MainActivity extends BaseActivity {
             return;
         }
 
+        String maLuot = "trang_chu_" + viTri + "_" + System.nanoTime();
+        chuanBiLichSu(maLuot, diaDiem.id, 0, KhoLichSu.THU_CONG);
         int ketQua = ttsTrangChu.speak(
                 diaDiem.moTa,
                 TextToSpeech.QUEUE_FLUSH,
                 null,
-                "thuyet_minh_trang_chu_" + viTri
+                maLuot
         );
 
         if (ketQua == TextToSpeech.ERROR) {
+            huyLuotLichSu();
             hienThongBao("Không thể phát thuyết minh.");
             return;
         }
@@ -1008,6 +1040,7 @@ public class MainActivity extends BaseActivity {
 
     // DUNG GIONG DOC
     private void dungThuyetMinhTrangChu() {
+        huyLuotLichSu();
 
         if (ttsTrangChu != null) {
             ttsTrangChu.stop();

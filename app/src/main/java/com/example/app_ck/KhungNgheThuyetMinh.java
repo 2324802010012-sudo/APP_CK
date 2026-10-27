@@ -65,6 +65,9 @@ final class KhungNgheThuyetMinh {
     private boolean ttsReady, ttsLoi, dangTao, muonPhat, dangTua, tiepSauTua, daHuy, daChuanBi;
     private int phien, doan, tong, nenDoan, viTriDung;
     private String noiDung, luotTao;
+    private int idDiaDiem, idDiem;
+    private String cheDoLichSu = KhoLichSu.THU_CONG;
+    private LuotNgheLichSu luotLichSu;
     private final Runnable quaHan=this::kiemTraQuaHan;
     private void kiemTraQuaHan() {
         if(muonPhat && dialog.isShowing())loi("Chuẩn bị âm thanh quá lâu. Kiểm tra giọng đọc hoặc kết nối rồi thử lại.");
@@ -114,8 +117,14 @@ final class KhungNgheThuyetMinh {
         });
     }
 
-    void mo(String ten,String bai,String diaDiem,Drawable anh,boolean phatNgay) {
+    void mo(String ten,String bai,String diaDiem,Drawable anh,boolean phatNgay,int idDiaDiem,int idDiem) {
+        mo(ten,bai,diaDiem,anh,phatNgay,idDiaDiem,idDiem,KhoLichSu.THU_CONG);
+    }
+
+    void mo(String ten,String bai,String diaDiem,Drawable anh,boolean phatNgay,int idDiaDiem,int idDiem,String cheDo) {
         dong();
+        this.idDiaDiem=idDiaDiem; this.idDiem=idDiem;
+        cheDoLichSu=cheDo;
         noiDung=ten+". "+bai;
         chu(R.id.ngheTenDiem,ten); chu(R.id.ngheNoiDung,bai);
         chu(R.id.ngheDiaDiem,"Ảnh tổng quan · "+diaDiem);
@@ -129,6 +138,7 @@ final class KhungNgheThuyetMinh {
 
     private void phat() {
         if(daHuy || !dialog.isShowing() || dangTao)return;
+        if(luotLichSu==null)luotLichSu=new LuotNgheLichSu(activity,idDiaDiem,idDiem,cheDoLichSu);
         if(!durations.isEmpty()) {
             if(player!=null)batAmThanh(); else taiTai(viTriDung,true);
             return;
@@ -265,6 +275,7 @@ final class KhungNgheThuyetMinh {
                     tua.setProgress(1000); chu(R.id.ngheDaPhat,thoiGian(tong));
                     chu(R.id.nghePhatTamDung,"↻  Nghe lại"); trangThai("Đã nghe hết bài thuyết minh");
                     viTriDung=0;
+                    luotLichSu=null;
                 }
             });
             moi.setOnErrorListener((p,what,extra)->{
@@ -284,7 +295,9 @@ final class KhungNgheThuyetMinh {
     private void batAmThanh() {
         if(player==null)return;
         if(!xinFocus()) { trangThai("Chưa thể phát lúc này. Hãy thử lại sau khi kết thúc âm thanh khác."); return; }
-        player.start(); chu(R.id.nghePhatTamDung,"Ⅱ  Tạm dừng"); trangThai("Đang phát thuyết minh");
+        player.start();
+        if(luotLichSu!=null)luotLichSu.batDau(activity);
+        chu(R.id.nghePhatTamDung,"Ⅱ  Tạm dừng"); trangThai("Đang phát thuyết minh");
         main.removeCallbacks(nhip); main.post(nhip);
     }
 
@@ -309,6 +322,7 @@ final class KhungNgheThuyetMinh {
     }
 
     private void dung() {
+        luotLichSu=null;
         muonPhat=false;
         if(dangTao || durations.isEmpty()) {
             donLuot();
@@ -348,6 +362,7 @@ final class KhungNgheThuyetMinh {
         if(player!=null) {player.release();player=null;}
     }
     private void donLuot() {
+        luotLichSu=null;
         main.removeCallbacks(quaHan);
         phien++; muonPhat=false; dangTao=false; luotTao=null;
         if(tts!=null)tts.stop();

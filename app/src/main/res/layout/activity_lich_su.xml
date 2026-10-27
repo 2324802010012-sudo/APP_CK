@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="#F6F8F5">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="64dp"
+        android:gravity="center_vertical" android:paddingHorizontal="12dp">
+        <TextView android:id="@+id/lsQuayLai" android:layout_width="48dp" android:layout_height="48dp"
+            android:text="‹" android:textSize="32sp" android:textColor="#20382A"
+            android:gravity="center" android:contentDescription="Quay lại" android:clickable="true" android:focusable="true" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Lịch sử thuyết minh" android:textSize="18sp" android:textStyle="bold" android:textColor="#20382A" />
+        <TextView android:id="@+id/lsXoaTatCa" android:layout_width="wrap_content" android:layout_height="48dp"
+            android:paddingHorizontal="12dp" android:gravity="center" android:text="Xóa tất cả"
+            android:textSize="13sp" android:textColor="#9C493B" android:clickable="true" android:focusable="true" />
+    </LinearLayout>
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="18dp">
+            <TextView android:id="@+id/lsTaiKhoan" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:textSize="14sp" android:textColor="#4F7C5A" />
+            <TextView android:id="@+id/lsTongSo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:textSize="13sp" android:textColor="#718277" />
+            <LinearLayout android:id="@+id/lsTrangThai" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="24dp" android:padding="24dp" android:orientation="vertical"
+                android:gravity="center_horizontal" android:background="@drawable/ui_card">
+                <ImageView android:layout_width="48dp" android:layout_height="48dp"
+                    android:src="@drawable/ui_ic_history" android:contentDescription="Lịch sử nghe" />
+                <TextView android:id="@+id/lsTieuDeTrangThai" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp" android:gravity="center" android:textSize="18sp"
+                    android:textStyle="bold" android:textColor="#20382A" />
+                <TextView android:id="@+id/lsMoTaTrangThai" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" android:gravity="center" android:textSize="14sp"
+                    android:lineSpacingExtra="4dp" android:textColor="#718277" />
+                <Button android:id="@+id/lsNutTrangThai" android:layout_width="match_parent" android:layout_height="52dp"
+                    android:layout_marginTop="20dp" android:textAllCaps="false" android:backgroundTint="#147657"
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/lsDanhSach" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:layout_marginTop="12dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

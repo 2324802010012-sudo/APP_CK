@@ -158,6 +158,8 @@ public class AutoDiSanFlowTest {
             doi(s,R.id.tourTrangThai,"Đang tự động phát:",5000);
             assertEquals(diem.ten,chu(s,R.id.tqTenKhuVuc));
             s.onActivity(a->a.findViewById(R.id.tqNutTiep).performClick());
+            assertTrue((Boolean)layController(s,"dangDoc"));
+            onView(withText("Chuyển điểm")).inRoot(UiKiemThu.hoiThoai()).perform(click());
             assertEquals("Thủ công · Chưa bật AUTO",chu(s,R.id.tourCheDo));
             assertFalse((Boolean)layController(s,"dangDoc"));
         }

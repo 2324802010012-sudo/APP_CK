@@ -410,18 +410,21 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanT
 
     private void chonChiSo(int chiSo) {
         if (chiSo < 0 || chiSo >= danhSachId.size()) return;
-        dungAutoThuCong();
-        dungTTS();
-        viTriHienTai = chiSo;
-        hienThiDiem();
-        moKhungThuyetMinh(false);
+        boolean autoDangPhat = huongDan != null && huongDan.dangPhatTuDong();
+        if (autoDangPhat && chiSo == viTriHienTai) return;
+        xacNhanChuyenDiem(autoDangPhat, danhSachTen.get(chiSo), () -> {
+            dungAutoThuCong();
+            dungTTS();
+            viTriHienTai = chiSo;
+            hienThiDiem();
+            moKhungThuyetMinh(false);
+        });
     }
 
     private void chonMarker(int id) {
         for (int i = 0; i < danhSachId.size(); i++) {
             if (danhSachId.get(i) == id) {
                 chonChiSo(i);
-                Toast.makeText(this, danhSachTen.get(i), Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -646,13 +649,15 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanT
 
     private boolean docDiemHienTai() {
         luotDoc = "hue_" + danhSachId.get(viTriHienTai) + "_" + System.nanoTime();
+        chuanBiLichSu(luotDoc, 2, danhSachId.get(viTriHienTai), huongDan == null ? KhoLichSu.THU_CONG : huongDan.cheDoLichSu());
         boolean ok = tts.speak(danhSachTen.get(viTriHienTai) + ". " + danhSachMoTa.get(viTriHienTai),
                 TextToSpeech.QUEUE_FLUSH, null, luotDoc) == TextToSpeech.SUCCESS;
-        if (!ok) luotDoc = null;
+        if (!ok) { luotDoc = null; huyLuotLichSu(); }
         return ok;
     }
 
     private void dungTTS() {
+        huyLuotLichSu();
         dongKhungThuyetMinh();
         luotDoc = null;
         if (tts != null) tts.stop();
@@ -666,7 +671,7 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanT
 
     private void caiDatTheoDoiDoc() {
         tts.setOnUtteranceProgressListener(new android.speech.tts.UtteranceProgressListener() {
-            @Override public void onStart(String id) {}
+            @Override public void onStart(String id) { batDauLichSu(id); }
             @Override public void onDone(String id) { ketThucDoc(id, true); }
             @Override public void onError(String id) { ketThucDoc(id, false); }
             @Override public void onError(String id, int maLoi) { ketThucDoc(id, false); }

@@ -11,7 +11,25 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 public class BaseActivity extends AppCompatActivity {
     private KhungNgheThuyetMinh khungNghe;
+    private androidx.appcompat.app.AlertDialog hoiChuyenDiem;
     private int diaDiemNguon = -1, diemNguon;
+    private String maLuotLichSu;
+    private LuotNgheLichSu luotLichSu;
+
+    protected void chuanBiLichSu(String ma, int diaDiem, int diem, String cheDo) {
+        maLuotLichSu = ma;
+        luotLichSu = new LuotNgheLichSu(this, diaDiem, diem, cheDo);
+    }
+
+    protected void batDauLichSu(String ma) {
+        runOnUiThread(() -> {
+            if (ma != null && ma.equals(maLuotLichSu) && luotLichSu != null
+                    && getLifecycle().getCurrentState().isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED))
+                luotLichSu.batDau(this);
+        });
+    }
+
+    protected void huyLuotLichSu() { maLuotLichSu = null; luotLichSu = null; }
 
     protected void ganNguonThongTin(int diaDiem, int diem) {
         diaDiemNguon = diaDiem;
@@ -35,13 +53,45 @@ public class BaseActivity extends AppCompatActivity {
         android.widget.TextView diaDiem = findViewById(R.id.tqTenDiaDiem);
         android.widget.ImageView anh = findViewById(R.id.tqAnhDiaDiem);
         if (ten == null || bai == null || isFinishing()) return;
+        moKhungThuyetMinh(ten.getText().toString(), bai.getText().toString(),
+                diaDiem.getText().toString(), anh.getDrawable(), phatNgay,
+                diaDiemNguon, diemNguon, KhoLichSu.THU_CONG);
+    }
+
+    protected void moKhungThuyetMinh(String ten, String bai, String diaDiem,
+            android.graphics.drawable.Drawable anh, boolean phatNgay, int idDiaDiem, int idDiem, String cheDo) {
+        if (isFinishing() || isDestroyed()) return;
         dungAmThanhThamQuan();
+        ganNguonThongTin(idDiaDiem, idDiem);
         if (khungNghe == null) khungNghe = new KhungNgheThuyetMinh(this);
-        khungNghe.mo(ten.getText().toString(), bai.getText().toString(),
-                diaDiem.getText().toString(), anh.getDrawable(), phatNgay);
+        khungNghe.mo(ten, bai, diaDiem, anh, phatNgay, idDiaDiem, idDiem, cheDo);
     }
 
     protected void dongKhungThuyetMinh() { if (khungNghe != null) khungNghe.dong(); }
+
+    protected void xacNhanChuyenDiem(boolean autoDangPhat, String tenDiem, Runnable chuyenDiem) {
+        if (isFinishing() || isDestroyed()) return;
+        if (hoiChuyenDiem != null && hoiChuyenDiem.isShowing()) return;
+        if (!autoDangPhat) {
+            chuyenDiem.run();
+            return;
+        }
+        hoiChuyenDiem = new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                .setTitle("Chuyển điểm tham quan?")
+                .setMessage("AUTO đang phát thuyết minh. Bạn có muốn dừng AUTO và chuyển sang điểm “"
+                        + tenDiem + "” để nghe thủ công không?")
+                .setNegativeButton("Tiếp tục nghe", null)
+                .setPositiveButton("Chuyển điểm", (dialog, which) -> {
+                    if (!isFinishing() && !isDestroyed()
+                            && getLifecycle().getCurrentState().isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED))
+                        chuyenDiem.run();
+                }).create();
+        androidx.appcompat.app.AlertDialog dangHoi = hoiChuyenDiem;
+        dangHoi.setOnDismissListener(dialog -> {
+            if (hoiChuyenDiem == dangHoi) hoiChuyenDiem = null;
+        });
+        hoiChuyenDiem.show();
+    }
 
     @Override protected void onDestroy() {
         if (khungNghe != null) khungNghe.giaiPhong();
@@ -84,6 +134,8 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     @Override protected void onStop() {
+        if (hoiChuyenDiem != null) hoiChuyenDiem.dismiss();
+        huyLuotLichSu();
         dongKhungThuyetMinh();
         if (thamQuanTuDong != null) thamQuanTuDong.dung("Đã dừng theo dõi và giọng đọc khi rời màn hình. Bấm Demo hoặc GPS thật để bắt đầu lượt mới.");
         super.onStop();

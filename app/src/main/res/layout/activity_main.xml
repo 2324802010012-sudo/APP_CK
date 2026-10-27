@@ -132,7 +132,7 @@
                         android:contentDescription="Tìm kiếm địa điểm"/>
                 </LinearLayout>
             </FrameLayout>
-            <!-- THANH CHUC NANG NHANH: 3 MUC TRONG MOT KHUNG -->
+            <!-- THANH CHUC NANG NHANH -->
             <LinearLayout
                 android:id="@+id/thanhChucNang"
                 android:layout_width="match_parent"
@@ -249,6 +249,27 @@
                         android:textSize="11sp"
                         android:textStyle="bold"
                         android:textColor="#35463D"/>
+                </LinearLayout>
+                <View android:layout_width="1dp" android:layout_height="40dp" android:background="#E6EEE8" />
+                <LinearLayout
+                    android:id="@+id/nutLichSu"
+                    android:layout_width="0dp"
+                    android:layout_height="86dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+                    <FrameLayout android:layout_width="48dp" android:layout_height="48dp"
+                        android:background="@drawable/ui_feature_bg">
+                        <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                            android:layout_gravity="center" android:src="@drawable/ui_ic_history"
+                            android:contentDescription="Lịch sử" />
+                    </FrameLayout>
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="7dp" android:gravity="center" android:text="Lịch sử"
+                        android:textSize="11sp" android:textStyle="bold" android:textColor="#35463D" />
                 </LinearLayout>
             </LinearLayout>
             <FrameLayout
