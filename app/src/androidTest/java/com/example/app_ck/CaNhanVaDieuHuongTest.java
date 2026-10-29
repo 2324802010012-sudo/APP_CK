@@ -1,5 +1,10 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.local.AppDatabase;
+import com.example.app_ck.session.PhienDangNhap;
+import com.example.app_ck.ui.profile.CaNhanActivity;
+import com.example.app_ck.ui.profile.YeuThichActivity;
+
 import android.app.Activity;
 import android.content.Context;
 import android.widget.TextView;
@@ -30,7 +35,7 @@ public class CaNhanVaDieuHuongTest {
         UiKiemThu.bat(context);
         idCu = PhienDangNhap.id(context); tenCu = PhienDangNhap.ten(context);
         ten = "profile_" + Long.toHexString(System.nanoTime());
-        try (TaiKhoanDb db = new TaiKhoanDb(context)) {
+        try (AppDatabase db = new AppDatabase(context)) {
             assertTrue(db.dangKy(ten, MAT_KHAU, "RECOVERY_ORIGINAL"));
             id = db.dangNhap(ten, MAT_KHAU);
             db.datYeuThich(id, 1, true);
@@ -46,7 +51,7 @@ public class CaNhanVaDieuHuongTest {
         });
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         UiKiemThu.tat(context);
-        try (TaiKhoanDb db = new TaiKhoanDb(context)) {
+        try (AppDatabase db = new AppDatabase(context)) {
             db.getWritableDatabase().delete("yeu_thich", "tai_khoan_id=?", new String[]{String.valueOf(id)});
             db.getWritableDatabase().delete("tai_khoan", "id=?", new String[]{String.valueOf(id)});
         }
@@ -102,7 +107,7 @@ public class CaNhanVaDieuHuongTest {
             scenario.recreate();
             onView(withId(R.id.cnTen)).check(matches(withText("Nguyễn Minh Anh")));
             chup("profile-preview.png");
-            try (TaiKhoanDb db = new TaiKhoanDb(context)) {
+            try (AppDatabase db = new AppDatabase(context)) {
                 assertEquals("minhanh@example.com", db.layHoSo(id).email);
                 assertEquals(ten, db.layHoSo(id).tenDangNhap);
                 assertTrue(db.daYeuThich(id, 1));
@@ -128,7 +133,7 @@ public class CaNhanVaDieuHuongTest {
             onView(withText("Tôi đã lưu mã")).perform(click());
             onView(withId(R.id.cnTen)).check(matches(withText(ten)));
             assertEquals(id, PhienDangNhap.id(context));
-            try (TaiKhoanDb db = new TaiKhoanDb(context)) {
+            try (AppDatabase db = new AppDatabase(context)) {
                 assertEquals(-1, db.dangNhap(ten, MAT_KHAU));
                 assertEquals(id, db.dangNhap(ten, "MatKhauMoi456!"));
                 assertNull(db.doiMatKhauBangMa(ten, "RECOVERY_ORIGINAL", MAT_KHAU));
@@ -152,7 +157,7 @@ public class CaNhanVaDieuHuongTest {
             onView(withId(android.R.id.button1)).inRoot(UiKiemThu.hoiThoai()).perform(click());
             onView(withId(R.id.cnKhach)).check(matches(isDisplayed()));
             assertFalse(PhienDangNhap.daDangNhap(context));
-            try (TaiKhoanDb db = new TaiKhoanDb(context)) { assertTrue(db.daYeuThich(id, 1)); }
+            try (AppDatabase db = new AppDatabase(context)) { assertTrue(db.daYeuThich(id, 1)); }
         }
     }
 }

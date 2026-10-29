@@ -1,10 +1,23 @@
 package com.example.app_ck;
 
+import com.example.app_ck.location.LoiMoiThuyetMinh;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class LoiMoiThuyetMinhTest {
     private LoiMoiThuyetMinh loiMoi() { return new LoiMoiThuyetMinh(10, 106); }
+
+    @Test public void banKinhCauHinhThayDoiVungMoiVaVanChoXacNhan() {
+        LoiMoiThuyetMinh hep = new LoiMoiThuyetMinh(10, 106, 20);
+        LoiMoiThuyetMinh rong = new LoiMoiThuyetMinh(10, 106, 200);
+        assertFalse(hep.capNhat(10.0008, 106, 3, 1000, 1000));
+        assertFalse(hep.capNhat(10.0008, 106, 3, 4000, 4000));
+        assertFalse(rong.capNhat(10.0008, 106, 3, 1000, 1000));
+        assertTrue(rong.capNhat(10.0008, 106, 3, 4000, 4000));
+        assertFalse(rong.daDongY());
+        assertTrue(rong.traLoi(true));
+    }
 
     @Test public void denGanChiMoiKhongTuDongYPhat() {
         LoiMoiThuyetMinh m = loiMoi();

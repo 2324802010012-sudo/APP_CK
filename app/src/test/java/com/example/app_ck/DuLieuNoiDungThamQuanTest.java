@@ -1,5 +1,8 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.model.BaiThuyetMinh;
+import com.example.app_ck.data.seed.DuLieuNoiDungThamQuan;
+
 import org.junit.Test;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -23,9 +26,9 @@ public class DuLieuNoiDungThamQuanTest {
             cacTruong.add(e.getValue().coQuan);
         }
         int soDiem = 0;
-        for (DuLieuNoiDungThamQuan.Bai d : DuLieuNoiDungThamQuan.DIA_DIEM) {
+        for (BaiThuyetMinh d : DuLieuNoiDungThamQuan.DIA_DIEM) {
             themBai(cacTruong, d);
-            for (DuLieuNoiDungThamQuan.Bai p : d.cacDiem) {
+            for (BaiThuyetMinh p : d.cacDiem) {
                 assertSame(p, DuLieuNoiDungThamQuan.lay(d.id, p.id));
                 themBai(cacTruong, p);
                 soDiem++;
@@ -40,7 +43,7 @@ public class DuLieuNoiDungThamQuanTest {
         assertEquals("6eea8a0e970b8fbce4c4c3bd9e0127ec1eef072f332a6d0e8ac2d40ab7e29abe", hex.toString());
     }
 
-    private void themBai(List<String> ds, DuLieuNoiDungThamQuan.Bai bai) {
+    private void themBai(List<String> ds, BaiThuyetMinh bai) {
         ds.add(String.valueOf(bai.id));
         ds.add(bai.ten);
         ds.add(bai.gioiThieu);

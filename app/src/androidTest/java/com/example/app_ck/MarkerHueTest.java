@@ -1,5 +1,7 @@
 package com.example.app_ck;
 
+import com.example.app_ck.ui.tour.DaiNoiHueThamQuanActivity;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.SystemClock;

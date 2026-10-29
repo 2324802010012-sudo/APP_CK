@@ -1,5 +1,12 @@
 package com.example.app_ck;
 
+import com.example.app_ck.location.CauHinhAutoDiSan;
+import com.example.app_ck.location.HuongDanTour;
+import com.example.app_ck.ui.common.BaseActivity;
+import com.example.app_ck.ui.place.ChiTietDiaDiemActivity;
+import com.example.app_ck.ui.tour.DaiNoiHueThamQuanActivity;
+import com.example.app_ck.ui.tour.VanMieuThamQuanActivity;
+
 import android.location.Location;
 import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;

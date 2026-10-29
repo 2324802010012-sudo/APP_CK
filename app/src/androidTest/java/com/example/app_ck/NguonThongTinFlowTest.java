@@ -1,5 +1,16 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.repository.KhoNoiDungThamQuan;
+import com.example.app_ck.data.seed.DuLieuNoiDungThamQuan;
+import com.example.app_ck.narration.KhungNgheThuyetMinh;
+import com.example.app_ck.ui.common.BaseActivity;
+import com.example.app_ck.ui.place.ChiTietDiaDiemActivity;
+import com.example.app_ck.ui.tour.BaoTangThamQuanActivity;
+import com.example.app_ck.ui.tour.ConDaoThamQuanActivity;
+import com.example.app_ck.ui.tour.DaiNoiHueThamQuanActivity;
+import com.example.app_ck.ui.tour.ThamQuanActivity;
+import com.example.app_ck.ui.tour.VanMieuThamQuanActivity;
+
 import android.content.Context;
 import android.content.Intent;
 import android.widget.TextView;
@@ -60,14 +71,14 @@ public class NguonThongTinFlowTest {
             try (ActivityScenario<ChiTietDiaDiemActivity> scenario = ActivityScenario.launch(intent)) {
                 scenario.onActivity(a -> {
                     a.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    assertEquals(KhoNoiDungThamQuan.bai(KhoNoiDungThamQuan.lay(id,0)),
+                    assertEquals(KhoNoiDungThamQuan.bai(DuLieuNoiDungThamQuan.lay(id,0)),
                             ((TextView)a.findViewById(R.id.moTaChiTiet)).getText().toString());
                     android.widget.LinearLayout ds = a.findViewById(R.id.danhSachDiemNoiBat);
                     assertEquals(soDiem[id], ds.getChildCount());
                     ds.getChildAt(soDiem[id] - 1).performClick();
                 });
                 onView(withId(R.id.tqMoTaKhuVuc)).check(matches(withText(
-                        KhoNoiDungThamQuan.bai(KhoNoiDungThamQuan.lay(id,soDiem[id])))));
+                        KhoNoiDungThamQuan.bai(DuLieuNoiDungThamQuan.lay(id,soDiem[id])))));
                 pressBack();
             }
         }
@@ -86,14 +97,14 @@ public class NguonThongTinFlowTest {
                     a.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     assertFalse(a.isFinishing());
                     TextView bai = a.findViewById(R.id.tqMoTaKhuVuc);
-                    assertEquals(KhoNoiDungThamQuan.bai(KhoNoiDungThamQuan.lay(id, cuoi[id])), bai.getText().toString());
+                    assertEquals(KhoNoiDungThamQuan.bai(DuLieuNoiDungThamQuan.lay(id, cuoi[id])), bai.getText().toString());
                     a.moKhungThuyetMinh(false);
                 });
                 doiKhungMoXong(scenario);
                 onView(withId(R.id.ngheNoiDung)).inRoot(UiKiemThu.hoiThoai()).check(matches(withText(
-                        KhoNoiDungThamQuan.bai(KhoNoiDungThamQuan.lay(id, cuoi[id])))));
+                        KhoNoiDungThamQuan.bai(DuLieuNoiDungThamQuan.lay(id, cuoi[id])))));
                 scenario.onActivity(a -> assertTrue(layKhung(a).findViewById(R.id.ngheNguonThongTin).performClick()));
-                String tieuDeNguon = "Nguồn thông tin – " + KhoNoiDungThamQuan.lay(id,cuoi[id]).ten;
+                String tieuDeNguon = "Nguồn thông tin – " + DuLieuNoiDungThamQuan.lay(id,cuoi[id]).ten;
                 onView(withText(tieuDeNguon)).inRoot(allOf(UiKiemThu.hoiThoai(),
                         withDecorView(hasDescendant(withText(tieuDeNguon)))))
                         .check(matches(isDisplayed()));

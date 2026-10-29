@@ -1,5 +1,7 @@
 package com.example.app_ck;
 
+import com.example.app_ck.ui.tour.VanMieuThamQuanActivity;
+
 import android.graphics.Color;
 import androidx.appcompat.app.AlertDialog;
 import androidx.test.core.app.ActivityScenario;

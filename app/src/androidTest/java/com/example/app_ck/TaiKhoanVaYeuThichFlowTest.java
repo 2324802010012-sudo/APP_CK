@@ -1,5 +1,12 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.local.AppDatabase;
+import com.example.app_ck.session.PhienDangNhap;
+import com.example.app_ck.ui.auth.DangNhapActivity;
+import com.example.app_ck.ui.home.WelcomeActivity;
+import com.example.app_ck.ui.place.ChiTietDiaDiemActivity;
+import com.example.app_ck.ui.profile.YeuThichActivity;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -50,7 +57,7 @@ public class TaiKhoanVaYeuThichFlowTest {
         });
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         UiKiemThu.tat(context);
-        try (TaiKhoanDb db = new TaiKhoanDb(context)) {
+        try (AppDatabase db = new AppDatabase(context)) {
             db.getWritableDatabase().execSQL("DELETE FROM yeu_thich WHERE tai_khoan_id IN "
                     + "(SELECT id FROM tai_khoan WHERE ten_dang_nhap IN (?,?))", new Object[]{ten, tenKhac});
             db.getWritableDatabase().delete("tai_khoan", "ten_dang_nhap IN (?,?)", new String[]{ten, tenKhac});
@@ -60,7 +67,7 @@ public class TaiKhoanVaYeuThichFlowTest {
     }
 
     private long taoTaiKhoan(String name) {
-        try (TaiKhoanDb db = new TaiKhoanDb(context)) {
+        try (AppDatabase db = new AppDatabase(context)) {
             assertTrue(db.dangKy(name, MAT_KHAU, MA));
             return db.dangNhap(name, MAT_KHAU);
         }
@@ -103,7 +110,7 @@ public class TaiKhoanVaYeuThichFlowTest {
             onView(withId(R.id.ytTongSo)).check(matches(withText("0 địa điểm đã lưu")));
             onView(withId(R.id.ytTieuDeTrangThai)).check(matches(withText("Chưa có địa điểm yêu thích")));
             assertTrue(PhienDangNhap.daDangNhap(context));
-            try (TaiKhoanDb db = new TaiKhoanDb(context)) {
+            try (AppDatabase db = new AppDatabase(context)) {
                 assertFalse(db.dangKy(ten.toUpperCase(java.util.Locale.ROOT), MAT_KHAU, MA));
             }
         }
@@ -119,7 +126,7 @@ public class TaiKhoanVaYeuThichFlowTest {
             nhap(R.id.qmkMatKhauMoi, "MatKhauMoi456!");
             nhap(R.id.qmkXacNhan, "MatKhauMoi456!");
             onView(withId(R.id.qmkXacNhanDoi)).perform(scrollTo(), click());
-            try (TaiKhoanDb db = new TaiKhoanDb(context)) {
+            try (AppDatabase db = new AppDatabase(context)) {
                 assertTrue(db.dangNhap(ten, MAT_KHAU) > 0);
             }
             nhap(R.id.qmkMaKhoiPhuc, MA);
@@ -127,7 +134,7 @@ public class TaiKhoanVaYeuThichFlowTest {
             onView(withText("Đổi mật khẩu thành công")).check(matches(isDisplayed()));
             onView(withText("Tôi đã lưu mã")).perform(click());
             onView(withId(R.id.edtTenDangNhap)).check(matches(withText(ten)));
-            try (TaiKhoanDb db = new TaiKhoanDb(context)) {
+            try (AppDatabase db = new AppDatabase(context)) {
                 assertEquals(-1, db.dangNhap(ten, MAT_KHAU));
                 assertNull(db.doiMatKhauBangMa(ten, MA, MAT_KHAU));
             }
@@ -139,7 +146,7 @@ public class TaiKhoanVaYeuThichFlowTest {
 
     @Test public void yeuThichHienHueBoLuuVaDangXuatKhongLoDanhSach() throws Exception {
         long id = taoTaiKhoan(ten), idKhac = taoTaiKhoan(tenKhac);
-        try (TaiKhoanDb db = new TaiKhoanDb(context)) {
+        try (AppDatabase db = new AppDatabase(context)) {
             db.datYeuThich(id, 2, true);
             db.datYeuThich(idKhac, 0, true);
         }
@@ -167,7 +174,7 @@ public class TaiKhoanVaYeuThichFlowTest {
             onView(withId(R.id.ytDangNhap)).check(matches(isDisplayed()));
             onView(withId(R.id.ytTenDiaDiem)).check(doesNotExist());
             assertFalse(PhienDangNhap.daDangNhap(context));
-            try (TaiKhoanDb db = new TaiKhoanDb(context)) { assertTrue(db.daYeuThich(idKhac, 0)); }
+            try (AppDatabase db = new AppDatabase(context)) { assertTrue(db.daYeuThich(idKhac, 0)); }
         }
     }
 
@@ -197,7 +204,7 @@ public class TaiKhoanVaYeuThichFlowTest {
 
     @Test public void dangNhapTuChiTietTiepTucLuuVaKhongXoaDiemDaLuu() {
         long id = taoTaiKhoan(ten);
-        try (TaiKhoanDb db = new TaiKhoanDb(context)) { db.datYeuThich(id, 1, true); }
+        try (AppDatabase db = new AppDatabase(context)) { db.datYeuThich(id, 1, true); }
         Intent intent = new Intent(context, ChiTietDiaDiemActivity.class).putExtra("viTriDiaDiem", 1);
         try (ActivityScenario<ChiTietDiaDiemActivity> scenario = ActivityScenario.launch(intent)) {
             onView(withId(R.id.nutTimYeuThich)).perform(click());
@@ -206,7 +213,7 @@ public class TaiKhoanVaYeuThichFlowTest {
             nhap(R.id.edtMatKhau, MAT_KHAU);
             onView(withId(R.id.btnDangNhap)).perform(scrollTo(), click());
             onView(withId(R.id.nutTimYeuThich)).check(matches(withText("♥")));
-            try (TaiKhoanDb db = new TaiKhoanDb(context)) { assertTrue(db.daYeuThich(id, 1)); }
+            try (AppDatabase db = new AppDatabase(context)) { assertTrue(db.daYeuThich(id, 1)); }
         }
     }
 }

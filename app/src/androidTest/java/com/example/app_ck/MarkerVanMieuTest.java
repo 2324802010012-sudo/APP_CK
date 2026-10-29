@@ -1,5 +1,8 @@
 package com.example.app_ck;
 
+import com.example.app_ck.ui.tour.SoDoThuPhongLayout;
+import com.example.app_ck.ui.tour.VanMieuThamQuanActivity;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.os.SystemClock;

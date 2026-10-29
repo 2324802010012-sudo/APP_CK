@@ -1,5 +1,7 @@
 package com.example.app_ck;
 
+import com.example.app_ck.location.BoChonDiemTuDong;
+
 import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;

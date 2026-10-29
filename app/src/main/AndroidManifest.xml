@@ -31,7 +31,7 @@
 
         <!-- MAN HINH CHAO MUNG -->
         <activity
-            android:name=".WelcomeActivity"
+            android:name="com.example.app_ck.ui.home.WelcomeActivity"
             android:exported="true">
 
             <intent-filter>
@@ -48,63 +48,63 @@
 
         <!-- MAN HINH TRANG CHU -->
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.app_ck.ui.home.MainActivity"
             android:exported="false" />
 
         <!-- MAN HINH CHI TIET DIA DIEM -->
         <activity
-            android:name=".ChiTietDiaDiemActivity"
+            android:name="com.example.app_ck.ui.place.ChiTietDiaDiemActivity"
             android:exported="false" />
 
         <!-- MAN HINH THAM QUAN NOI BO -->
         <activity
-            android:name=".ThamQuanActivity"
+            android:name="com.example.app_ck.ui.tour.ThamQuanActivity"
             android:exported="false" />
 
         <!-- MAN HINH BAN DO OPENSTREETMAP -->
         <activity
-            android:name=".BanDoActivity"
+            android:name="com.example.app_ck.ui.map.BanDoActivity"
             android:exported="false" />
 
         <!-- MAN HINH DANG NHAP -->
         <activity
-            android:name=".DangNhapActivity"
+            android:name="com.example.app_ck.ui.auth.DangNhapActivity"
             android:exported="false" />
 
         <!-- MAN HINH QUEN MAT KHAU -->
         <activity
-            android:name=".QuenMatKhauActivity"
+            android:name="com.example.app_ck.ui.auth.QuenMatKhauActivity"
             android:exported="false" />
 
         <!-- MAN HINH DANG KY -->
         <activity
-            android:name=".DangKyActivity"
+            android:name="com.example.app_ck.ui.auth.DangKyActivity"
             android:exported="false" />
 
         <!-- MAN HINH YEU THICH -->
         <activity
-            android:name=".YeuThichActivity"
+            android:name="com.example.app_ck.ui.profile.YeuThichActivity"
             android:exported="false" />
         <activity
-            android:name=".BaoTangThamQuanActivity"
+            android:name="com.example.app_ck.ui.tour.BaoTangThamQuanActivity"
             android:exported="false" />
 
         <activity
-            android:name=".VanMieuThamQuanActivity"
+            android:name="com.example.app_ck.ui.tour.VanMieuThamQuanActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ConDaoThamQuanActivity"
+            android:name="com.example.app_ck.ui.tour.ConDaoThamQuanActivity"
             android:exported="false" />
         <activity
-            android:name=".DaiNoiHueThamQuanActivity"
+            android:name="com.example.app_ck.ui.tour.DaiNoiHueThamQuanActivity"
             android:exported="false" />
 
-        <activity android:name=".CaNhanActivity" android:exported="false" />
-        <activity android:name=".SuaHoSoActivity" android:exported="false" />
-        <activity android:name=".DoiMatKhauActivity" android:exported="false" />
-        <activity android:name=".KhamPhaActivity" android:exported="false" />
-        <activity android:name=".LichSuActivity" android:exported="false" />
+        <activity android:name="com.example.app_ck.ui.profile.CaNhanActivity" android:exported="false" />
+        <activity android:name="com.example.app_ck.ui.profile.SuaHoSoActivity" android:exported="false" />
+        <activity android:name="com.example.app_ck.ui.profile.DoiMatKhauActivity" android:exported="false" />
+        <activity android:name="com.example.app_ck.ui.home.KhamPhaActivity" android:exported="false" />
+        <activity android:name="com.example.app_ck.ui.profile.LichSuActivity" android:exported="false" />
     </application>
 
 </manifest>

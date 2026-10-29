@@ -1,5 +1,8 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.model.DiaDiem;
+import com.example.app_ck.location.BoNhanDienDiaDiem;
+
 import java.util.Arrays;
 import org.junit.Test;
 import static org.junit.Assert.*;

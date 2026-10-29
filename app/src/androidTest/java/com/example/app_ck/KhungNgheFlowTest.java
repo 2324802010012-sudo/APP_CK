@@ -1,5 +1,12 @@
 package com.example.app_ck;
 
+import com.example.app_ck.ui.common.BaseActivity;
+import com.example.app_ck.ui.tour.BaoTangThamQuanActivity;
+import com.example.app_ck.ui.tour.ConDaoThamQuanActivity;
+import com.example.app_ck.ui.tour.DaiNoiHueThamQuanActivity;
+import com.example.app_ck.ui.tour.ThamQuanActivity;
+import com.example.app_ck.ui.tour.VanMieuThamQuanActivity;
+
 import android.app.Dialog;
 import android.media.MediaPlayer;
 import android.os.SystemClock;

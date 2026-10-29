@@ -1,5 +1,8 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.local.AppDatabase;
+import com.example.app_ck.data.repository.KhoLichSu;
+
 import android.database.sqlite.SQLiteDatabase;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import org.junit.Test;
@@ -11,11 +14,9 @@ import static org.junit.Assert.*;
 public class KhoLichSuTest {
     private SQLiteDatabase taoDb() {
         SQLiteDatabase db = SQLiteDatabase.create(null);
-        db.execSQL("CREATE TABLE tai_khoan(id INTEGER PRIMARY KEY)");
-        db.execSQL("INSERT INTO tai_khoan VALUES(1),(2)");
-        db.execSQL("CREATE TABLE dia_diem(id INTEGER PRIMARY KEY)");
-        db.execSQL("INSERT INTO dia_diem VALUES(0),(1),(2),(3),(4)");
-        KhoLichSu.taoBang(db);
+        android.content.Context context = androidx.test.core.app.ApplicationProvider.getApplicationContext();
+        try (AppDatabase helper = new AppDatabase(context)) { helper.onCreate(db); }
+        db.execSQL("INSERT INTO tai_khoan(id,ten_dang_nhap,muoi,mat_khau_bam) VALUES(1,'nguoi1','',''),(2,'nguoi2','','')");
         return db;
     }
 

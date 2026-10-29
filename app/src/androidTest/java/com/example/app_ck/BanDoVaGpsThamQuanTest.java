@@ -1,5 +1,21 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.local.AppDatabase;
+import com.example.app_ck.data.model.DiaDiem;
+import com.example.app_ck.data.repository.KhoDuLieuThamQuan;
+import com.example.app_ck.location.BoNhanDienDiaDiem;
+import com.example.app_ck.location.ThamQuanTuDong;
+import com.example.app_ck.ui.common.BaseActivity;
+import com.example.app_ck.ui.home.MainActivity;
+import com.example.app_ck.ui.home.WelcomeActivity;
+import com.example.app_ck.ui.map.BanDoActivity;
+import com.example.app_ck.ui.place.ChiTietDiaDiemActivity;
+import com.example.app_ck.ui.tour.BaoTangThamQuanActivity;
+import com.example.app_ck.ui.tour.ConDaoThamQuanActivity;
+import com.example.app_ck.ui.tour.DaiNoiHueThamQuanActivity;
+import com.example.app_ck.ui.tour.ThamQuanActivity;
+import com.example.app_ck.ui.tour.VanMieuThamQuanActivity;
+
 import android.widget.TextView;
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
@@ -17,26 +33,44 @@ import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
 public class BanDoVaGpsThamQuanTest {
-    @Test public void banDoCoDuNamMarkerDungToaDoVaNutChonDungId() {
+    @Test public void banDoDocMarkerVaNutChonTheoIdVaToaDoSQLite() {
         try (ActivityScenario<BanDoActivity> scenario = ActivityScenario.launch(BanDoActivity.class)) {
             scenario.onActivity(a -> {
                 MapView map = a.findViewById(R.id.banDoTuongTac);
                 ArrayList<Marker> markers = new ArrayList<>();
                 for (org.osmdroid.views.overlay.Overlay o : map.getOverlays()) if (o instanceof Marker) markers.add((Marker) o);
-                assertEquals(5, markers.size());
-                int[] nuts = {R.id.nutChonDinhDocLap, R.id.nutChonBaoTang, R.id.nutChonDaiNoiHue,
-                        R.id.nutChonConDao, R.id.nutChonVanMieu};
-                try (TaiKhoanDb db = new TaiKhoanDb(a)) {
+                try (AppDatabase db = new AppDatabase(a)) {
+                    int coGps = 0;
                     for (DiaDiem d : db.danhSachDiaDiem()) {
-                        Marker marker = markers.stream().filter(m -> d.ten.equals(m.getTitle())).findFirst().orElseThrow(AssertionError::new);
-                        assertEquals(KhoToaDoThamQuan.TOA_DO[d.id][0], marker.getPosition().getLatitude(), .0000001);
-                        assertEquals(KhoToaDoThamQuan.TOA_DO[d.id][1], marker.getPosition().getLongitude(), .0000001);
-                        a.findViewById(nuts[d.id]).performClick();
+                        if (Double.isFinite(d.viDo) && Double.isFinite(d.kinhDo)) {
+                            coGps++;
+                            Marker marker = markers.stream().filter(m -> String.valueOf(d.id).equals(m.getId()))
+                                    .findFirst().orElseThrow(AssertionError::new);
+                            assertEquals(d.ten, marker.getTitle());
+                            assertEquals(d.viDo, marker.getPosition().getLatitude(), .0000001);
+                            assertEquals(d.kinhDo, marker.getPosition().getLongitude(), .0000001);
+                        }
+                        android.view.View nut = timNutTheoId(a.findViewById(android.R.id.content), d.id);
+                        assertNotNull("Thiếu nút chọn địa điểm " + d.id, nut);
+                        nut.performClick();
                         assertEquals(d.ten, ((TextView) a.findViewById(R.id.tenDiaDiemBanDo)).getText().toString());
                     }
+                    assertEquals(coGps, markers.size());
                 }
             });
         }
+    }
+
+    private android.view.View timNutTheoId(android.view.View view, int id) {
+        if (Integer.valueOf(id).equals(view.getTag())) return view;
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                android.view.View found = timNutTheoId(group.getChildAt(i), id);
+                if (found != null) return found;
+            }
+        }
+        return null;
     }
 
     private ActivityScenario<MainActivity> moTrangChu() {
@@ -59,18 +93,23 @@ public class BanDoVaGpsThamQuanTest {
                     TextView viTri = a.findViewById(R.id.autoViTri);
                     TextView trangThai = a.findViewById(R.id.autoTrangThai);
                     assertTrue(viTri.getText().toString().contains("Đã bật theo dõi"));
+                    DiaDiem diaDiem = null;
+                    try (AppDatabase db = new AppDatabase(a)) {
+                        for (DiaDiem d : db.danhSachDiaDiem()) if (d.id == 0) diaDiem = d;
+                    }
+                    assertNotNull(diaDiem);
                     android.location.Location l = new android.location.Location("gps");
-                    l.setLatitude(KhoToaDoThamQuan.TOA_DO[0][0]);
-                    l.setLongitude(KhoToaDoThamQuan.TOA_DO[0][1]);
+                    l.setLatitude(diaDiem.viDo);
+                    l.setLongitude(diaDiem.kinhDo);
                     l.setAccuracy(100);
                     l.setElapsedRealtimeNanos(android.os.SystemClock.elapsedRealtimeNanos());
                     bo.onLocationChanged(l);
                     assertTrue(viTri.getText().toString().contains("Đang theo dõi"));
                     assertTrue(viTri.getText().toString().contains("Sai số ±100 m"));
                     TextView khoangCach = a.findViewById(R.id.autoKhoangCach);
-                    assertTrue(khoangCach.getText().toString().contains("Dinh Độc Lập: 0 m"));
+                    assertTrue(khoangCach.getText().toString().contains(diaDiem.ten + ": 0 m"));
                     assertTrue(khoangCach.getText().toString().contains("đường chim bay"));
-                    try (TaiKhoanDb db = new TaiKhoanDb(a)) {
+                    try (AppDatabase db = new AppDatabase(a)) {
                         for (DiaDiem d : db.danhSachDiaDiem())
                             assertTrue(khoangCach.getText().toString().contains(d.ten + ": "));
                     }
@@ -96,14 +135,14 @@ public class BanDoVaGpsThamQuanTest {
                     bo.onLocationChanged(l);
                     assertTrue(viTri.getText().toString().contains("đo cách đây"));
                     assertTrue(trangThai.getText().toString().contains("Vị trí cũ"));
-                    assertFalse(khoangCach.getText().toString().contains("Dinh Độc Lập: 0 m"));
+                    assertFalse(khoangCach.getText().toString().contains(diaDiem.ten + ": 0 m"));
                     assertFalse(((BoNhanDienDiaDiem) nhanDien.get(bo)).dangChoTraLoi());
                     if (android.os.Build.VERSION.SDK_INT >= 31) {
                         l.setElapsedRealtimeNanos(android.os.SystemClock.elapsedRealtimeNanos());
                         l.setMock(true);
                         bo.onLocationChanged(l);
                         assertTrue(trangThai.getText().toString().contains("GPS giả lập"));
-                        assertFalse(khoangCach.getText().toString().contains("Dinh Độc Lập: 0 m"));
+                        assertFalse(khoangCach.getText().toString().contains(diaDiem.ten + ": 0 m"));
                     }
                     bo.dung("Kết thúc kiểm thử");
                     assertEquals("Đã tắt theo dõi vị trí", viTri.getText().toString());
@@ -190,14 +229,18 @@ public class BanDoVaGpsThamQuanTest {
     @Test public void caNamSoDoChiCoMarkerThuCongKhongCoGpsDemo() {
         Class<?>[] classes = {ThamQuanActivity.class, BaoTangThamQuanActivity.class,
                 DaiNoiHueThamQuanActivity.class, ConDaoThamQuanActivity.class, VanMieuThamQuanActivity.class};
-        int[] soDiem = {25, 13, 10, 19, 16};
         for (int i = 0; i < classes.length; i++) {
             @SuppressWarnings("unchecked") Class<BaseActivity> lop = (Class<BaseActivity>) classes[i];
             final int id = i;
             try (ActivityScenario<BaseActivity> scenario = ActivityScenario.launch(lop)) {
                 scenario.onActivity(a -> {
+                    int soDiem;
+                    try (AppDatabase helper = new AppDatabase(a)) {
+                        soDiem = KhoDuLieuThamQuan.danhSach(helper.getReadableDatabase(), id).size();
+                    }
+                    assertTrue("Fixture có ít nhất hai điểm để kiểm tra chuyển điểm", soDiem >= 2);
                     String dem = ((TextView) a.findViewById(R.id.tqDemKhuVuc)).getText().toString();
-                    assertTrue(dem, dem.endsWith("/" + soDiem[id]));
+                    assertTrue(dem, dem.endsWith("/" + soDiem));
                     assertNull(a.findViewById(R.id.autoDemo));
                     assertNull(a.findViewById(R.id.autoGps));
                     assertNotNull(a.findViewById(R.id.tqNutPhat));
@@ -206,7 +249,7 @@ public class BanDoVaGpsThamQuanTest {
                     assertNotEquals(truoc, ((TextView) a.findViewById(R.id.tqTenKhuVuc)).getText().toString());
                     String sau = ((TextView) a.findViewById(R.id.tqDemKhuVuc)).getText().toString();
                     assertNotEquals("Chuyển điểm phải cập nhật bộ đếm", dem, sau);
-                    assertTrue(sau, sau.endsWith("/" + soDiem[id]));
+                    assertTrue(sau, sau.endsWith("/" + soDiem));
                 });
             }
         }

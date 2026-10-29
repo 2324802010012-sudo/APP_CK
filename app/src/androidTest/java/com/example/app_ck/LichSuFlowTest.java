@@ -1,5 +1,20 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.local.AppDatabase;
+import com.example.app_ck.data.repository.KhoLichSu;
+import com.example.app_ck.narration.LuotNgheLichSu;
+import com.example.app_ck.session.PhienDangNhap;
+import com.example.app_ck.ui.common.BaseActivity;
+import com.example.app_ck.ui.home.MainActivity;
+import com.example.app_ck.ui.place.ChiTietDiaDiemActivity;
+import com.example.app_ck.ui.profile.CaNhanActivity;
+import com.example.app_ck.ui.profile.LichSuActivity;
+import com.example.app_ck.ui.tour.BaoTangThamQuanActivity;
+import com.example.app_ck.ui.tour.ConDaoThamQuanActivity;
+import com.example.app_ck.ui.tour.DaiNoiHueThamQuanActivity;
+import com.example.app_ck.ui.tour.ThamQuanActivity;
+import com.example.app_ck.ui.tour.VanMieuThamQuanActivity;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -39,7 +54,7 @@ public class LichSuFlowTest {
         idCu=PhienDangNhap.id(context); tenCu=PhienDangNhap.ten(context);
         tenA="history_"+Long.toHexString(System.nanoTime());
         UiKiemThu.bat(context);
-        try(TaiKhoanDb db=new TaiKhoanDb(context)) {
+        try(AppDatabase db=new AppDatabase(context)) {
             assertTrue(db.dangKy(tenA,MAT_KHAU,"MA_HISTORY"));
             assertTrue(db.dangKy(tenA+"_b",MAT_KHAU,"MA_HISTORY"));
             a=db.dangNhap(tenA,MAT_KHAU); b=db.dangNhap(tenA+"_b",MAT_KHAU);
@@ -56,7 +71,7 @@ public class LichSuFlowTest {
         });
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         UiKiemThu.tat(context);
-        try(TaiKhoanDb db=new TaiKhoanDb(context)) {
+        try(AppDatabase db=new AppDatabase(context)) {
             KhoLichSu.xoa(db.getWritableDatabase(),a,null); KhoLichSu.xoa(db.getWritableDatabase(),b,null);
             db.getWritableDatabase().delete("yeu_thich","tai_khoan_id IN (?,?)",new String[]{String.valueOf(a),String.valueOf(b)});
             db.getWritableDatabase().delete("tai_khoan","ten_dang_nhap IN (?,?)",new String[]{tenA,tenA+"_b"});
@@ -65,7 +80,7 @@ public class LichSuFlowTest {
     }
 
     private ArrayList<KhoLichSu.Luot> doc(long id) {
-        try(TaiKhoanDb db=new TaiKhoanDb(context)) { return KhoLichSu.doc(db.getReadableDatabase(),id); }
+        try(AppDatabase db=new AppDatabase(context)) { return KhoLichSu.doc(db.getReadableDatabase(),id); }
     }
 
     @Test public void khachMoTuTrangChuDangNhapVaXemTrangThaiRong() {
@@ -90,7 +105,7 @@ public class LichSuFlowTest {
     }
 
     @Test public void nhanCheDoDongBoVaXoaMotLuotCoXacNhan() {
-        try(TaiKhoanDb db=new TaiKhoanDb(context)) {
+        try(AppDatabase db=new AppDatabase(context)) {
             KhoLichSu.ghi(db.getWritableDatabase(),a,2,0,KhoLichSu.AUTO_MAIN,1,"chinh");
             KhoLichSu.ghi(db.getWritableDatabase(),a,4,6,KhoLichSu.AUTO_SUB,2,"thanh-phan");
         }
@@ -110,7 +125,7 @@ public class LichSuFlowTest {
     }
 
     @Test public void moDungDiemXoaCoXacNhanVaKhongMatYeuThichHayLichSuNguoiKhac() {
-        try(TaiKhoanDb db=new TaiKhoanDb(context)) {
+        try(AppDatabase db=new AppDatabase(context)) {
             KhoLichSu.ghi(db.getWritableDatabase(),a,0,0,KhoLichSu.THU_CONG,1,"a1");
             KhoLichSu.ghi(db.getWritableDatabase(),a,4,6,KhoLichSu.DEMO,2,"a2");
             KhoLichSu.ghi(db.getWritableDatabase(),b,3,19,KhoLichSu.AUTO_GPS,3,"b1");
@@ -133,7 +148,7 @@ public class LichSuFlowTest {
             onView(withText("Xóa")).perform(click());
             onView(withText("Chưa có lịch sử nghe")).check(matches(isDisplayed()));
             assertTrue(doc(a).isEmpty()); assertEquals(1,doc(b).size());
-            try(TaiKhoanDb db=new TaiKhoanDb(context)) { assertTrue(db.daYeuThich(a,4)); }
+            try(AppDatabase db=new AppDatabase(context)) { assertTrue(db.daYeuThich(a,4)); }
             PhienDangNhap.dangXuat(context);
             s.recreate();
             onView(withText("Đăng nhập để xem lịch sử")).check(matches(isDisplayed()));
@@ -170,7 +185,7 @@ public class LichSuFlowTest {
     @Test public void intentMoLaiDuNamNoiVaDiemThanhPhanKhongTuPhat() {
         String[] lop={"ThamQuanActivity","BaoTangThamQuanActivity","DaiNoiHueThamQuanActivity","ConDaoThamQuanActivity","VanMieuThamQuanActivity"};
         int[] cuoi={25,13,10,19,16};
-        try(TaiKhoanDb db=new TaiKhoanDb(context)) {
+        try(AppDatabase db=new AppDatabase(context)) {
             for(int i=0;i<5;i++) {
                 KhoLichSu.ghi(db.getWritableDatabase(),a,i,0,KhoLichSu.THU_CONG,10+i,"noi"+i);
                 KhoLichSu.Luot tong=null;

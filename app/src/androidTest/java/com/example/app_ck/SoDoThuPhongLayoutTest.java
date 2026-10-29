@@ -1,5 +1,7 @@
 package com.example.app_ck;
 
+import com.example.app_ck.ui.tour.SoDoThuPhongLayout;
+
 import android.content.Context;
 import android.os.SystemClock;
 import android.view.MotionEvent;

@@ -1,5 +1,13 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.local.AppDatabase;
+import com.example.app_ck.data.model.BaiThuyetMinh;
+import com.example.app_ck.data.model.DiemThamQuan;
+import com.example.app_ck.data.repository.KhoDuLieuThamQuan;
+import com.example.app_ck.data.repository.KhoNguonThongTin;
+import com.example.app_ck.data.repository.KhoNoiDungThamQuan;
+import com.example.app_ck.data.seed.DuLieuNoiDungThamQuan;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -16,10 +24,10 @@ public class NoiDungThamQuanTest {
     @Test public void duNamDiaDiemTamMuoiBaDiemVaNguonChinhThuc() {
         assertEquals(5, DuLieuNoiDungThamQuan.DIA_DIEM.size());
         for (int id = 0; id < 5; id++) {
-            DuLieuNoiDungThamQuan.Bai diaDiem = KhoNoiDungThamQuan.lay(id, 0);
+            BaiThuyetMinh diaDiem = DuLieuNoiDungThamQuan.lay(id, 0);
             assertEquals(SO_DIEM[id], diaDiem.cacDiem.size());
             for (int diem = 0; diem <= SO_DIEM[id]; diem++) {
-                DuLieuNoiDungThamQuan.Bai bai = KhoNoiDungThamQuan.lay(id, diem);
+                BaiThuyetMinh bai = DuLieuNoiDungThamQuan.lay(id, diem);
                 assertFalse(bai.gioiThieu.trim().isEmpty());
                 assertFalse(bai.diemNhan.trim().isEmpty());
                 assertFalse(bai.thamQuan.trim().isEmpty());
@@ -37,67 +45,41 @@ public class NoiDungThamQuanTest {
         }
     }
 
-    private SQLiteDatabase taoDuLieuCu() {
+    private SQLiteDatabase taoDuLieu() {
         SQLiteDatabase db = SQLiteDatabase.create(null);
-        db.execSQL("CREATE TABLE dia_diem(id INTEGER PRIMARY KEY, mo_ta TEXT, vi_do REAL, kinh_do REAL)");
-        db.execSQL("CREATE TABLE tai_khoan(id INTEGER PRIMARY KEY, mat_khau_bam TEXT)");
-        db.execSQL("INSERT INTO tai_khoan VALUES(42,'KhongDoi')");
-        db.execSQL("CREATE TABLE yeu_thich(tai_khoan_id INTEGER,dia_diem_id INTEGER)");
-        db.execSQL("INSERT INTO yeu_thich VALUES(42,4)");
-        for (int id = 0; id < 5; id++) {
-            db.execSQL("INSERT INTO dia_diem VALUES(?,'Cu',12.34,56.78)", new Object[]{id});
-            String khoa = id == 0 ? "diem_tham_quan_id" : "id";
-            String cot = id < 2 ? "noi_dung" : "mo_ta";
-            db.execSQL("CREATE TABLE " + BANG[id] + "(" + khoa + " INTEGER PRIMARY KEY," + cot + " TEXT,x REAL,y REAL)");
-            for (int p = 1; p <= SO_DIEM[id]; p++)
-                db.execSQL("INSERT INTO " + BANG[id] + " VALUES(?,'Cu',0.123,0.456)", new Object[]{p});
-        }
+        android.content.Context context = androidx.test.core.app.ApplicationProvider.getApplicationContext();
+        try (AppDatabase helper = new AppDatabase(context)) { helper.onCreate(db); }
         return db;
     }
 
-    @Test public void capNhatTaiChoChayLaiKhongTrungVaGiuTaiKhoanYeuThichToaDo() throws Exception {
-        try (SQLiteDatabase db = taoDuLieuCu()) {
-            for (int lap = 0; lap < 2; lap++) {
-                KhoNoiDungThamQuan.dongBoGioiThieu(db);
-                for (int id = 0; id < 5; id++) KhoNoiDungThamQuan.dongBo(db, id);
-            }
+    @Test public void caiMoiDuNoiDungVaNguonTrongSQLite() {
+        try (SQLiteDatabase db = taoDuLieu()) {
             for (int id = 0; id < 5; id++) {
-                String khoa = id == 0 ? "diem_tham_quan_id" : "id";
-                String cot = id < 2 ? "noi_dung" : "mo_ta";
-                try (Cursor c = db.rawQuery("SELECT " + khoa + "," + cot + ",x,y FROM " + BANG[id] + " ORDER BY " + khoa, null)) {
-                    assertEquals(SO_DIEM[id], c.getCount());
-                    while (c.moveToNext()) {
-                        assertEquals(KhoNoiDungThamQuan.bai(KhoNoiDungThamQuan.lay(id, c.getInt(0))), c.getString(1));
-                        assertEquals(0.123, c.getDouble(2), 0.00001);
-                        assertEquals(0.456, c.getDouble(3), 0.00001);
-                    }
+                assertEquals(SO_DIEM[id], KhoDuLieuThamQuan.danhSach(db, id).size());
+                for (int point = 0; point <= SO_DIEM[id]; point++) {
+                    assertEquals(DuLieuNoiDungThamQuan.lay(id, point).ten,
+                            KhoNoiDungThamQuan.lay(db, id, point).ten);
+                    assertFalse(KhoNoiDungThamQuan.bai(KhoNoiDungThamQuan.lay(db, id, point)).isEmpty());
+                    assertFalse(KhoNguonThongTin.danhSach(db, id, point).isEmpty());
                 }
-            }
-            try (Cursor c = db.rawQuery("SELECT mat_khau_bam FROM tai_khoan WHERE id=42", null)) {
-                assertTrue(c.moveToFirst()); assertEquals("KhongDoi", c.getString(0));
-            }
-            try (Cursor c = db.rawQuery("SELECT tai_khoan_id,dia_diem_id FROM yeu_thich", null)) {
-                assertEquals(1, c.getCount()); assertTrue(c.moveToFirst());
-                assertEquals(42, c.getInt(0)); assertEquals(4, c.getInt(1));
-            }
-            try (Cursor c = db.rawQuery("SELECT vi_do,kinh_do FROM dia_diem", null)) {
-                while (c.moveToNext()) { assertEquals(12.34,c.getDouble(0),0.00001); assertEquals(56.78,c.getDouble(1),0.00001); }
             }
         }
     }
 
-    @Test public void thieuDiemThiHoanTacCaBaiVaPhienBan() {
-        try (SQLiteDatabase db = taoDuLieuCu()) {
-            db.delete("van_mieu_diem", "id=16", null);
-            try { KhoNoiDungThamQuan.dongBo(db, 4); fail("Cần báo thiếu điểm"); }
-            catch (IllegalStateException expected) { assertTrue(expected.getMessage().contains("4/16")); }
-            try (Cursor c = db.rawQuery("SELECT mo_ta FROM van_mieu_diem WHERE id=1", null)) {
-                assertTrue(c.moveToFirst()); assertEquals("Cu", c.getString(0));
-            }
-            // CREATE TABLE cũng được hoàn tác trong giao dịch thất bại.
-            try (Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE name='phien_ban_noi_dung'", null)) {
-                assertEquals(0, c.getCount());
-            }
+    @Test public void moLaiKhongDongBoGhiDeNoiDungDaSuaVaKhongBatBuocDuSoDiemMau() {
+        try (SQLiteDatabase db = taoDuLieu()) {
+            db.execSQL("UPDATE diem_tham_quan_chung SET ten='Tên đã sửa',noi_dung_thuyet_minh='Bài đã sửa',x_ty_le=0.123,y_ty_le=0.456 WHERE dia_diem_id=4 AND id=1");
+            db.delete(KhoDuLieuThamQuan.BANG_DIEM, "dia_diem_id=4 AND id=16", null);
+            android.content.Context context = androidx.test.core.app.ApplicationProvider.getApplicationContext();
+            try (AppDatabase helper = new AppDatabase(context)) { helper.onOpen(db); helper.onOpen(db); }
+            assertEquals(15, KhoDuLieuThamQuan.danhSach(db, 4).size());
+            DiemThamQuan point = KhoDuLieuThamQuan.lay(db, 4, 1);
+            assertEquals("Tên đã sửa", point.ten);
+            assertEquals("Bài đã sửa", point.noiDung);
+            assertEquals(0.123, point.x, .00001);
+            assertEquals(0.456, point.y, .00001);
+            assertEquals("Tên đã sửa", KhoNoiDungThamQuan.lay(db, 4, 1).ten);
+            assertEquals("Bài đã sửa", KhoNoiDungThamQuan.bai(KhoNoiDungThamQuan.lay(db, 4, 1)));
         }
     }
 }

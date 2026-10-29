@@ -1,5 +1,9 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.seed.CauHinhAutoConDao;
+import com.example.app_ck.ui.place.ChiTietDiaDiemActivity;
+import com.example.app_ck.ui.tour.ConDaoThamQuanActivity;
+
 import android.os.SystemClock;
 import android.widget.TextView;
 import androidx.test.core.app.ActivityScenario;

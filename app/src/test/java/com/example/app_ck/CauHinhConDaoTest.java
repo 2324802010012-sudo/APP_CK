@@ -1,5 +1,7 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.seed.CauHinhAutoConDao;
+
 import org.junit.Test;
 import java.util.HashSet;
 import java.util.Set;

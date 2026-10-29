@@ -1,5 +1,8 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.repository.KhoToaDoThamQuan;
+import com.example.app_ck.ui.home.WelcomeActivity;
+
 import android.os.SystemClock;
 import android.widget.ScrollView;
 import androidx.test.core.app.ActivityScenario;

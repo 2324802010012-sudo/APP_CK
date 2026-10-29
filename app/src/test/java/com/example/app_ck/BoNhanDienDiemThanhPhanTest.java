@@ -1,5 +1,9 @@
 package com.example.app_ck;
 
+import com.example.app_ck.data.seed.CauHinhAutoConDao;
+import com.example.app_ck.location.BoChonDiemTuDong;
+import com.example.app_ck.location.BoNhanDienDiemThanhPhan;
+
 import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
