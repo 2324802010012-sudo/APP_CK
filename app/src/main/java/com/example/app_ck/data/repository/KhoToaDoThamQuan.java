@@ -14,8 +14,8 @@ import java.util.List;
 public final class KhoToaDoThamQuan {
     private KhoToaDoThamQuan() {}
     public static final double[][] TOA_DO = {
-            {10.77702, 106.69540}, {10.779475, 106.692132},
-            {16.4689726, 107.5781266}, {8.68907, 106.61484}, {21.02861, 105.83556}
+            {10.778073, 106.696311}, {10.779475, 106.692132},
+            {16.467695, 107.579155}, {8.688165, 106.614225}, {21.027375, 105.835361}
     };
 
     public static void nangCap(SQLiteDatabase db) {

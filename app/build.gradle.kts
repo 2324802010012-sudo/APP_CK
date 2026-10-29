@@ -4,11 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.app_ck"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.app_ck"
@@ -17,29 +13,32 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner =
+            "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     testOptions {
         animationsDisabled = true
     }
 }
 
 dependencies {
-
     // Thu vien Android
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -47,16 +46,10 @@ dependencies {
     implementation(libs.constraintlayout)
 
     // Thu vien ban do OpenStreetMap
-    implementation(
-        "org.osmdroid:osmdroid-android:6.1.20"
-    )
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
 
     // Thu vien kiem thu
     testImplementation(libs.junit)
-
     androidTestImplementation(libs.ext.junit)
-
-    androidTestImplementation(
-        libs.espresso.core
-    )
+    androidTestImplementation(libs.espresso.core)
 }
