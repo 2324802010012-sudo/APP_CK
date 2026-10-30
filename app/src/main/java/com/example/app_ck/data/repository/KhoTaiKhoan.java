@@ -109,6 +109,42 @@ public final class KhoTaiKhoan {
         } catch (Exception ex) { return false; }
     }
 
+    public boolean taiKhoanBiKhoa(String ten, String matKhau) {
+        try (Cursor c = helper.getReadableDatabase().query(
+                "tai_khoan",
+                new String[]{
+                        "muoi", "mat_khau_bam", "trang_thai"
+                },
+                "ten_dang_nhap=?",
+                new String[]{chuanHoa(ten)},
+                null, null, null)) {
+
+            if (!c.moveToFirst()) {
+                return false;
+            }
+
+            byte[] salt = Base64.decode(
+                    c.getString(0),
+                    Base64.NO_WRAP
+            );
+
+            // Chỉ thông báo bị khóa khi mật khẩu đúng.
+            boolean matKhauDung = bangNhau(
+                    bam(matKhau, salt),
+                    c.getString(1)
+            );
+
+            boolean biKhoa = HoSoTaiKhoan.LOCKED.equals(
+                    c.getString(2)
+            );
+
+            return matKhauDung && biKhoa;
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public long dangNhap(String ten, String matKhau) {
         try (Cursor c = helper.getReadableDatabase().query("tai_khoan", new String[]{"id","muoi","mat_khau_bam"}, "ten_dang_nhap=? AND trang_thai='ACTIVE'", new String[]{chuanHoa(ten)}, null,null,null)) {
             if (!c.moveToFirst()) return -1;

@@ -10,10 +10,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import android.database.DatabaseUtils;
-import android.text.TextUtils;
+
 import com.example.app_ck.data.repository.KhoDuLieuThamQuan;
-import com.example.app_ck.ui.common.AnhDiaDiem;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -34,7 +32,7 @@ import com.example.app_ck.session.PhienDangNhap;
 import com.example.app_ck.ui.common.BaseActivity;
 import java.util.ArrayList;
 import java.util.Locale;
-
+import com.example.app_ck.ui.common.AnhDiaDiem;
 public class QuanLyDiaDiemActivity extends BaseActivity {
     private LinearLayout danhSach;
     private EditText timKiem;

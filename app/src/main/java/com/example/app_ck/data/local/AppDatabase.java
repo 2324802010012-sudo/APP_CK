@@ -49,4 +49,8 @@ public class AppDatabase extends SQLiteOpenHelper {
     public ArrayList<DiaDiem> danhSachDiaDiem() { return diaDiem.danhSachDiaDiem(); }
     public ArrayList<DuLieuDinhDocLap.DiemThamQuan> layDiemDinhDocLap() { return diaDiem.layDiemDinhDocLap(); }
     public String layThuyetMinhTheoId(int id) { return diaDiem.layThuyetMinhTheoId(id); }
+
+    public boolean taiKhoanBiKhoa(String ten, String matKhau) {
+        return taiKhoan.taiKhoanBiKhoa(ten, matKhau);
+    }
 }

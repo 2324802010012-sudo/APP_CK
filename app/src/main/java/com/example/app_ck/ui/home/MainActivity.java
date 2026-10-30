@@ -42,7 +42,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
-
+import com.example.app_ck.ui.common.AnhDiaDiem;
 public class MainActivity extends BaseActivity {
     public static final String BAT_DAU_HUONG_DAN = "com.example.app_ck.BAT_DAU_HUONG_DAN";
     public static final String CUON_LEN_TIM_KIEM = "com.example.app_ck.CUON_LEN_TIM_KIEM";

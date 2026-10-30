@@ -32,7 +32,10 @@ public final class NguonThongTin {
         TextView ghiChu = new TextView(activity);
         ghiChu.setText(ghiChuNguon);
         ghiChu.setTextColor(android.graphics.Color.parseColor("#24382D"));
-        khung.addView(ghiChu);
+        if (ghiChuNguon != null
+                && !ghiChuNguon.trim().isEmpty()) {
+            khung.addView(ghiChu);
+        }
         for (KhoNguonThongTin.Nguon s : cacNguon) {
             TextView link = new TextView(activity);
             link.setText("\n" + s.ten + " ↗\n" + s.coQuan + "\n" + s.url);

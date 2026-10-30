@@ -58,4 +58,21 @@ public final class PhienDangNhap {
         }
         throw new SecurityException("Thao tác này yêu cầu tài khoản ADMIN đang hoạt động");
     }
+    public static boolean laAdmin(Context context) {
+        long taiKhoanId = id(context);
+
+        if (taiKhoanId <= 0) {
+            return false;
+        }
+
+        try (AppDatabase helper = new AppDatabase(context)) {
+            yeuCauQuanTri(
+                    context,
+                    helper.getReadableDatabase()
+            );
+            return true;
+        } catch (SecurityException e) {
+            return false;
+        }
+    }
 }

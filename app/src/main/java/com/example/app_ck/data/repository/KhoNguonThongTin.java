@@ -57,11 +57,34 @@ public final class KhoNguonThongTin {
         }
         return result;
     }
+    public static String ghiChu(
+            SQLiteDatabase db, int place, int point) {
 
-    public static String ghiChu(SQLiteDatabase db, int place, int point) {
-        try (Cursor c = db.rawQuery("SELECT ngay_doi_chieu,ghi_chu FROM ghi_chu_nguon WHERE dia_diem_id=? AND diem_id=?", new String[]{""+place,""+point})) {
-            return c.moveToFirst() ? "Đối chiếu: " + c.getString(0) + "\n" + c.getString(1)
-                    : "Chưa có trích dẫn cho nội dung này.";
+        try (Cursor c = db.rawQuery(
+                "SELECT ngay_doi_chieu, ghi_chu "
+                        + "FROM ghi_chu_nguon "
+                        + "WHERE dia_diem_id=? AND diem_id=?",
+                new String[]{
+                        String.valueOf(place),
+                        String.valueOf(point)
+                })) {
+
+            if (c.moveToFirst()) {
+                String ngay = c.getString(0);
+                String ghiChu = c.getString(1);
+
+                if (ghiChu == null || ghiChu.trim().isEmpty()) {
+                    return "";
+                }
+
+                if (ngay == null || ngay.trim().isEmpty()) {
+                    return ghiChu;
+                }
+
+                return "Đối chiếu: " + ngay + "\n" + ghiChu;
+            }
         }
+
+        return "";
     }
 }
