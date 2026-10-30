@@ -1,0 +1,4 @@
+<resources>
+<style name="DDLabel"><item name="android:layout_width">match_parent</item><item name="android:layout_height">wrap_content</item><item name="android:layout_marginTop">16dp</item><item name="android:layout_marginBottom">7dp</item><item name="android:textColor">#20382A</item><item name="android:textSize">13sp</item><item name="android:textStyle">bold</item></style>
+<style name="DDInput"><item name="android:layout_width">match_parent</item><item name="android:layout_height">52dp</item><item name="android:background">@drawable/ui_card</item><item name="android:paddingStart">12dp</item><item name="android:paddingEnd">12dp</item><item name="android:textColor">#20382A</item><item name="android:textColorHint">#87958B</item><item name="android:textSize">14sp</item><item name="android:singleLine">true</item></style>
+</resources>

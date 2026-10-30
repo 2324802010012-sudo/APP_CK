@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical" android:background="#F6F8F5">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
+        android:gravity="center_vertical" android:padding="16dp">
+        <TextView android:id="@+id/ddFormQuayLai" android:layout_width="48dp" android:layout_height="48dp"
+            android:gravity="center" android:text="‹" android:textSize="32sp" android:textColor="#245B43"
+            android:clickable="true" android:focusable="true" android:contentDescription="Quay lại" />
+        <TextView android:id="@+id/ddFormTieuDe" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="Thêm địa điểm" android:textColor="#20382A"
+            android:textSize="21sp" android:textStyle="bold" />
+    </LinearLayout>
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scrollbars="none">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="20dp"
+            android:orientation="vertical">
+            <TextView style="@style/DDLabel" android:text="Tên địa điểm *" />
+            <EditText android:id="@+id/ddFormTen" style="@style/DDInput" android:hint="Nhập tên địa điểm" />
+            <TextView style="@style/DDLabel" android:text="Địa chỉ" />
+            <EditText android:id="@+id/ddFormDiaChi" style="@style/DDInput" android:hint="Số nhà, đường, tỉnh/thành phố" />
+            <TextView style="@style/DDLabel" android:text="Danh mục" />
+            <Spinner android:id="@+id/ddFormDanhMuc" android:layout_width="match_parent"
+                android:layout_height="52dp" android:background="@drawable/ui_card" android:paddingHorizontal="12dp" />
+            <TextView style="@style/DDLabel" android:text="Giới thiệu địa điểm" />
+            <EditText android:id="@+id/ddFormMoTa" style="@style/DDInput"
+                android:layout_height="120dp" android:gravity="top|start" android:padding="12dp"
+                android:inputType="textMultiLine|textCapSentences" android:singleLine="false"
+                android:hint="Giới thiệu lịch sử, đặc điểm nổi bật..." />
+            <TextView style="@style/DDLabel" android:text="Tọa độ địa điểm *" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <EditText android:id="@+id/ddFormViDo" style="@style/DDInput" android:layout_width="0dp"
+                    android:layout_weight="1" android:hint="Vĩ độ" android:inputType="numberDecimal|numberSigned" />
+                <EditText android:id="@+id/ddFormKinhDo" style="@style/DDInput" android:layout_width="0dp"
+                    android:layout_weight="1" android:layout_marginStart="8dp" android:hint="Kinh độ"
+                    android:inputType="numberDecimal|numberSigned" />
+            </LinearLayout>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6dp" android:text="Nhập tọa độ GPS theo định dạng số thập phân. Ví dụ: 10.777000 / 106.695300"
+                android:textColor="#718277" android:textSize="12sp" />
+            <TextView style="@style/DDLabel" android:text="Hình ảnh địa điểm" />
+            <ImageView android:id="@+id/ddFormAnh" android:layout_width="match_parent" android:layout_height="190dp"
+                android:background="@drawable/ui_card" android:scaleType="centerCrop"
+                android:src="@android:drawable/ic_menu_gallery" android:contentDescription="Ảnh địa điểm" />
+            <Button android:id="@+id/ddFormChonAnh" android:layout_width="match_parent"
+                android:layout_height="50dp" android:layout_marginTop="10dp" android:text="Chọn ảnh từ điện thoại"
+                android:textAllCaps="false" android:textColor="#245B43" android:backgroundTint="#E3F0E5" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                android:text="Ảnh được lưu riêng trong ứng dụng; không cần chép vào drawable."
+                android:textColor="#718277" android:textSize="12sp" />
+            <TextView style="@style/DDLabel" android:text="Nguồn thông tin" />
+            <EditText android:id="@+id/ddFormTenNguon" style="@style/DDInput"
+                android:hint="Tên tài liệu hoặc cơ quan cung cấp" />
+            <EditText android:id="@+id/ddFormUrlNguon" style="@style/DDInput"
+                android:layout_marginTop="8dp" android:hint="https://..."
+                android:inputType="textUri" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="7dp" android:text="Nguồn được liên kết với phần giới thiệu địa điểm; không chèn URL vào lời thuyết minh."
+                android:textColor="#718277" android:textSize="12sp" />
+            <Button android:id="@+id/ddFormLuu" android:layout_width="match_parent" android:layout_height="54dp"
+                android:layout_marginTop="24dp" android:text="Lưu địa điểm" android:textAllCaps="false"
+                android:backgroundTint="#2C7351" android:textColor="#FFFFFF" />
+            <Button android:id="@+id/ddFormXoa" android:layout_width="match_parent" android:layout_height="50dp"
+                android:layout_marginTop="10dp" android:text="Xóa địa điểm" android:textAllCaps="false"
+                android:textColor="#A34D43" android:backgroundTint="#F4EAE7" android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
