@@ -1,5 +1,4 @@
 package com.example.app_ck.ui.place;
-
 import com.example.app_ck.R;
 import com.example.app_ck.data.local.AppDatabase;
 import com.example.app_ck.data.model.DiaDiem;
@@ -11,7 +10,7 @@ import com.example.app_ck.ui.auth.DangNhapActivity;
 import com.example.app_ck.ui.common.BaseActivity;
 import com.example.app_ck.ui.common.NguonThongTin;
 import com.example.app_ck.ui.tour.DieuHuongThamQuan;
-
+import com.example.app_ck.ui.common.AnhDiaDiem;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -190,7 +189,10 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
     }
 
     private void hienThiThongTin() {
-        ((ImageView) findViewById(R.id.anhChiTiet)).setImageResource(anhDiaDiem);
+        ImageView anhChinh = findViewById(R.id.anhChiTiet);
+        anhChinh.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        // Đồng bộ ảnh drawable và ảnh Admin chọn từ điện thoại.
+        AnhDiaDiem.hien(anhChinh, diaDiem.tenAnh);
         ((TextView) findViewById(R.id.tenChiTiet)).setText(diaDiem.ten);
         ((TextView) findViewById(R.id.danhMucChiTiet)).setText(diaDiem.danhMuc);
         ((TextView) findViewById(R.id.diaChiChiTiet)).setText(
@@ -352,7 +354,13 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
             int anhDiem = getResources().getIdentifier(diem.tenAnh == null ? "" : diem.tenAnh,
                     "drawable", getPackageName());
-            anh.setImageResource(anhDiem == 0 ? anhDiaDiem : anhDiem);
+            if (anhDiem != 0) {
+                // Ưu tiên ảnh riêng của điểm tham quan hiện có.
+                anh.setImageResource(anhDiem);
+            } else {
+                // Không có ảnh riêng: sử dụng ảnh chính đã được lưu.
+                AnhDiaDiem.hien(anh, diaDiem.tenAnh);
+            }
             anh.setScaleType(
                     ImageView.ScaleType.CENTER_CROP
             );
@@ -417,8 +425,9 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
     private void moThuVien() {
 
         ImageView anh = new ImageView(this);
-        anh.setImageResource(anhDiaDiem);
+        AnhDiaDiem.hien(anh, diaDiem.tenAnh);
         anh.setAdjustViewBounds(true);
+        anh.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
                 .setTitle("Hình ảnh – " + diaDiem.ten)

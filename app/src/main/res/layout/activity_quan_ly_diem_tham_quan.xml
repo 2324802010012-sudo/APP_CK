@@ -89,6 +89,11 @@
                     android:layout_height="52dp" android:layout_marginStart="12dp" android:hint="Y (0–1)"
                     android:inputType="numberDecimal" android:textColor="#20382A" android:textColorHint="#819286" />
             </LinearLayout>
+            <Button android:id="@+id/dtChonMarker"
+                android:layout_width="match_parent" android:layout_height="52dp"
+                android:layout_marginTop="10dp" android:text="Chạm trên sơ đồ để đặt Marker"
+                android:textAllCaps="false" android:textColor="#2C7351"
+                android:backgroundTint="#E4F0E6" />
             <Button android:id="@+id/dtLuu" android:layout_width="match_parent" android:layout_height="52dp"
                 android:layout_marginTop="18dp" android:text="Lưu điểm tham quan" android:textAllCaps="false"
                 android:textColor="#FFFFFF" android:backgroundTint="#2C7351" />

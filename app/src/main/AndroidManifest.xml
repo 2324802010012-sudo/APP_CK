@@ -108,6 +108,9 @@
         <activity
             android:name=".ui.admin.QuanLyDiaDiemActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.admin.QuanLyDiemThamQuanActivity"
+            android:exported="false" />
 
         <activity android:name="com.example.app_ck.ui.profile.CaNhanActivity" android:exported="false" />
         <activity android:name="com.example.app_ck.ui.profile.SuaHoSoActivity" android:exported="false" />

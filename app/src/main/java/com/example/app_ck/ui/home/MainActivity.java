@@ -1,5 +1,4 @@
 package com.example.app_ck.ui.home;
-
 import com.example.app_ck.R;
 import com.example.app_ck.data.local.AppDatabase;
 import com.example.app_ck.data.model.DiaDiem;
@@ -756,27 +755,10 @@ public class MainActivity extends BaseActivity {
             }
         }
 
-        // CAP NHAT ANH TU TEN RESOURCE LUU TRONG SQLITE
+        // Doc ca anh drawable va anh duoc Admin chon tu dien thoai.
         if (anh != null) {
-            anh.setImageResource(android.R.drawable.ic_menu_gallery);
+            AnhDiaDiem.hien(anh, diaDiem.tenAnh);
             anh.setContentDescription("Ảnh " + diaDiem.ten);
-        }
-        if (anh != null &&
-                diaDiem.tenAnh != null &&
-                !diaDiem.tenAnh.trim().isEmpty()) {
-
-            int maAnh = getResources().getIdentifier(
-                    diaDiem.tenAnh,
-                    "drawable",
-                    getPackageName()
-            );
-
-            if (maAnh != 0) {
-                anh.setImageResource(maAnh);
-                anh.setContentDescription(
-                        "Ảnh " + diaDiem.ten
-                );
-            }
         }
     }
 
@@ -800,21 +782,13 @@ public class MainActivity extends BaseActivity {
         the.setPadding(dpThe(7), dpThe(7), dpThe(7), dpThe(7));
         the.setClickable(true);
         the.setFocusable(true);
-        GradientDrawable nen = new GradientDrawable();
-        nen.setColor(Color.WHITE);
-        nen.setCornerRadius(dpThe(14));
-        nen.setStroke(dpThe(1), Color.parseColor("#E0E8DF"));
-        the.setBackground(nen);
+        the.setBackgroundResource(R.drawable.ui_card);
 
         ImageView anh = new ImageView(this);
         anh.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        int maAnh = getResources().getIdentifier(
-                diaDiem.tenAnh == null ? "" : diaDiem.tenAnh, "drawable", getPackageName());
-        if (maAnh != 0) {
-            anh.setImageResource(maAnh);
-        } else {
-            anh.setImageResource(android.R.drawable.ic_menu_gallery);
-        }
+        // Ho tro anh drawable cu va anh chon tu dien thoai.
+        AnhDiaDiem.hien(anh, diaDiem.tenAnh);
+        anh.setContentDescription("Ảnh " + diaDiem.ten);
         the.addView(anh, new LinearLayout.LayoutParams(-1,
                 getResources().getDimensionPixelSize(R.dimen.featured_destination_image_height)));
 
@@ -849,9 +823,13 @@ public class MainActivity extends BaseActivity {
         // Không ép LayoutParams kiểu LinearLayout vào GridLayout.
         int viTriChen = Math.min(2, cha.getChildCount());
         if (cha instanceof LinearLayout) {
-            LinearLayout.LayoutParams thongSoThe = new LinearLayout.LayoutParams(
-                    getResources().getDimensionPixelSize(R.dimen.featured_destination_card_width),
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams thongSoThe =
+                    new LinearLayout.LayoutParams(
+                            getResources().getDimensionPixelSize(
+                                    R.dimen.featured_destination_card_width
+                            ),
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
             thongSoThe.setMarginEnd(dpThe(12));
             cha.addView(the, viTriChen, thongSoThe);
         } else {
@@ -861,41 +839,157 @@ public class MainActivity extends BaseActivity {
         cacTheTaoDong.add(the);
     }
 
+
     private void taoCacTheBoSung() {
+
+        // 1. Các thẻ địa điểm có sẵn.
         theDiaDiem.put(0, diaDiemDinhDocLap);
         theDiaDiem.put(1, diaDiemBaoTang);
         theDiaDiem.put(2, diaDiemDaiNoi);
         theDiaDiem.put(3, diaDiemConDao);
         theDiaDiem.put(4, diaDiemVanMieu);
-        for (java.util.Map.Entry<Integer, View> entry : theDiaDiem.entrySet()) {
-            if (entry.getValue() != null) entry.getValue().setVisibility(
-                    viTriTheoId(entry.getKey()) >= 0 ? View.VISIBLE : View.GONE);
+
+        // 2. Hiển thị theo dữ liệu SQLite.
+        for (java.util.Map.Entry<Integer, View> entry
+                : theDiaDiem.entrySet()) {
+
+            if (entry.getValue() != null) {
+                entry.getValue().setVisibility(
+                        viTriTheoId(entry.getKey()) >= 0
+                                ? View.VISIBLE
+                                : View.GONE
+                );
+            }
         }
-        if (diaDiemVanMieu == null || !(diaDiemVanMieu.getParent() instanceof ViewGroup)) return;
-        ViewGroup parent = (ViewGroup) diaDiemVanMieu.getParent();
+
+        if (diaDiemVanMieu == null
+                || !(diaDiemVanMieu.getParent() instanceof ViewGroup)) {
+            return;
+        }
+
+        ViewGroup parent =
+                (ViewGroup) diaDiemVanMieu.getParent();
+
+        // 3. Tạo thẻ cho các địa điểm mới được Admin thêm.
         for (DiaDiem d : duLieuDiaDiem) {
-            if (theDiaDiem.containsKey(d.id)) continue;
+
+            if (d == null || theDiaDiem.containsKey(d.id)) {
+                continue;
+            }
+
+            // THẺ ĐỊA ĐIỂM
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
-            card.setPadding(dpThe(10), dpThe(10), dpThe(10), dpThe(10));
-            card.setBackgroundResource(R.drawable.nen_tien_ich_xanh);
+            card.setPadding(
+                    dpThe(7),
+                    dpThe(7),
+                    dpThe(7),
+                    dpThe(7)
+            );
+
+            // Dùng cùng nền với các thẻ trong activity_main.xml.
+            card.setBackgroundResource(R.drawable.ui_card);
+
+            card.setClickable(true);
+            card.setFocusable(true);
+
+            // HÌNH ẢNH
             ImageView image = new ImageView(this);
-            image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            int imageId = getResources().getIdentifier(d.tenAnh == null ? "" : d.tenAnh,
-                    "drawable", getPackageName());
-            image.setImageResource(imageId == 0 ? android.R.drawable.ic_menu_gallery : imageId);
+
+            image.setScaleType(
+                    ImageView.ScaleType.CENTER_CROP
+            );
+
+            image.setAdjustViewBounds(false);
+
+            // Hỗ trợ cả ảnh drawable và ảnh chọn từ điện thoại.
+            AnhDiaDiem.hien(image, d.tenAnh);
+
             image.setContentDescription("Ảnh " + d.ten);
-            card.addView(image, new LinearLayout.LayoutParams(-1,
-                    getResources().getDimensionPixelSize(R.dimen.featured_destination_image_height)));
+
+            LinearLayout.LayoutParams anhParams =
+                    new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            getResources().getDimensionPixelSize(
+                                    R.dimen.featured_destination_image_height
+                            )
+                    );
+
+            card.addView(image, anhParams);
+
+            // TÊN ĐỊA ĐIỂM
             TextView title = new TextView(this);
             title.setText(d.ten);
-            title.setMaxLines(2);
-            title.setEllipsize(android.text.TextUtils.TruncateAt.END);
-            title.setTextColor(Color.parseColor("#24382D"));
-            card.addView(title);
+            title.setTextSize(14);
+            title.setTextColor(
+                    Color.parseColor("#20382A")
+            );
+            title.setTypeface(
+                    null,
+                    android.graphics.Typeface.BOLD
+            );
+            title.setLines(2);
+            title.setEllipsize(
+                    android.text.TextUtils.TruncateAt.END
+            );
+            LinearLayout.LayoutParams titleParams =
+                    new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+
+            titleParams.setMarginStart(dpThe(5));
+            titleParams.topMargin = dpThe(10);
+
+            card.addView(title, titleParams);
+
+            // DANH MỤC
+            TextView category = new TextView(this);
+
+            category.setText(
+                    d.danhMuc == null ? "" : d.danhMuc
+            );
+
+            category.setTextSize(11);
+            category.setTextColor(
+                    Color.parseColor("#788B7E")
+            );
+            category.setSingleLine(true);
+            category.setEllipsize(
+                    android.text.TextUtils.TruncateAt.END
+            );
+
+            LinearLayout.LayoutParams categoryParams =
+                    new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+
+            categoryParams.setMarginStart(dpThe(5));
+            categoryParams.topMargin = dpThe(5);
+            categoryParams.bottomMargin = dpThe(9);
+
+            card.addView(category, categoryParams);
+
+            // MỞ CHI TIẾT ĐỊA ĐIỂM
             card.setOnClickListener(v -> moChiTiet(d.id));
-            parent.addView(card, new ViewGroup.LayoutParams(
-                    getResources().getDimensionPixelSize(R.dimen.featured_destination_card_width), -2));
+
+            // CÙNG CHIỀU RỘNG VÀ KHOẢNG CÁCH VỚI THẺ CŨ
+            // GIU NGUYEN CHIEU CAO TU DONG GIONG 5 THE GOC
+            LinearLayout.LayoutParams cardParams =
+                    new LinearLayout.LayoutParams(
+                            getResources().getDimensionPixelSize(
+                                    R.dimen.featured_destination_card_width
+                            ),
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+
+            cardParams.setMarginEnd(dpThe(12));
+
+// CHỈ THÊM THẺ MỘT LẦN
+            parent.addView(card, cardParams);
+
+// Ghi nhận thẻ để làm mới danh sách
             theDiaDiem.put(d.id, card);
             cacTheTaoDong.add(card);
         }
