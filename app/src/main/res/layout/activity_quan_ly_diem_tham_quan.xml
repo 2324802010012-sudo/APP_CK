@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="#F6F8F5">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical" android:padding="16dp" android:orientation="horizontal">
+        <TextView android:id="@+id/dtQuayLai" android:layout_width="44dp"
+            android:layout_height="44dp" android:gravity="center" android:text="‹"
+            android:textSize="32sp" android:textColor="#286747" android:contentDescription="Quay lại" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView android:id="@+id/dtTieuDe" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Quản lý điểm tham quan" android:textSize="20sp" android:textStyle="bold" android:textColor="#20382A" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Điểm thành phần, Marker và thuyết minh" android:textSize="12sp" android:textColor="#718277" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:id="@+id/dtKhungDanhSach" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:orientation="vertical" android:paddingHorizontal="18dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="ĐỊA ĐIỂM DU LỊCH CHÍNH" android:textSize="12sp" android:textStyle="bold"
+            android:textColor="#2C7351" />
+        <Spinner android:id="@+id/dtChonDiaDiem" android:layout_width="match_parent"
+            android:layout_height="48dp" android:background="@drawable/ui_card" />
+        <EditText android:id="@+id/dtTimKiem" android:layout_width="match_parent"
+            android:layout_height="52dp" android:layout_marginTop="12dp"
+            android:background="@drawable/ui_card" android:paddingHorizontal="14dp"
+            android:hint="Tìm tên hoặc mã điểm tham quan" android:singleLine="true"
+            android:textColor="#20382A" android:textColorHint="#819286" android:textSize="14sp" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center_vertical" android:layout_marginTop="12dp" android:orientation="horizontal">
+            <TextView android:id="@+id/dtSoLuong" android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content" android:text="Danh sách điểm tham quan" android:textSize="13sp"
+                android:textColor="#2C7351" android:textStyle="bold" />
+            <Button android:id="@+id/dtThemMoi" android:layout_width="wrap_content" android:layout_height="48dp"
+                android:text="+ Thêm điểm" android:textAllCaps="false" android:textColor="#FFFFFF"
+                android:backgroundTint="#2C7351" />
+        </LinearLayout>
+        <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:fillViewport="true" android:scrollbars="none">
+            <LinearLayout android:id="@+id/dtDanhSach" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical" android:paddingBottom="24dp" />
+        </ScrollView>
+    </LinearLayout>
+    <ScrollView android:id="@+id/dtKhungBieuMau" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:visibility="gone" android:scrollbars="none">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:paddingHorizontal="20dp" android:paddingBottom="30dp">
+            <TextView android:id="@+id/dtTieuDeBieuMau" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="Thêm điểm tham quan" android:textSize="19sp"
+                android:textStyle="bold" android:textColor="#20382A" android:layout_marginBottom="12dp" />
+            <TextView android:id="@+id/dtGhiChu" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Tầng và mã điểm giữ liên kết với sơ đồ và thuyết minh hiện có."
+                android:textSize="12sp" android:textColor="#718277" android:layout_marginBottom="10dp" />
+            <EditText android:id="@+id/dtTen" android:layout_width="match_parent" android:layout_height="52dp"
+                android:hint="Tên điểm tham quan *" android:singleLine="true" android:textColor="#20382A"
+                android:textColorHint="#819286" />
+            <EditText android:id="@+id/dtTang" android:layout_width="match_parent" android:layout_height="52dp"
+                android:hint="Tầng hoặc khu vực (số nguyên)" android:inputType="numberSigned"
+                android:textColor="#20382A" android:textColorHint="#819286" />
+            <EditText android:id="@+id/dtThuTu" android:layout_width="match_parent" android:layout_height="52dp"
+                android:hint="Thứ tự hiển thị" android:inputType="numberSigned"
+                android:textColor="#20382A" android:textColorHint="#819286" />
+            <EditText android:id="@+id/dtSoHienThi" android:layout_width="match_parent" android:layout_height="52dp"
+                android:hint="Số hiển thị trên Marker" android:inputType="numberSigned"
+                android:textColor="#20382A" android:textColorHint="#819286" />
+            <EditText android:id="@+id/dtMoTa" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:minHeight="90dp" android:gravity="top" android:paddingTop="12dp"
+                android:inputType="textMultiLine|textCapSentences" android:hint="Giới thiệu điểm tham quan"
+                android:textColor="#20382A" android:textColorHint="#819286" />
+            <EditText android:id="@+id/dtThuyetMinh" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:minHeight="110dp" android:gravity="top" android:paddingTop="12dp"
+                android:inputType="textMultiLine|textCapSentences" android:hint="Nội dung thuyết minh"
+                android:textColor="#20382A" android:textColorHint="#819286" />
+            <EditText android:id="@+id/dtTenAnh" android:layout_width="match_parent" android:layout_height="52dp"
+                android:hint="Tên ảnh trong drawable (nếu có)" android:singleLine="true"
+                android:textColor="#20382A" android:textColorHint="#819286" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="14dp" android:text="TỌA ĐỘ MARKER TRÊN SƠ ĐỒ (0–1)"
+                android:textColor="#2C7351" android:textStyle="bold" android:textSize="12sp" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Để trống cả hai nếu chưa đặt Marker; không phải vĩ độ/kinh độ GPS."
+                android:textColor="#718277" android:textSize="12sp" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <EditText android:id="@+id/dtX" android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="52dp" android:hint="X (0–1)" android:inputType="numberDecimal"
+                    android:textColor="#20382A" android:textColorHint="#819286" />
+                <EditText android:id="@+id/dtY" android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="52dp" android:layout_marginStart="12dp" android:hint="Y (0–1)"
+                    android:inputType="numberDecimal" android:textColor="#20382A" android:textColorHint="#819286" />
+            </LinearLayout>
+            <Button android:id="@+id/dtLuu" android:layout_width="match_parent" android:layout_height="52dp"
+                android:layout_marginTop="18dp" android:text="Lưu điểm tham quan" android:textAllCaps="false"
+                android:textColor="#FFFFFF" android:backgroundTint="#2C7351" />
+            <Button android:id="@+id/dtXoa" android:layout_width="match_parent" android:layout_height="52dp"
+                android:layout_marginTop="8dp" android:text="Xóa điểm tham quan" android:textAllCaps="false"
+                android:backgroundTint="#F6EAE8" android:textColor="#B24B41" />
+            <Button android:id="@+id/dtHuy" android:layout_width="match_parent" android:layout_height="52dp"
+                android:layout_marginTop="8dp" android:text="Quay về danh sách" android:textAllCaps="false"
+                android:backgroundTint="#EAF1E8" android:textColor="#2C7351" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
