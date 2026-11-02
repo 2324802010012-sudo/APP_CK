@@ -94,12 +94,16 @@ public class AdminActivity extends BaseActivity {
                 );
 
         // UC08.5 - UC08.7
+// MO MAN HINH QUAN LY DIEM THAM QUAN
         findViewById(R.id.adminDiemThamQuan)
-                .setOnClickListener(v ->
-                        thongBaoChuaTrienKhai(
-                                "Quản lý điểm tham quan"
-                        )
-                );
+                .setOnClickListener(v -> {
+                    Intent intent = new Intent(
+                            AdminActivity.this,
+                            QuanLyDiemThamQuanActivity.class
+                    );
+
+                    startActivity(intent);
+                });
 
         // UC08.8
         findViewById(R.id.adminThuyetMinh)
