@@ -8,28 +8,26 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.view.ViewGroup;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 
 import com.example.app_ck.R;
 import com.example.app_ck.data.local.AppDatabase;
@@ -37,8 +35,8 @@ import com.example.app_ck.data.model.DiaDiem;
 import com.example.app_ck.data.model.DiemThamQuan;
 import com.example.app_ck.data.repository.KhoDuLieuThamQuan;
 import com.example.app_ck.session.PhienDangNhap;
-import com.example.app_ck.ui.common.AnhDiaDiem;
 import com.example.app_ck.ui.common.BaseActivity;
+import com.example.app_ck.ui.common.AnhDiaDiem;
 import androidx.activity.OnBackPressedCallback;
 import java.io.File;
 import java.util.ArrayList;
@@ -50,9 +48,10 @@ import java.util.Locale;
  * Chuc nang:
  * - Chon dia diem du lich chinh
  * - Danh sach, tim kiem, them/sua/xoa diem thanh phan
- * - Quan ly anh so do theo tang/khu vuc
- * - Chon anh so do tu drawable hoac dien thoai
- * - Cham tren so do de dat Marker X/Y
+ * - Su dung so do da luu trong SQLite theo dia diem va tang/khu vuc
+ * - Hien thi anh RIENG cho tung diem thanh phan, khong trung voi anh so do
+ * - Gan nguon thong tin RIENG vao bai_nguon/nguon_thong_tin
+ * - Cham tren so do de dat Marker X/Y va phong to thu nho
  *
  * Khong thay doi SQLite version 15.
  * Khong ghi de cau hinh GPS AUTO khi sua diem.
@@ -109,46 +108,23 @@ public class QuanLyDiemThamQuanActivity
 
     private boolean doiSpinner = false;
 
-    // =====================================================
-    // DU LIEU ANH SO DO
-    // =====================================================
+    // Anh RIENG diem thanh phan. Khong phai anh so do.
+    private ImageView anhDiemXemTruoc;
+    private EditText oTenNguonDiem, oUrlNguonDiem;
+    private Uri anhDiemMoi;
+    private String anhDiemDaLuu = "";
 
-    private Uri anhSoDoMoi;
-
-    private ImageView xemTruocSoDo;
-
-    private EditText oTenAnhSoDoDangMo;
-
-    private int diaDiemSoDoDangMo = -1;
-
-    private String maAnhSoDoDaChon = "";
-
-    private final ActivityResultLauncher<String> layAnhSoDo =
+    private final ActivityResultLauncher<String> chonAnhDiem =
             registerForActivityResult(
                     new ActivityResultContracts.GetContent(),
                     uri -> {
-
-                        if (uri == null) {
-                            return;
-                        }
-
-                        anhSoDoMoi = uri;
-
-                        maAnhSoDoDaChon = "";
-
-                        if (oTenAnhSoDoDangMo != null) {
-                            oTenAnhSoDoDangMo.setText("");
-                        }
-
-                        if (xemTruocSoDo != null) {
-                            xemTruocSoDo.setImageURI(uri);
-                        }
-
-                        thongBao(
-                                "Đã chọn ảnh sơ đồ từ điện thoại"
-                        );
+                        if (uri == null) return;
+                        anhDiemMoi = uri;
+                        tenAnh.setText("");
+                        anhDiemXemTruoc.setImageURI(uri);
                     }
             );
+
 
     // =====================================================
     // ON CREATE
@@ -171,8 +147,7 @@ public class QuanLyDiemThamQuanActivity
 
         anhXa();
 
-        // Tao nut quan ly so do ngay sau Spinner
-        taoNutQuanLySoDo();
+        taoKhuVucAnhVaNguonDiem();
 
         // Quay lai
         findViewById(R.id.dtQuayLai)
@@ -274,7 +249,6 @@ public class QuanLyDiemThamQuanActivity
         );
 
         taiDiaDiem();
-        anhXa();
         getOnBackPressedDispatcher().addCallback(
                 this,
                 new OnBackPressedCallback(true) {
@@ -707,9 +681,11 @@ public class QuanLyDiemThamQuanActivity
                 d == null ? "" : d.noiDung
         );
 
-        tenAnh.setText(
-                d == null ? "" : d.tenAnh
-        );
+        anhDiemMoi = null;
+        anhDiemDaLuu = d == null || d.tenAnh == null ? "" : d.tenAnh;
+        tenAnh.setText(anhDiemDaLuu.startsWith("anh_may:") ? "" : anhDiemDaLuu);
+        hienAnhDiemDangChon();
+        taiNguonRiengCuaDiem(d == null ? -1 : d.id);
 
         x.setText(
                 d == null || !d.coMarker()
@@ -849,10 +825,25 @@ public class QuanLyDiemThamQuanActivity
             }
         }
 
-        String tenAnhMoi = val(tenAnh);
+        String tenNguonMoi = val(oTenNguonDiem);
+        String urlNguonMoi = val(oUrlNguonDiem);
+        if (!tenNguonMoi.isEmpty() || !urlNguonMoi.isEmpty()) {
+            if (tenNguonMoi.isEmpty()
+                    || !urlNguonMoi.matches("(?i)^https?://[^\\s]+$")) {
+                oUrlNguonDiem.setError("Nhập tên nguồn và URL http(s) hợp lệ");
+                return;
+            }
+        }
+
+        String tenAnhMoi = anhDiemDaLuu;
+        if (anhDiemMoi == null && !val(tenAnh).isEmpty()) {
+            tenAnhMoi = val(tenAnh);
+        }
+        // Truong hop anh moi tu may duoc sao chep truoc khi ghi SQLite.
+
 
         // Ho tro ten drawable hoac anh_may: da luu.
-        if (!tenAnhMoi.isEmpty()
+        if (anhDiemMoi == null && !tenAnhMoi.isEmpty()
                 && !tenAnhMoi.startsWith("anh_may:")) {
 
             int anhId = getResources().getIdentifier(
@@ -928,6 +919,17 @@ public class QuanLyDiemThamQuanActivity
                 }
             }
 
+            if (anhDiemMoi != null) {
+                try {
+                    tenAnhMoi = AnhDiaDiem.luuTuMay(this, anhDiemMoi);
+                    v.put("ten_anh", tenAnhMoi);
+                } catch (Exception e) {
+                    Log.e(TAG, "Khong sao chep duoc anh diem", e);
+                    thongBao("Không lưu được ảnh điểm thành phần");
+                    return;
+                }
+            }
+
             boolean thanhCong =
                     KhoDuLieuThamQuan.luuDiem(
                             this,
@@ -938,13 +940,16 @@ public class QuanLyDiemThamQuanActivity
                     );
 
             if (thanhCong) {
-
-                thongBao(
-                        idDangSua < 0
-                                ? "Đã thêm điểm tham quan"
-                                : "Đã cập nhật điểm tham quan"
+                boolean nguonThanhCong = luuNguonRiengCuaDiem(
+                        db, idDiaDiem, maDiem, tenNguonMoi, urlNguonMoi
                 );
-
+                if (nguonThanhCong) {
+                    thongBao(idDangSua < 0
+                            ? "Đã thêm điểm tham quan"
+                            : "Đã cập nhật điểm tham quan");
+                } else {
+                    thongBao("Đã lưu điểm, nhưng chưa lưu được nguồn riêng");
+                }
                 hienDanhSach();
 
             } else {
@@ -973,593 +978,158 @@ public class QuanLyDiemThamQuanActivity
     }
 
     // =====================================================
-    // TAO NUT QUAN LY SO DO TRONG DANH SACH
+    // ANH RIENG + NGUON RIENG CUA DIEM THANH PHAN
     // =====================================================
 
-    private void taoNutQuanLySoDo() {
-
-        Button nut = new Button(this);
-
-        nut.setText(
-                "Quản lý ảnh sơ đồ tham quan"
-        );
-
-        nut.setAllCaps(false);
-        nut.setTextColor(Color.WHITE);
-
-        nut.setBackgroundTintList(
-                ColorStateList.valueOf(MAU_XANH)
-        );
-
-        LinearLayout.LayoutParams params =
-                new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        dp(52)
-                );
-
-        params.topMargin = dp(10);
-        params.bottomMargin = dp(10);
-
-        ViewGroup parent =
-                (ViewGroup) chonDiaDiem.getParent();
-
-        if (parent instanceof LinearLayout) {
-
-            LinearLayout layout =
-                    (LinearLayout) parent;
-
-            int viTri =
-                    layout.indexOfChild(chonDiaDiem);
-
-            layout.addView(
-                    nut,
-                    viTri + 1,
-                    params
-            );
-        }
-
-        nut.setOnClickListener(
-                v -> moQuanLySoDo()
-        );
-    }
-
-    // =====================================================
-    // MO QUAN LY ANH SO DO
-    // =====================================================
-
-    private void moQuanLySoDo() {
-
-        if (!coQuyenAdmin()) {
-            finish();
+    private void taoKhuVucAnhVaNguonDiem() {
+        ViewGroup cha = (ViewGroup) tenAnh.getParent();
+        if (!(cha instanceof LinearLayout)) {
+            Log.e(TAG, "dtTenAnh khong nam trong LinearLayout");
             return;
         }
 
-        if (idDiaDiem < 0) {
+        LinearLayout layout = (LinearLayout) cha;
+        int viTri = layout.indexOfChild(tenAnh) + 1;
 
-            thongBao(
-                    "Vui lòng chọn địa điểm du lịch"
-            );
-
-            return;
-        }
-
-        final int diaDiemDangChon = idDiaDiem;
-
-        diaDiemSoDoDangMo = diaDiemDangChon;
-
-        anhSoDoMoi = null;
-
-        maAnhSoDoDaChon = "";
-
-        LinearLayout khung =
-                new LinearLayout(this);
-
-        khung.setOrientation(
-                LinearLayout.VERTICAL
-        );
-
-        khung.setPadding(
-                dp(20), dp(10),
-                dp(20), dp(14)
-        );
-
-        String tenDiaDiem = "";
-
-        for (DiaDiem d : cacDiaDiem) {
-
-            if (d.id == diaDiemDangChon) {
-
-                tenDiaDiem = d.ten;
-                break;
-            }
-        }
-
-        TextView tieuDeSoDo =
-                new TextView(this);
-
-        tieuDeSoDo.setText(tenDiaDiem);
-        tieuDeSoDo.setTextSize(16);
-        tieuDeSoDo.setTextColor(MAU_CHU);
-
-        tieuDeSoDo.setTypeface(
-                null,
-                android.graphics.Typeface.BOLD
-        );
-
-        khung.addView(tieuDeSoDo);
-
-        TextView nhanTang =
-                taoNhan("Tầng / khu vực");
-
-        khung.addView(nhanTang);
-
-        EditText oTang = new EditText(this);
-
-        oTang.setHint("Ví dụ: 0");
-        oTang.setText("0");
-        oTang.setSingleLine(true);
-
-        oTang.setInputType(
-                InputType.TYPE_CLASS_NUMBER
-                        | InputType.TYPE_NUMBER_FLAG_SIGNED
-        );
-
-        khung.addView(oTang);
-
-        TextView nhanTen =
-                taoNhan("Tên sơ đồ tham quan");
-
-        khung.addView(nhanTen);
-
-        EditText oTen = new EditText(this);
-
-        oTen.setSingleLine(true);
-
-        oTen.setText(
-                "Sơ đồ tham quan tổng thể"
-        );
-
-        khung.addView(oTen);
-
-        TextView nhanAnh =
-                taoNhan("Tên ảnh trong drawable");
-
-        khung.addView(nhanAnh);
-
-        EditText oAnh = new EditText(this);
-
-        oAnh.setSingleLine(true);
-
-        oAnh.setHint(
-                "Ví dụ: so_do_nha_tu_hoa_lo"
-        );
-
-        oTenAnhSoDoDangMo = oAnh;
-
-        khung.addView(oAnh);
-
-        // Khung xem truoc anh
-        ImageView xemTruoc =
-                new ImageView(this);
-
-        xemTruoc.setScaleType(
-                ImageView.ScaleType.FIT_CENTER
-        );
-
-        xemTruoc.setBackgroundColor(
-                Color.rgb(239, 244, 239)
-        );
-
-        xemTruoc.setImageResource(
-                android.R.drawable.ic_menu_gallery
-        );
-
-        LinearLayout.LayoutParams anhParams =
-                new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        dp(200)
-                );
-
-        anhParams.topMargin = dp(12);
-
-        khung.addView(
-                xemTruoc,
-                anhParams
-        );
-
-        xemTruocSoDo = xemTruoc;
-
-        // Xem truoc drawable
-        Button nutXem = taoNut(
-                "Xem trước ảnh drawable"
-        );
-
-        khung.addView(nutXem);
-
-        nutXem.setOnClickListener(v -> {
-
-            String ma = val(oAnh);
-
-            if (!ma.matches(
-                    "[a-z][a-z0-9_]*"
-            )) {
-
-                oAnh.setError(
-                        "Tên ảnh drawable không hợp lệ"
-                );
-
-                return;
-            }
-
-            int resId = getResources()
-                    .getIdentifier(
-                            ma,
-                            "drawable",
-                            getPackageName()
-                    );
-
-            if (resId == 0) {
-
-                oAnh.setError(
-                        "Không tìm thấy ảnh trong drawable"
-                );
-
-                return;
-            }
-
-            anhSoDoMoi = null;
-            maAnhSoDoDaChon = ma;
-
-            xemTruoc.setImageResource(resId);
-        });
-
-        // Chon anh tu dien thoai
-        Button nutChon = taoNut(
-                "Chọn ảnh sơ đồ từ điện thoại"
-        );
-
-        khung.addView(nutChon);
-
-        nutChon.setOnClickListener(v -> {
-
-            oAnh.setText("");
-
-            maAnhSoDoDaChon = "";
-
-            layAnhSoDo.launch("image/*");
-        });
-
-        // Xem so do da luu
-        Button nutTai = taoNut(
-                "Xem sơ đồ đã lưu"
-        );
-
-        khung.addView(nutTai);
-
-        nutTai.setOnClickListener(v -> {
-
-            int khu;
-
-            try {
-
-                khu = Integer.parseInt(
-                        val(oTang)
-                );
-
-            } catch (NumberFormatException e) {
-
-                oTang.setError(
-                        "Tầng/khu vực không hợp lệ"
-                );
-
-                return;
-            }
-
-            try (AppDatabase helper =
-                         new AppDatabase(this)) {
-
-                SQLiteDatabase db =
-                        helper.getReadableDatabase();
-
-                String ma =
-                        KhoDuLieuThamQuan.anhSoDo(
-                                db,
-                                diaDiemDangChon,
-                                khu
-                        );
-
-                if (ma == null
-                        || ma.trim().isEmpty()) {
-
-                    thongBao(
-                            "Khu vực này chưa có ảnh sơ đồ"
-                    );
-
-                    return;
-                }
-
-                anhSoDoMoi = null;
-                maAnhSoDoDaChon = ma;
-
-                if (ma.startsWith("anh_may:")) {
-
-                    oAnh.setText("");
-
-                } else {
-
-                    oAnh.setText(ma);
-                }
-
-                AnhDiaDiem.hien(
-                        xemTruoc,
-                        ma
-                );
-
-            } catch (Exception e) {
-
-                Log.e(TAG, "Loi tai so do", e);
-
-                thongBao(
-                        "Không tải được sơ đồ"
-                );
-            }
-        });
-
+        // Nhan ro: o dtTenAnh hien co KHONG phai ten anh so do.
         TextView ghiChu = new TextView(this);
-
-        ghiChu.setText(
-                "Ảnh sơ đồ được liên kết với địa điểm và tầng/khu vực. " +
-                        "Ảnh từ điện thoại được sao chép vào bộ nhớ riêng của ứng dụng."
-        );
-
+        ghiChu.setText("Ảnh RIÊNG của điểm tham quan. Không nhập tên ảnh sơ đồ tại đây. "
+                + "Ví dụ: anh_cong_chinh_hoa_lo (không có .jpg/.png).");
         ghiChu.setTextSize(12);
         ghiChu.setTextColor(MAU_PHU);
+        ghiChu.setPadding(0, dp(5), 0, dp(6));
+        layout.addView(ghiChu, viTri++);
 
-        ghiChu.setPadding(
-                0, dp(10), 0, dp(8)
-        );
+        anhDiemXemTruoc = new ImageView(this);
+        anhDiemXemTruoc.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        anhDiemXemTruoc.setBackgroundColor(Color.rgb(239, 244, 239));
+        anhDiemXemTruoc.setImageResource(android.R.drawable.ic_menu_gallery);
+        LinearLayout.LayoutParams paramsAnh =
+                new LinearLayout.LayoutParams(-1, dp(180));
+        paramsAnh.topMargin = dp(8);
+        paramsAnh.bottomMargin = dp(6);
+        layout.addView(anhDiemXemTruoc, viTri++, paramsAnh);
 
-        khung.addView(ghiChu);
-
-        ScrollView scroll =
-                new ScrollView(this);
-
-        scroll.addView(khung);
-
-        AlertDialog dialog =
-                new AlertDialog.Builder(this)
-                        .setTitle(
-                                "Quản lý sơ đồ tham quan"
-                        )
-                        .setView(scroll)
-                        .setNegativeButton(
-                                "Hủy", null
-                        )
-                        .setPositiveButton(
-                                "Lưu sơ đồ", null
-                        )
-                        .create();
-
-        dialog.setOnDismissListener(d -> {
-
-            if (diaDiemSoDoDangMo
-                    == diaDiemDangChon) {
-
-                xemTruocSoDo = null;
-                oTenAnhSoDoDangMo = null;
-
-                anhSoDoMoi = null;
-                maAnhSoDoDaChon = "";
-
-                diaDiemSoDoDangMo = -1;
+        Button nutXem = new Button(this);
+        nutXem.setText("Xem trước ảnh drawable");
+        nutXem.setAllCaps(false);
+        nutXem.setOnClickListener(v -> {
+            String ma = val(tenAnh);
+            int idAnh = ma.matches("[a-z][a-z0-9_]*")
+                    ? getResources().getIdentifier(ma, "drawable", getPackageName()) : 0;
+            if (idAnh == 0) {
+                tenAnh.setError("Tên ảnh không tồn tại trong drawable");
+                return;
             }
+            anhDiemMoi = null;
+            anhDiemXemTruoc.setImageResource(idAnh);
         });
+        layout.addView(nutXem, viTri++);
 
-        dialog.setOnShowListener(d -> {
+        Button nutMay = new Button(this);
+        nutMay.setText("Chọn ảnh riêng từ điện thoại");
+        nutMay.setAllCaps(false);
+        nutMay.setOnClickListener(v -> chonAnhDiem.launch("image/*"));
+        layout.addView(nutMay, viTri++);
 
-            dialog.getButton(
-                    AlertDialog.BUTTON_POSITIVE
-            ).setOnClickListener(v -> {
+        TextView nhanNguon = new TextView(this);
+        nhanNguon.setText("Nguồn riêng của điểm tham quan");
+        nhanNguon.setTextSize(15);
+        nhanNguon.setTextColor(MAU_XANH);
+        nhanNguon.setPadding(0, dp(18), 0, dp(5));
+        layout.addView(nhanNguon, viTri++);
 
-                int khu;
+        oTenNguonDiem = new EditText(this);
+        oTenNguonDiem.setSingleLine(true);
+        oTenNguonDiem.setHint("Tên tài liệu / cơ quan cung cấp");
+        layout.addView(oTenNguonDiem, viTri++);
 
-                try {
+        oUrlNguonDiem = new EditText(this);
+        oUrlNguonDiem.setSingleLine(true);
+        oUrlNguonDiem.setInputType(android.text.InputType.TYPE_CLASS_TEXT
+                | android.text.InputType.TYPE_TEXT_VARIATION_URI);
+        oUrlNguonDiem.setHint("https://...");
+        layout.addView(oUrlNguonDiem, viTri++);
 
-                    khu = Integer.parseInt(
-                            val(oTang)
-                    );
+        TextView nhanGiaiThich = new TextView(this);
+        nhanGiaiThich.setText("Nguồn gắn với điểm thành phần này, không thay nguồn của địa điểm chính.");
+        nhanGiaiThich.setTextSize(12);
+        nhanGiaiThich.setTextColor(MAU_PHU);
+        layout.addView(nhanGiaiThich, viTri);
+    }
 
-                } catch (NumberFormatException e) {
+    private void hienAnhDiemDangChon() {
+        if (anhDiemXemTruoc == null) return;
+        if (anhDiemMoi != null) {
+            anhDiemXemTruoc.setImageURI(anhDiemMoi);
+            return;
+        }
+        String ma = val(tenAnh);
+        if (ma.isEmpty()) ma = anhDiemDaLuu;
+        AnhDiaDiem.hien(anhDiemXemTruoc, ma);
+    }
 
-                    oTang.setError(
-                            "Nhập tầng/khu vực hợp lệ"
-                    );
+    private String maNguonDiem(int diaDiemId, int diemId) {
+        return "admin_diem_" + diaDiemId + "_" + diemId;
+    }
 
-                    return;
-                }
+    private void taiNguonRiengCuaDiem(int diemId) {
+        if (oTenNguonDiem == null || oUrlNguonDiem == null) return;
+        oTenNguonDiem.setText("");
+        oUrlNguonDiem.setText("");
+        if (diemId <= 0) return;
+        try (AppDatabase helper = new AppDatabase(this);
+             Cursor c = helper.getReadableDatabase().rawQuery(
+                     "SELECT n.ten,n.url FROM nguon_thong_tin n "
+                             + "JOIN bai_nguon b ON b.ma_nguon=n.ma "
+                             + "WHERE b.dia_diem_id=? AND b.diem_id=? AND n.ma=? LIMIT 1",
+                     new String[]{String.valueOf(idDiaDiem), String.valueOf(diemId),
+                             maNguonDiem(idDiaDiem, diemId)})) {
+            if (c.moveToFirst()) {
+                oTenNguonDiem.setText(c.getString(0));
+                oUrlNguonDiem.setText(c.getString(1));
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Loi tai nguon diem", e);
+            thongBao("Không tải được nguồn riêng của điểm");
+        }
+    }
 
-                String tenSoDo = val(oTen);
-                String tenDrawable = val(oAnh);
-
-                if (tenSoDo.isEmpty()) {
-
-                    oTen.setError(
-                            "Vui lòng nhập tên sơ đồ"
-                    );
-
-                    return;
-                }
-
-                String maAnh =
-                        maAnhSoDoDaChon;
-
-                // 1. Co nhap drawable
-                if (!tenDrawable.isEmpty()) {
-
-                    if (!tenDrawable.matches(
-                            "[a-z][a-z0-9_]*"
-                    )) {
-
-                        oAnh.setError(
-                                "Tên ảnh không hợp lệ"
-                        );
-
-                        return;
-                    }
-
-                    int resId = getResources()
-                            .getIdentifier(
-                                    tenDrawable,
-                                    "drawable",
-                                    getPackageName()
-                            );
-
-                    if (resId == 0) {
-
-                        oAnh.setError(
-                                "Không tìm thấy ảnh"
-                        );
-
-                        return;
-                    }
-
-                    maAnh = tenDrawable;
-                }
-
-                // 2. Anh moi tu dien thoai
-                else if (anhSoDoMoi != null) {
-
-                    try {
-
-                        maAnh =
-                                AnhDiaDiem.luuTuMay(
-                                        this,
-                                        anhSoDoMoi
-                                );
-
-                    } catch (Exception e) {
-
-                        Log.e(
-                                TAG,
-                                "Loi luu anh so do",
-                                e
-                        );
-
-                        thongBao(
-                                "Không lưu được file ảnh"
-                        );
-
-                        return;
-                    }
-                }
-
-                // 3. Khong chon anh moi,
-                // giu anh da luu
-                else if (maAnh == null
-                        || maAnh.isEmpty()) {
-
-                    try (AppDatabase helper =
-                                 new AppDatabase(this)) {
-
-                        maAnh =
-                                KhoDuLieuThamQuan.anhSoDo(
-                                        helper.getReadableDatabase(),
-                                        diaDiemDangChon,
-                                        khu
-                                );
-
-                    } catch (Exception e) {
-
-                        thongBao(
-                                "Không đọc được ảnh hiện tại"
-                        );
-
-                        return;
-                    }
-                }
-
-                if (maAnh == null
-                        || maAnh.trim().isEmpty()) {
-
-                    thongBao(
-                            "Vui lòng chọn ảnh sơ đồ"
-                    );
-
-                    return;
-                }
-
-                // Kiem tra anh ton tai
-                // truoc khi ghi SQLite
-                Bitmap kiemTra =
-                        docAnhSoDo(maAnh);
-
-                if (kiemTra == null) {
-
-                    thongBao(
-                            "Ảnh sơ đồ không tồn tại hoặc không hợp lệ"
-                    );
-
-                    return;
-                }
-
-                kiemTra.recycle();
-
-                // Luu theo dia diem + tang/khu
-                try (AppDatabase helper =
-                             new AppDatabase(this)) {
-
-                    SQLiteDatabase db =
-                            helper.getWritableDatabase();
-
-                    boolean thanhCong =
-                            KhoDuLieuThamQuan.luuSoDo(
-                                    this,
-                                    db,
-                                    diaDiemDangChon,
-                                    khu,
-                                    tenSoDo,
-                                    maAnh
-                            );
-
-                    if (thanhCong) {
-
-                        thongBao(
-                                "Đã lưu sơ đồ tham quan"
-                        );
-
-                        dialog.dismiss();
-
-                    } else {
-
-                        thongBao(
-                                "Không thể lưu sơ đồ"
-                        );
-                    }
-
-                } catch (SecurityException e) {
-
-                    thongBao(
-                            "Không có quyền quản trị"
-                    );
-
-                    dialog.dismiss();
-
-                } catch (Exception e) {
-
-                    Log.e(
-                            TAG,
-                            "Loi luu so do",
-                            e
-                    );
-
-                    thongBao(
-                            "Lỗi lưu sơ đồ tham quan"
-                    );
-                }
-            });
-        });
-
-        dialog.show();
+    private boolean luuNguonRiengCuaDiem(
+            SQLiteDatabase db, int diaDiemId, int diemId, String ten, String url) {
+        String ma = maNguonDiem(diaDiemId, diemId);
+        db.beginTransaction();
+        try {
+            PhienDangNhap.yeuCauQuanTri(this, db);
+            String[] lienKet = {String.valueOf(diaDiemId), String.valueOf(diemId), ma};
+            if (ten.isEmpty() && url.isEmpty()) {
+                // Chi bo LIEN KET nguon do admin tao cho diem nay.
+                // Khong xoa cac nguon khac cua diem.
+                db.delete("bai_nguon", "dia_diem_id=? AND diem_id=? AND ma_nguon=?", lienKet);
+            } else {
+                ContentValues n = new ContentValues();
+                n.put("ma", ma);
+                n.put("ten", ten);
+                n.put("url", url);
+                n.put("co_quan", ten);
+                if (db.insertWithOnConflict("nguon_thong_tin", null,
+                        n, SQLiteDatabase.CONFLICT_REPLACE) == -1) return false;
+                ContentValues b = new ContentValues();
+                b.put("dia_diem_id", diaDiemId);
+                b.put("diem_id", diemId);
+                b.put("ma_nguon", ma);
+                b.put("thu_tu", 999);
+                if (db.insertWithOnConflict("bai_nguon", null,
+                        b, SQLiteDatabase.CONFLICT_REPLACE) == -1) return false;
+            }
+            db.setTransactionSuccessful();
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG, "Loi luu nguon diem", e);
+            return false;
+        } finally {
+            db.endTransaction();
+        }
     }
 
     // =====================================================
@@ -1714,9 +1284,9 @@ public class QuanLyDiemThamQuanActivity
                     .setMessage(
                             "Tầng/khu " + tangChon
                                     + " chưa có ảnh sơ đồ. "
-                                    + "Hãy quay về danh sách và chọn "
-                                    + "'Quản lý ảnh sơ đồ tham quan' "
-                                    + "để bổ sung ảnh trước khi đặt Marker."
+                                    + "Ảnh sơ đồ chưa được liên kết trong dữ liệu ứng dụng. "
+                                    + "Hãy kiểm tra bản ghi so_do_tham_quan cho địa điểm và tầng/khu vực này. "
+                                    + "Dữ liệu hiện có không bị xóa."
                     )
                     .setPositiveButton(
                             "Đã hiểu", null
@@ -1797,7 +1367,29 @@ public class QuanLyDiemThamQuanActivity
         chiDan.setTextSize(13);
 
         khung.addView(chiDan);
+// Thanh dieu khien phong to / thu nho
+        LinearLayout thanhZoom = new LinearLayout(this);
+        thanhZoom.setOrientation(LinearLayout.HORIZONTAL);
+        thanhZoom.setGravity(Gravity.CENTER);
 
+        Button nutCong = taoNut("+");
+        Button nutTru = taoNut("−");
+        Button nutDatLai = taoNut("Đặt lại");
+
+        thanhZoom.addView(nutTru,
+                new LinearLayout.LayoutParams(0, dp(48), 1));
+
+        thanhZoom.addView(nutDatLai,
+                new LinearLayout.LayoutParams(0, dp(48), 2));
+
+        thanhZoom.addView(nutCong,
+                new LinearLayout.LayoutParams(0, dp(48), 1));
+
+        khung.addView(thanhZoom);
+
+        nutCong.setOnClickListener(v -> banDo.zoomIn());
+        nutTru.setOnClickListener(v -> banDo.zoomOut());
+        nutDatLai.setOnClickListener(v -> banDo.resetZoom());
         khung.addView(
                 banDo,
                 new LinearLayout.LayoutParams(

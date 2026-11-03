@@ -17,11 +17,14 @@ public class AdminActivity extends BaseActivity {
 
     private static final String TAG = "APP_CK_ADMIN";
 
+    // =====================================================
+    // KHOI TAO
+    // =====================================================
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Chỉ tài khoản ADMIN được mở màn hình.
         if (!kiemTraQuyen()) {
             finish();
             return;
@@ -37,13 +40,15 @@ public class AdminActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        // Kiểm tra lại khi quay về màn hình Admin.
         if (!kiemTraQuyen()) {
             finish();
         }
     }
 
-    // KIEM TRA QUYEN ADMIN TU SQLITE
+    // =====================================================
+    // KIEM TRA QUYEN ADMIN
+    // =====================================================
+
     private boolean kiemTraQuyen() {
 
         try (AppDatabase helper = new AppDatabase(this)) {
@@ -79,90 +84,83 @@ public class AdminActivity extends BaseActivity {
         }
     }
 
-    // GAN SU KIEN GIAO DIEN
+    // =====================================================
+    // GAN SU KIEN CAC CHUC NANG
+    // =====================================================
+
     private void ganSuKien() {
 
         // UC08.1 - UC08.4
+        // QUAN LY DIA DIEM DU LICH
         findViewById(R.id.adminDiaDiem)
-                .setOnClickListener(v ->
-                        startActivity(
-                                new Intent(
-                                        this,
-                                        QuanLyDiaDiemActivity.class
-                                )
-                        )
-                );
+                .setOnClickListener(v -> {
+                    startActivity(
+                            new Intent(
+                                    AdminActivity.this,
+                                    QuanLyDiaDiemActivity.class
+                            )
+                    );
+                });
 
         // UC08.5 - UC08.7
-// MO MAN HINH QUAN LY DIEM THAM QUAN
+        // QUAN LY DIEM THAM QUAN
         findViewById(R.id.adminDiemThamQuan)
+                .setOnClickListener(v -> {
+                    startActivity(
+                            new Intent(
+                                    AdminActivity.this,
+                                    QuanLyDiemThamQuanActivity.class
+                            )
+                    );
+                });
+
+        // UC08.8
+        // QUAN LY NOI DUNG THUYET MINH
+        findViewById(R.id.adminThuyetMinh)
+                .setOnClickListener(v -> {
+                    startActivity(
+                            new Intent(
+                                    AdminActivity.this,
+                                    QuanLyThuyetMinhActivity.class
+                            )
+                    );
+                });
+        // UC08 - CAU HINH GPS AUTO
+        findViewById(R.id.adminGpsAuto)
                 .setOnClickListener(v -> {
                     Intent intent = new Intent(
                             AdminActivity.this,
-                            QuanLyDiemThamQuanActivity.class
+                            QuanLyGpsAutoActivity.class
                     );
 
                     startActivity(intent);
                 });
 
-        // UC08.8
-        findViewById(R.id.adminThuyetMinh)
-                .setOnClickListener(v ->
-                        thongBaoChuaTrienKhai(
-                                "Quản lý nội dung thuyết minh"
-                        )
-                );
-
-        // CAU HINH GPS AUTO
-        findViewById(R.id.adminGpsAuto)
-                .setOnClickListener(v ->
-                        thongBaoChuaTrienKhai(
-                                "Cấu hình GPS AUTO"
-                        )
-                );
-
         // UC08.9 - UC08.12
-        // Mot muc quan ly tai khoan duy nhat.
+        // QUAN LY TAI KHOAN
         findViewById(R.id.adminTaiKhoan)
-                .setOnClickListener(v ->
-                        startActivity(
-                                new Intent(
-                                        this,
-                                        QuanLyTaiKhoanActivity.class
-                                )
-                        )
-                );
+                .setOnClickListener(v -> {
+                    startActivity(
+                            new Intent(
+                                    AdminActivity.this,
+                                    QuanLyTaiKhoanActivity.class
+                            )
+                    );
+                });
 
-        // VE TRANG CHU, GIU PHIEN ADMIN
+        // VE TRANG CHU - GIU PHIEN ADMIN
         findViewById(R.id.adminTrangChu)
-                .setOnClickListener(v ->
-                        veTrangChu()
-                );
+                .setOnClickListener(v -> veTrangChu());
 
         // DANG XUAT
         findViewById(R.id.adminDangXuat)
-                .setOnClickListener(v ->
-                        xacNhanDangXuat()
-                );
+                .setOnClickListener(v -> xacNhanDangXuat());
     }
 
-    // MO QUAN LY TAI KHOAN
-    private void moQuanLyTaiKhoan() {
+    // =====================================================
+    // THONG BAO CHUA TRIEN KHAI
+    // =====================================================
 
-        if (!kiemTraQuyen()) {
-            finish();
-            return;
-        }
-
-        Intent intent = new Intent(
-                AdminActivity.this,
-                QuanLyTaiKhoanActivity.class
-        );
-
-        startActivity(intent);
-    }
-
-    // THONG BAO CAC CHUC NANG CHUA TRIEN KHAI
     private void thongBaoChuaTrienKhai(String chucNang) {
 
         Toast.makeText(
@@ -172,7 +170,10 @@ public class AdminActivity extends BaseActivity {
         ).show();
     }
 
-    // VE TRANG CHU NHUNG KHONG DANG XUAT
+    // =====================================================
+    // VE TRANG CHU - GIU PHIEN ADMIN
+    // =====================================================
+
     private void veTrangChu() {
 
         Intent intent = new Intent(
@@ -184,7 +185,10 @@ public class AdminActivity extends BaseActivity {
         finish();
     }
 
-    // DANG XUAT TAI KHOAN ADMIN
+    // =====================================================
+    // DANG XUAT
+    // =====================================================
+
     private void xacNhanDangXuat() {
 
         new AlertDialog.Builder(this)
@@ -197,8 +201,6 @@ public class AdminActivity extends BaseActivity {
                         "Đăng xuất",
                         (dialog, which) -> {
 
-                            // Xoa phien dang nhap.
-                            // Khong xoa tai khoan hay du lieu SQLite.
                             PhienDangNhap.dangXuat(this);
 
                             Intent intent = new Intent(

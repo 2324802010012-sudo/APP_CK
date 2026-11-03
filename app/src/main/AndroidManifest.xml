@@ -111,7 +111,13 @@
         <activity
             android:name=".ui.admin.QuanLyDiemThamQuanActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".ui.admin.QuanLyThuyetMinhActivity"
+            android:exported="false" />
+        <!-- QUAN LY CAU HINH GPS AUTO -->
+        <activity
+            android:name=".ui.admin.QuanLyGpsAutoActivity"
+            android:exported="false" />
         <activity android:name="com.example.app_ck.ui.profile.CaNhanActivity" android:exported="false" />
         <activity android:name="com.example.app_ck.ui.profile.SuaHoSoActivity" android:exported="false" />
         <activity android:name="com.example.app_ck.ui.profile.DoiMatKhauActivity" android:exported="false" />

@@ -55,16 +55,57 @@ public class BaseActivity extends AppCompatActivity {
     /** Màn hình con dừng AUTO/TTS trước khi mở trình nghe thủ công. */
     protected void dungAmThanhThamQuan() {}
 
+
     public void moKhungThuyetMinh(boolean phatNgay) {
-        android.widget.TextView ten = findViewById(R.id.tqTenKhuVuc);
-        android.widget.TextView bai = findViewById(R.id.tqMoTaKhuVuc);
-        android.widget.TextView diaDiem = findViewById(R.id.tqTenDiaDiem);
-        android.widget.ImageView anh = findViewById(R.id.tqAnhDiaDiem);
-        if (ten == null || bai == null || isFinishing()) return;
-        moKhungThuyetMinh(ten.getText().toString(), bai.getText().toString(),
-                diaDiem.getText().toString(), anh.getDrawable(), phatNgay,
-                diaDiemNguon, diemNguon, KhoLichSu.THU_CONG);
+        android.widget.TextView ten =
+                findViewById(R.id.tqTenKhuVuc);
+
+        android.widget.TextView bai =
+                findViewById(R.id.tqMoTaKhuVuc);
+
+        android.widget.TextView diaDiem =
+                findViewById(R.id.tqTenDiaDiem);
+
+        android.widget.ImageView anhChinh =
+                findViewById(R.id.tqAnhDiaDiem);
+
+        android.widget.ImageView anhDiem =
+                findViewById(R.id.tqAnhDiemThanhPhan);
+
+        if (ten == null || bai == null || isFinishing()) {
+            return;
+        }
+
+        // Uu tien anh cua Marker dang chon.
+        // Neu Marker chua co anh, dung anh dia diem chinh.
+        android.graphics.drawable.Drawable anhHienThi = null;
+
+        if (anhDiem != null
+                && anhDiem.getVisibility() == android.view.View.VISIBLE
+                && anhDiem.getDrawable() != null) {
+
+            anhHienThi = anhDiem.getDrawable();
+
+        } else if (anhChinh != null) {
+            anhHienThi = anhChinh.getDrawable();
+        }
+
+        String tenDiaDiem = diaDiem == null
+                ? ""
+                : diaDiem.getText().toString();
+
+        moKhungThuyetMinh(
+                ten.getText().toString(),
+                bai.getText().toString(),
+                tenDiaDiem,
+                anhHienThi,
+                phatNgay,
+                diaDiemNguon,
+                diemNguon,
+                KhoLichSu.THU_CONG
+        );
     }
+
 
     public void moKhungThuyetMinh(String ten, String bai, String diaDiem,
             android.graphics.drawable.Drawable anh, boolean phatNgay, int idDiaDiem, int idDiem, String cheDo) {

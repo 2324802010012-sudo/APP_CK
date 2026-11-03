@@ -233,6 +233,17 @@
                     android:textStyle="bold"
                     android:textColor="#24382D"/>
 
+                <!-- ANH RIENG CUA DIEM THAM QUAN / MARKER -->
+                <ImageView
+                    android:id="@+id/tqAnhDiemThanhPhan"
+                    android:layout_width="match_parent"
+                    android:layout_height="190dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/nen_tq_the"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Hình ảnh điểm tham quan hiện tại"
+                    android:visibility="gone" />
+
                 <TextView
                     android:id="@+id/tqMoTaKhuVuc"
                     android:layout_width="match_parent"
