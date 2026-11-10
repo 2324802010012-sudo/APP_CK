@@ -53,7 +53,7 @@ import java.util.Locale;
  * - Gan nguon thong tin RIENG vao bai_nguon/nguon_thong_tin
  * - Cham tren so do de dat Marker X/Y va phong to thu nho
  *
- * Khong thay doi SQLite version 15.
+ * Du lieu van hanh dung SQLite chung.
  * Khong ghi de cau hinh GPS AUTO khi sua diem.
  */
 public class QuanLyDiemThamQuanActivity
@@ -146,6 +146,8 @@ public class QuanLyDiemThamQuanActivity
         apDungKhoangTrongHeThong();
 
         anhXa();
+        QuanLySoDo quanLySoDo=new QuanLySoDo(this);
+        findViewById(R.id.dtQuanLySoDo).setOnClickListener(v->quanLySoDo.mo(idDiaDiem,this::taiDiem));
 
         taoKhuVucAnhVaNguonDiem();
 
@@ -896,29 +898,6 @@ public class QuanLyDiemThamQuanActivity
 
             int maDiem = idDangSua;
 
-            if (maDiem < 0) {
-
-                try (Cursor c = db.rawQuery(
-                        "SELECT COALESCE(MAX(id),0)+1 " +
-                                "FROM diem_tham_quan_chung " +
-                                "WHERE dia_diem_id=?",
-                        new String[]{
-                                String.valueOf(idDiaDiem)
-                        })) {
-
-                    if (!c.moveToFirst()) {
-
-                        thongBao(
-                                "Không tạo được mã điểm"
-                        );
-
-                        return;
-                    }
-
-                    maDiem = c.getInt(0);
-                }
-            }
-
             if (anhDiemMoi != null) {
                 try {
                     tenAnhMoi = AnhDiaDiem.luuTuMay(this, anhDiemMoi);
@@ -930,26 +909,11 @@ public class QuanLyDiemThamQuanActivity
                 }
             }
 
-            boolean thanhCong =
-                    KhoDuLieuThamQuan.luuDiem(
-                            this,
-                            db,
-                            idDiaDiem,
-                            maDiem,
-                            v
-                    );
+            boolean thanhCong = KhoDuLieuThamQuan.luuKemNguon(
+                    this, db, false, idDiaDiem, maDiem, v, tenNguonMoi, urlNguonMoi);
 
             if (thanhCong) {
-                boolean nguonThanhCong = luuNguonRiengCuaDiem(
-                        db, idDiaDiem, maDiem, tenNguonMoi, urlNguonMoi
-                );
-                if (nguonThanhCong) {
-                    thongBao(idDangSua < 0
-                            ? "Đã thêm điểm tham quan"
-                            : "Đã cập nhật điểm tham quan");
-                } else {
-                    thongBao("Đã lưu điểm, nhưng chưa lưu được nguồn riêng");
-                }
+                thongBao(getString(R.string.luu_diem_thanh_cong));
                 hienDanhSach();
 
             } else {
@@ -1092,43 +1056,6 @@ public class QuanLyDiemThamQuanActivity
         } catch (Exception e) {
             Log.e(TAG, "Loi tai nguon diem", e);
             thongBao("Không tải được nguồn riêng của điểm");
-        }
-    }
-
-    private boolean luuNguonRiengCuaDiem(
-            SQLiteDatabase db, int diaDiemId, int diemId, String ten, String url) {
-        String ma = maNguonDiem(diaDiemId, diemId);
-        db.beginTransaction();
-        try {
-            PhienDangNhap.yeuCauQuanTri(this, db);
-            String[] lienKet = {String.valueOf(diaDiemId), String.valueOf(diemId), ma};
-            if (ten.isEmpty() && url.isEmpty()) {
-                // Chi bo LIEN KET nguon do admin tao cho diem nay.
-                // Khong xoa cac nguon khac cua diem.
-                db.delete("bai_nguon", "dia_diem_id=? AND diem_id=? AND ma_nguon=?", lienKet);
-            } else {
-                ContentValues n = new ContentValues();
-                n.put("ma", ma);
-                n.put("ten", ten);
-                n.put("url", url);
-                n.put("co_quan", ten);
-                if (db.insertWithOnConflict("nguon_thong_tin", null,
-                        n, SQLiteDatabase.CONFLICT_REPLACE) == -1) return false;
-                ContentValues b = new ContentValues();
-                b.put("dia_diem_id", diaDiemId);
-                b.put("diem_id", diemId);
-                b.put("ma_nguon", ma);
-                b.put("thu_tu", 999);
-                if (db.insertWithOnConflict("bai_nguon", null,
-                        b, SQLiteDatabase.CONFLICT_REPLACE) == -1) return false;
-            }
-            db.setTransactionSuccessful();
-            return true;
-        } catch (Exception e) {
-            Log.e(TAG, "Loi luu nguon diem", e);
-            return false;
-        } finally {
-            db.endTransaction();
         }
     }
 

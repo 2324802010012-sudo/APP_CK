@@ -41,7 +41,8 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                     ketQua -> {
                         if (ketQua.getResultCode() == RESULT_OK && PhienDangNhap.daDangNhap(this)) {
                             try (AppDatabase db = new AppDatabase(this)) {
-                                db.datYeuThich(PhienDangNhap.id(this), viTri, true);
+                                if(!db.datYeuThich(PhienDangNhap.id(this), viTri, true))
+                                    throw new IllegalStateException("Không lưu được yêu thích");
                                 capNhatYeuThich();
                             } catch (Exception e) {
                                 Toast.makeText(this, "Không thể lưu địa điểm. Vui lòng thử lại.",
@@ -352,11 +353,9 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
             // Ảnh của điểm tham quan
             ImageView anh = new ImageView(this);
 
-            int anhDiem = getResources().getIdentifier(diem.tenAnh == null ? "" : diem.tenAnh,
-                    "drawable", getPackageName());
-            if (anhDiem != 0) {
-                // Ưu tiên ảnh riêng của điểm tham quan hiện có.
-                anh.setImageResource(anhDiem);
+            android.graphics.Bitmap anhDiem = AnhDiaDiem.doc(this, diem.tenAnh);
+            if (anhDiem != null) {
+                anh.setImageBitmap(anhDiem);
             } else {
                 // Không có ảnh riêng: sử dụng ảnh chính đã được lưu.
                 AnhDiaDiem.hien(anh, diaDiem.tenAnh);
@@ -521,11 +520,15 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                     viTri
             );
 
-            db.datYeuThich(
+            if(!db.datYeuThich(
                     id,
                     viTri,
                     !daLuu
-            );
+            )) throw new IllegalStateException("Không cập nhật được yêu thích");
+        } catch(Exception e) {
+            Log.e("ChiTietDiaDiem","Không cập nhật được yêu thích",e);
+            thongBao("Không thể lưu địa điểm. Vui lòng thử lại.");
+            return;
         }
 
         capNhatYeuThich();

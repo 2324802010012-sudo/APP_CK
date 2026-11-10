@@ -79,6 +79,10 @@ public class TaiKhoanVaYeuThichFlowTest {
     }
 
     @Test public void welcomeCoHaiDuongVaoVaHuyDangNhapQuayVeWelcome() {
+        // Nút Bắt đầu bật GPS; ca này kiểm tra điều hướng, không kiểm tra hộp xin quyền hệ thống.
+        android.app.UiAutomation ui=InstrumentationRegistry.getInstrumentation().getUiAutomation();
+        ui.grantRuntimePermission(context.getPackageName(),android.Manifest.permission.ACCESS_COARSE_LOCATION);
+        ui.grantRuntimePermission(context.getPackageName(),android.Manifest.permission.ACCESS_FINE_LOCATION);
         try (ActivityScenario<WelcomeActivity> scenario = ActivityScenario.launch(WelcomeActivity.class)) {
             onView(withId(R.id.btnDangNhap)).perform(scrollTo(), click());
             onView(withId(R.id.edtTenDangNhap)).check(matches(isDisplayed()));
@@ -147,8 +151,10 @@ public class TaiKhoanVaYeuThichFlowTest {
     @Test public void yeuThichHienHueBoLuuVaDangXuatKhongLoDanhSach() throws Exception {
         long id = taoTaiKhoan(ten), idKhac = taoTaiKhoan(tenKhac);
         try (AppDatabase db = new AppDatabase(context)) {
-            db.datYeuThich(id, 2, true);
-            db.datYeuThich(idKhac, 0, true);
+            PhienDangNhap.luu(context,id,ten);
+            assertTrue(db.datYeuThich(id, 2, true));
+            PhienDangNhap.luu(context,idKhac,tenKhac);
+            assertTrue(db.datYeuThich(idKhac, 0, true));
         }
         PhienDangNhap.luu(context, id, ten);
         try (ActivityScenario<YeuThichActivity> scenario = ActivityScenario.launch(YeuThichActivity.class)) {
@@ -174,6 +180,7 @@ public class TaiKhoanVaYeuThichFlowTest {
             onView(withId(R.id.ytDangNhap)).check(matches(isDisplayed()));
             onView(withId(R.id.ytTenDiaDiem)).check(doesNotExist());
             assertFalse(PhienDangNhap.daDangNhap(context));
+            PhienDangNhap.luu(context,idKhac,tenKhac);
             try (AppDatabase db = new AppDatabase(context)) { assertTrue(db.daYeuThich(idKhac, 0)); }
         }
     }
@@ -204,7 +211,9 @@ public class TaiKhoanVaYeuThichFlowTest {
 
     @Test public void dangNhapTuChiTietTiepTucLuuVaKhongXoaDiemDaLuu() {
         long id = taoTaiKhoan(ten);
-        try (AppDatabase db = new AppDatabase(context)) { db.datYeuThich(id, 1, true); }
+        PhienDangNhap.luu(context,id,ten);
+        try (AppDatabase db = new AppDatabase(context)) { assertTrue(db.datYeuThich(id, 1, true)); }
+        PhienDangNhap.dangXuat(context);
         Intent intent = new Intent(context, ChiTietDiaDiemActivity.class).putExtra("viTriDiaDiem", 1);
         try (ActivityScenario<ChiTietDiaDiemActivity> scenario = ActivityScenario.launch(intent)) {
             onView(withId(R.id.nutTimYeuThich)).perform(click());

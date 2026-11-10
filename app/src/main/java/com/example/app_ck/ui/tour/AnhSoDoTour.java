@@ -35,14 +35,8 @@ public final class AnhSoDoTour {
 
     public static void ganAnhDaiDien(Activity activity, String tenAnh) {
         ImageView anh = activity.findViewById(R.id.tqAnhDiaDiem);
-        int id = activity.getResources().getIdentifier(tenAnh, "drawable", activity.getPackageName());
-        if (id != 0) {
-            anh.setImageResource(id);
-            anh.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        } else {
-            anh.setImageDrawable(null);
-            anh.setBackgroundColor(Color.parseColor("#EAF0E8"));
-        }
+        com.example.app_ck.ui.common.AnhDiaDiem.hien(anh,tenAnh);
+        anh.setScaleType(ImageView.ScaleType.CENTER_CROP);
     }
 
     public static void themSoDo(Activity activity, LinearLayout khung, int place, int tang,
@@ -64,9 +58,8 @@ public final class AnhSoDoTour {
         nhan.setPadding(0, dp(activity, 16), 0, dp(activity, 10));
         khung.addView(nhan);
 
-        int idAnh = tenAnh.isEmpty() ? 0 : activity.getResources().getIdentifier(
-                tenAnh, "drawable", activity.getPackageName());
-        if (idAnh == 0) {
+        Bitmap anh=com.example.app_ck.ui.common.AnhDiaDiem.doc(activity,tenAnh);
+        if (anh == null) {
             TextView thieu = new TextView(activity);
             thieu.setText("Chưa có ảnh sơ đồ. Bạn vẫn chọn điểm trong danh sách để xem và nghe thuyết minh.");
             thieu.setTextColor(Color.parseColor("#647568"));
@@ -74,7 +67,7 @@ public final class AnhSoDoTour {
             khung.addView(thieu);
             return;
         }
-        SoDoTrongTrang view = new SoDoTrongTrang(activity, idAnh, markers, idDangChon, chon);
+        SoDoTrongTrang view = new SoDoTrongTrang(activity, anh, markers, idDangChon, chon);
         SoDoThuPhongLayout.themVao(khung, view, dp(activity, place == 3 ? 440 : 385));
         TextView ghiChu = new TextView(activity);
         ghiChu.setText(markers.isEmpty()
@@ -95,12 +88,10 @@ public final class AnhSoDoTour {
         private final Bitmap anh;
         private final GestureDetector cuChi;
 
-        SoDoTrongTrang(Context context, int anhId, List<DiemThamQuan> markers,
+        SoDoTrongTrang(Context context, Bitmap bitmap, List<DiemThamQuan> markers,
                        int idDangChon, ChonDiem chon) {
             super(context);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = false;
-            anh = BitmapFactory.decodeResource(context.getResources(), anhId, options);
+            anh = bitmap;
             this.markers = markers;
             this.idDangChon = idDangChon;
             this.chon = chon;

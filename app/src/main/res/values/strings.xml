@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">APP_CK</string>
+    <string name="quan_ly_so_do">Quản lý sơ đồ và tầng/khu vực</string>
+    <string name="luu_dia_diem_thanh_cong">Đã lưu địa điểm</string>
+    <string name="luu_diem_thanh_cong">Đã lưu điểm tham quan</string>
+    <string name="thiet_lap_quan_tri">Thiết lập quản trị trên thiết bị</string>
+    <string name="thiet_lap_quan_tri_mo_ta">Thiết bị này chưa có tài khoản quản trị. Hãy nhập tài khoản đã đăng ký và mật khẩu ở trên. Tài khoản được chọn sẽ quản lý dữ liệu và tài khoản trên thiết bị này.</string>
+    <string name="thiet_lap_quan_tri_xac_nhan">Thiết lập</string>
+    <string name="thiet_lap_quan_tri_huy">Hủy</string>
+    <string name="thiet_lap_quan_tri_thanh_cong">Đã thiết lập quản trị. Đăng nhập để tiếp tục.</string>
+    <string name="thiet_lap_quan_tri_that_bai">Không thể thiết lập. Kiểm tra tài khoản, mật khẩu hoặc tài khoản quản trị đã tồn tại.</string>
 </resources>

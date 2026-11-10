@@ -21,10 +21,9 @@ public final class LuotNgheLichSu {
 
     public void batDau(Context context) {
         if (daXuLy) return;
-        daXuLy = true;
-        if (taiKhoan <= 0 || PhienDangNhap.id(context) != taiKhoan) return;
+        if (taiKhoan <= 0 || PhienDangNhap.id(context) != taiKhoan) {daXuLy=true;return;}
         try (AppDatabase db = new AppDatabase(context)) {
-            KhoLichSu.ghi(db.getWritableDatabase(), taiKhoan, diaDiem, diem, cheDo,
+            daXuLy=KhoLichSu.ghi(context, db.getWritableDatabase(), taiKhoan, diaDiem, diem, cheDo,
                     System.currentTimeMillis(), maLuot);
         } catch (Exception e) {
             android.util.Log.e("LichSuNghe", "Không lưu được lượt nghe", e);

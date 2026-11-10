@@ -131,7 +131,22 @@ public final class KhungNgheThuyetMinh {
         cheDoLichSu=cheDo;
         noiDung=ten+". "+bai;
         chu(R.id.ngheTenDiem,ten); chu(R.id.ngheNoiDung,bai);
-        chu(R.id.ngheDiaDiem,"Ảnh tổng quan · "+diaDiem);
+        boolean coAnhDiem = false;
+        if (idDiaDiem >= 0 && idDiem > 0) {
+            try (com.example.app_ck.data.local.AppDatabase helper =
+                         new com.example.app_ck.data.local.AppDatabase(activity)) {
+                com.example.app_ck.data.model.DiemThamQuan diem =
+                        com.example.app_ck.data.repository.KhoDuLieuThamQuan.lay(
+                                helper.getReadableDatabase(), idDiaDiem, idDiem);
+                android.graphics.Bitmap bitmap = diem == null ? null
+                        : com.example.app_ck.ui.common.AnhDiaDiem.doc(activity, diem.tenAnh);
+                if (bitmap != null) {
+                    anh = new android.graphics.drawable.BitmapDrawable(activity.getResources(), bitmap);
+                    coAnhDiem = true;
+                }
+            }
+        }
+        chu(R.id.ngheDiaDiem,(coAnhDiem ? "Ảnh điểm tham quan · " : "Ảnh tổng quan · ")+diaDiem);
         ImageView image=view.findViewById(R.id.ngheAnh);
         image.setImageDrawable(anh==null?null:anh.getConstantState()==null?anh:anh.getConstantState().newDrawable().mutate());
         resetDongHo();

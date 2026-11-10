@@ -1,6 +1,6 @@
 package com.example.app_ck.data.repository;
 
-import com.example.app_ck.data.local.ChuyenDoiDuLieuThamQuan;
+import com.example.app_ck.data.local.NangCapDatabase;
 import com.example.app_ck.data.model.DiemThamQuan;
 import com.example.app_ck.session.PhienDangNhap;
 
@@ -18,6 +18,40 @@ import java.util.Set;
 public final class KhoDuLieuThamQuan {
     public static final String BANG_DIEM="diem_tham_quan_chung", BANG_SO_DO="so_do_tham_quan";
     private KhoDuLieuThamQuan() {}
+
+    /** Cấp ID và lưu cả nguồn trong một transaction; thất bại thì rollback toàn bộ. */
+    public static boolean luuKemNguon(android.content.Context context, SQLiteDatabase db,
+            boolean laDiaDiem, int place, int point, ContentValues v, String tenNguon, String url) {
+        db.beginTransaction();
+        try {
+            PhienDangNhap.yeuCauQuanTri(context,db);
+            if(laDiaDiem && place<0) place=capMa(db,"dia_diem",0,
+                    Math.max(4,dem(db,"SELECT COALESCE(MAX(id),4) FROM dia_diem",null)));
+            if(!laDiaDiem && point<0) point=capMa(db,"diem",place,
+                    dem(db,"SELECT COALESCE(MAX(id),0) FROM "+BANG_DIEM+" WHERE dia_diem_id=?",new String[]{""+place}));
+            boolean ok=laDiaDiem ? luuDiaDiem(context,db,place,v) : luuDiem(context,db,place,point,v);
+            if(!ok) return false;
+            KhoNguonThongTin.luuNguonRieng(context,db,place,laDiaDiem ? 0 : point,tenNguon,url);
+            db.setTransactionSuccessful();
+            return true;
+        } catch(android.database.sqlite.SQLiteException | IllegalArgumentException ex) {
+            android.util.Log.e("SQLite","Không lưu được dữ liệu và nguồn",ex);
+            return false;
+        } finally {db.endTransaction();}
+    }
+
+    private static void ghiNhanMa(SQLiteDatabase db,String loai,int phamVi,long id) {
+        ContentValues v=new ContentValues();v.put("loai",loai);v.put("pham_vi",phamVi);v.put("gia_tri",id);
+        db.insertWithOnConflict("bo_dem_ma",null,v,SQLiteDatabase.CONFLICT_IGNORE);
+        db.execSQL("UPDATE bo_dem_ma SET gia_tri=MAX(gia_tri,?) WHERE loai=? AND pham_vi=?",new Object[]{id,loai,phamVi});
+    }
+
+    private static int capMa(SQLiteDatabase db,String loai,int phamVi,long maxHienTai) {
+        ghiNhanMa(db,loai,phamVi,maxHienTai);
+        long cu=dem(db,"SELECT gia_tri FROM bo_dem_ma WHERE loai=? AND pham_vi=?",new String[]{loai,""+phamVi});
+        if(cu>=Integer.MAX_VALUE) throw new IllegalArgumentException("Đã hết mã dữ liệu");
+        ghiNhanMa(db,loai,phamVi,cu+1);return (int)(cu+1);
+    }
 
     public static boolean coBang(SQLiteDatabase db,String ten) {
         try(Cursor c=db.rawQuery("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",new String[]{ten})) {
@@ -48,7 +82,7 @@ public final class KhoDuLieuThamQuan {
     }
 
     /** Chỉ gọi trong transaction tạo/nâng cấp. Không dùng làm đồng bộ khi mở app. */
-    public static void nangCap(SQLiteDatabase db) { ChuyenDoiDuLieuThamQuan.thucHien(db); }
+    public static void nangCap(SQLiteDatabase db) { NangCapDatabase.chuyenDoiDuLieuThamQuan(db); }
 
     public static ArrayList<DiemThamQuan> danhSach(SQLiteDatabase db,int place) {
         ArrayList<DiemThamQuan> ds=new ArrayList<>();
@@ -113,12 +147,14 @@ public final class KhoDuLieuThamQuan {
             String ten=v.getAsString("ten");
             if (ten==null || ten.trim().isEmpty()) return false;
             v.put("ten",ten.trim());
+            if(!soTuyChon(v,"vi_do",-90,90) || !soTuyChon(v,"kinh_do",-180,180)
+                    || !soTuyChon(v,"ban_kinh",0.01,100000)) return false;
             // Điểm chưa có ảnh sơ đồ vẫn xuất hiện ở danh sách cùng tầng tương ứng.
             ContentValues soDo=new ContentValues(); soDo.put("dia_diem_id",place); soDo.put("tang",v.getAsInteger("tang"));
             soDo.put("ten","Khu vực " + v.getAsInteger("tang")); soDo.put("ten_anh", "");
             db.insertWithOnConflict(BANG_SO_DO,null,soDo,SQLiteDatabase.CONFLICT_IGNORE);
             boolean thanhCong=tonTai ? capNhat(db,place,id,v)==1 : db.insert(BANG_DIEM,null,v)!=-1;
-            if (thanhCong) db.setTransactionSuccessful();
+            if (thanhCong) {ghiNhanMa(db,"diem",place,id);db.setTransactionSuccessful();}
             return thanhCong;
         } catch (android.database.sqlite.SQLiteConstraintException | IllegalArgumentException ex) { return false; }
         finally { db.endTransaction(); }
@@ -151,8 +187,9 @@ public final class KhoDuLieuThamQuan {
             if (v.getAsString("ten")==null || v.getAsString("ten").trim().isEmpty()
                     || !soHopLe(v,"vi_do",-90,90) || !soHopLe(v,"kinh_do",-180,180)
                     || (v.containsKey("ban_kinh_auto") && !soHopLe(v,"ban_kinh_auto",0.01,100000))) return false;
+            v.put("ten",v.getAsString("ten").trim());
             boolean ok=tonTai ? db.update("dia_diem",v,"id=?",new String[]{""+id})==1 : db.insert("dia_diem",null,v)!=-1;
-            if (ok) db.setTransactionSuccessful();
+            if (ok) {ghiNhanMa(db,"dia_diem",0,id);db.setTransactionSuccessful();}
             return ok;
         } catch (android.database.sqlite.SQLiteConstraintException | IllegalArgumentException ex) { return false; }
         finally { db.endTransaction(); }
@@ -165,7 +202,11 @@ public final class KhoDuLieuThamQuan {
             if (dem(db,"SELECT COUNT(*) FROM " + BANG_DIEM + " WHERE dia_diem_id=?",a)>0
                     || dem(db,"SELECT COUNT(*) FROM lich_su_nghe WHERE dia_diem_id=?",a)>0
                     || dem(db,"SELECT COUNT(*) FROM yeu_thich WHERE dia_diem_id=?",a)>0) return false;
-            if (coBang(db,"khu_vuc") && dem(db,"SELECT COUNT(*) FROM khu_vuc WHERE dia_diem_id=?",a)>0) return false;
+            // Bảng cũ chỉ là dữ liệu chuyển đổi; dọn con trước cha, không chặn xóa tour rỗng.
+            db.delete("thuyet_minh","diem_tham_quan_id IN (SELECT p.id FROM diem_tham_quan p JOIN khu_vuc k ON k.id=p.khu_vuc_id WHERE k.dia_diem_id=?)",a);
+            db.delete("diem_tham_quan","khu_vuc_id IN (SELECT id FROM khu_vuc WHERE dia_diem_id=?)",a);
+            db.delete("khu_vuc","dia_diem_id=?",a);
+            if(coBang(db,"gps_diem_tham_quan")) db.delete("gps_diem_tham_quan","dia_diem_id=?",a);
             db.delete(BANG_SO_DO,"dia_diem_id=?",a);
             if (coBang(db,"bai_nguon")) db.delete("bai_nguon","dia_diem_id=?",a);
             if (coBang(db,"ghi_chu_nguon")) db.delete("ghi_chu_nguon","dia_diem_id=?",a);
@@ -215,5 +256,8 @@ public final class KhoDuLieuThamQuan {
     }
     private static boolean soHopLe(ContentValues v,String cot,double min,double max) {
         Double n=v.getAsDouble(cot); return n!=null && Double.isFinite(n) && n>=min && n<=max;
+    }
+    private static boolean soTuyChon(ContentValues v,String cot,double min,double max) {
+        return !v.containsKey(cot) || v.get(cot)==null || soHopLe(v,cot,min,max);
     }
 }

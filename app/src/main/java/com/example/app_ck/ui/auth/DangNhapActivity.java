@@ -26,6 +26,8 @@ public class DangNhapActivity extends BaseActivity {
 
     private EditText ten;
     private EditText matKhau;
+    private final java.util.concurrent.ExecutorService tacVu=java.util.concurrent.Executors.newSingleThreadExecutor();
+    private boolean dangThietLap;
 
     private final ActivityResultLauncher<Intent> nhanTaiKhoan =
             registerForActivityResult(
@@ -56,6 +58,15 @@ public class DangNhapActivity extends BaseActivity {
 
         ten = findViewById(R.id.edtTenDangNhap);
         matKhau = findViewById(R.id.edtMatKhau);
+        findViewById(R.id.btnThietLapQuanTri).setOnClickListener(v -> {
+            if(dangThietLap) return;
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.thiet_lap_quan_tri)
+                    .setMessage(R.string.thiet_lap_quan_tri_mo_ta)
+                    .setNegativeButton(R.string.thiet_lap_quan_tri_huy,null)
+                    .setPositiveButton(R.string.thiet_lap_quan_tri_xac_nhan,(dialog,which)->thietLapQuanTri())
+                    .show();
+        });
 
         findViewById(R.id.dnQuayLai)
                 .setOnClickListener(v -> finish());
@@ -108,6 +119,40 @@ public class DangNhapActivity extends BaseActivity {
             );
         }
     }
+
+    @Override protected void onResume() {
+        super.onResume();
+        capNhatThietLapQuanTri();
+    }
+
+    private void capNhatThietLapQuanTri() {
+        try(AppDatabase h=new AppDatabase(this)) {
+            findViewById(R.id.btnThietLapQuanTri).setVisibility(h.daCoQuanTri() ? android.view.View.GONE : android.view.View.VISIBLE);
+        } catch(Exception e) {
+            android.util.Log.e("DangNhap","Không kiểm tra được quản trị",e);
+            findViewById(R.id.btnThietLapQuanTri).setVisibility(android.view.View.GONE);
+        }
+    }
+
+    private void thietLapQuanTri() {
+        if(dangThietLap) return;
+        String t=ten.getText().toString().trim(),m=matKhau.getText().toString();
+        dangThietLap=true;findViewById(R.id.btnThietLapQuanTri).setEnabled(false);
+        tacVu.execute(()->{
+            boolean ok=false;
+            try(AppDatabase h=new AppDatabase(getApplicationContext())) {ok=h.khoiTaoQuanTri(t,m);}
+            catch(Exception e) {android.util.Log.e("DangNhap","Không thiết lập được quản trị",e);}
+            final boolean thanhCong=ok;
+            runOnUiThread(()->{
+                if(isFinishing() || isDestroyed()) return;
+                dangThietLap=false;findViewById(R.id.btnThietLapQuanTri).setEnabled(true);
+                matKhau.setText("");capNhatThietLapQuanTri();
+                Toast.makeText(this,thanhCong ? R.string.thiet_lap_quan_tri_thanh_cong : R.string.thiet_lap_quan_tri_that_bai,Toast.LENGTH_LONG).show();
+            });
+        });
+    }
+
+    @Override protected void onDestroy() {tacVu.shutdown();super.onDestroy();}
 
     private void dangNhap() {
 

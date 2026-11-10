@@ -38,7 +38,8 @@ public class CaNhanVaDieuHuongTest {
         try (AppDatabase db = new AppDatabase(context)) {
             assertTrue(db.dangKy(ten, MAT_KHAU, "RECOVERY_ORIGINAL"));
             id = db.dangNhap(ten, MAT_KHAU);
-            db.datYeuThich(id, 1, true);
+            PhienDangNhap.luu(context,id,ten);
+            assertTrue(db.datYeuThich(id, 1, true));
         }
         PhienDangNhap.luu(context, id, ten);
     }
@@ -157,7 +158,13 @@ public class CaNhanVaDieuHuongTest {
             onView(withId(android.R.id.button1)).inRoot(UiKiemThu.hoiThoai()).perform(click());
             onView(withId(R.id.cnKhach)).check(matches(isDisplayed()));
             assertFalse(PhienDangNhap.daDangNhap(context));
-            try (AppDatabase db = new AppDatabase(context)) { assertTrue(db.daYeuThich(id, 1)); }
+            try (AppDatabase db = new AppDatabase(context)) {
+                assertFalse("Khách không được đọc yêu thích theo ID",db.daYeuThich(id,1));
+                try(android.database.Cursor c=db.getReadableDatabase().rawQuery(
+                        "SELECT 1 FROM yeu_thich WHERE tai_khoan_id=? AND dia_diem_id=1",new String[]{""+id})) {
+                    assertTrue("Đăng xuất không xóa dữ liệu đã lưu",c.moveToFirst());
+                }
+            }
         }
     }
 }

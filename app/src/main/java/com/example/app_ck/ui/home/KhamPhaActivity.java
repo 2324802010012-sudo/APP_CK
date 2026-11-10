@@ -109,8 +109,7 @@ public class KhamPhaActivity extends BaseActivity {
             ((TextView) the.findViewById(R.id.ytDanhMuc)).setText(d.danhMuc);
             ((TextView) the.findViewById(R.id.ytDiaChi)).setText(d.diaChi);
             the.findViewById(R.id.ytBoLuu).setVisibility(View.GONE);
-            int anh = d.tenAnh == null ? 0 : getResources().getIdentifier(d.tenAnh, "drawable", getPackageName());
-            ((ImageView) the.findViewById(R.id.ytAnhDiaDiem)).setImageResource(anh == 0 ? android.R.drawable.ic_menu_gallery : anh);
+            com.example.app_ck.ui.common.AnhDiaDiem.hien(the.findViewById(R.id.ytAnhDiaDiem),d.tenAnh);
             the.setOnClickListener(v -> startActivity(new Intent(this, ChiTietDiaDiemActivity.class).putExtra("viTriDiaDiem", d.id)));
             danhSach.addView(the); so++;
         }

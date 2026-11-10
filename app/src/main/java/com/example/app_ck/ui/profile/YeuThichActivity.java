@@ -113,9 +113,7 @@ public class YeuThichActivity extends BaseActivity {
         ((TextView) the.findViewById(R.id.ytTenDiaDiem)).setText(d.ten);
         ((TextView) the.findViewById(R.id.ytDanhMuc)).setText(d.danhMuc);
         ((TextView) the.findViewById(R.id.ytDiaChi)).setText(d.diaChi);
-        int anh = d.tenAnh == null ? 0 : getResources().getIdentifier(d.tenAnh, "drawable", getPackageName());
-        ((ImageView) the.findViewById(R.id.ytAnhDiaDiem)).setImageResource(
-                anh == 0 ? android.R.drawable.ic_menu_gallery : anh);
+        com.example.app_ck.ui.common.AnhDiaDiem.hien(the.findViewById(R.id.ytAnhDiaDiem),d.tenAnh);
         the.setOnClickListener(v -> startActivity(new Intent(this, ChiTietDiaDiemActivity.class)
                 .putExtra("viTriDiaDiem", d.id)));
         the.findViewById(R.id.ytBoLuu).setContentDescription("Bỏ yêu thích " + d.ten);
@@ -133,7 +131,8 @@ public class YeuThichActivity extends BaseActivity {
                         return;
                     }
                     try (AppDatabase db = new AppDatabase(this)) {
-                        db.datYeuThich(taiKhoan, d.id, false);
+                        if(!db.datYeuThich(taiKhoan, d.id, false))
+                            throw new IllegalStateException("Phiên hoặc địa điểm không còn hợp lệ");
                         hienThi();
                     } catch (Exception e) {
                         Toast.makeText(this, "Không thể bỏ lưu. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();

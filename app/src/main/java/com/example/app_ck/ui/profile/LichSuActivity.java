@@ -63,7 +63,7 @@ public class LichSuActivity extends BaseActivity {
         }
         chu(R.id.lsTaiKhoan, "Tài khoản: " + PhienDangNhap.ten(this));
         try (AppDatabase db = new AppDatabase(this)) {
-            ArrayList<KhoLichSu.Luot> ds = KhoLichSu.doc(db.getReadableDatabase(), PhienDangNhap.id(this));
+            ArrayList<KhoLichSu.Luot> ds = KhoLichSu.doc(this, db.getReadableDatabase(), PhienDangNhap.id(this));
             chu(R.id.lsTongSo, ds.size() + " lượt nghe · Mới nhất trước");
             findViewById(R.id.lsTrangThai).setVisibility(ds.isEmpty() ? View.VISIBLE : View.GONE);
             findViewById(R.id.lsXoaTatCa).setVisibility(ds.isEmpty() ? View.GONE : View.VISIBLE);
@@ -112,7 +112,7 @@ public class LichSuActivity extends BaseActivity {
                 .setMessage("Chỉ xóa lịch sử của tài khoản hiện tại. Các địa điểm yêu thích vẫn được giữ lại.")
                 .setPositiveButton("Xóa", (d, w) -> {
                     if (taiKhoan != PhienDangNhap.id(this)) { hienThi(); return; }
-                    try (AppDatabase db = new AppDatabase(this)) { KhoLichSu.xoa(db.getWritableDatabase(), taiKhoan, id); }
+                    try (AppDatabase db = new AppDatabase(this)) { KhoLichSu.xoa(this, db.getWritableDatabase(), taiKhoan, id); }
                     catch (Exception e) { Toast.makeText(this, "Không xóa được lịch sử. Hãy thử lại.", Toast.LENGTH_SHORT).show(); }
                     hienThi();
                 }).setNegativeButton("Hủy", null).show();

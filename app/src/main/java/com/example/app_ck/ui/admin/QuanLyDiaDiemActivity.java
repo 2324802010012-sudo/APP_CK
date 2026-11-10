@@ -805,24 +805,6 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
 
             int targetId = id;
 
-            if (targetId < 0) {
-                try (
-                        Cursor c = db.rawQuery(
-                                "SELECT COALESCE(MAX(id), -1) + 1 " +
-                                        "FROM dia_diem",
-                                null
-                        )
-                ) {
-                    if (!c.moveToFirst()) {
-                        throw new IllegalStateException(
-                                "Không xác định được ID"
-                        );
-                    }
-
-                    targetId = c.getInt(0);
-                }
-            }
-
             // Sao chep anh tu may vao bo nho rieng
             if (anhMoi != null) {
                 newName = AnhDiaDiem.luuTuMay(
@@ -846,27 +828,11 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
             v.put("kinh_do", lon);
             v.put("ten_anh", newName);
 
-            boolean saved =
-                    KhoDuLieuThamQuan.luuDiaDiem(
-                            this,
-                            db,
-                            targetId,
-                            v
-                    );
+            boolean saved = KhoDuLieuThamQuan.luuKemNguon(
+                    this, db, true, targetId, 0, v, nguonTen, nguonUrl);
 
             if (saved) {
-                boolean nguonOk = luuNguon(
-                        db,
-                        targetId,
-                        nguonTen,
-                        nguonUrl
-                );
-
-                thongBao(
-                        nguonOk
-                                ? "Đã lưu địa điểm"
-                                : "Đã lưu địa điểm, nhưng không lưu được nguồn"
-                );
+                thongBao(getString(R.string.luu_dia_diem_thanh_cong));
 
                 dongBieuMau();
                 taiDuLieu();
@@ -893,68 +859,6 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     // =====================================================
     // LUU NGUON THONG TIN
     // =====================================================
-
-    private boolean luuNguon(
-            SQLiteDatabase db,
-            int diaDiemId,
-            String ten,
-            String url
-    ) {
-        if (ten.isEmpty() && url.isEmpty()) {
-            return true;
-        }
-
-        String ma = "admin_dd_" + diaDiemId;
-
-        db.beginTransaction();
-
-        try {
-            PhienDangNhap.yeuCauQuanTri(this, db);
-
-            ContentValues n = new ContentValues();
-
-            n.put("ma", ma);
-            n.put("ten", ten);
-            n.put("url", url);
-            n.put("co_quan", ten);
-
-            db.insertWithOnConflict(
-                    "nguon_thong_tin",
-                    null,
-                    n,
-                    SQLiteDatabase.CONFLICT_REPLACE
-            );
-
-            ContentValues b = new ContentValues();
-
-            b.put("dia_diem_id", diaDiemId);
-            b.put("diem_id", 0);
-            b.put("ma_nguon", ma);
-            b.put("thu_tu", 999);
-
-            db.insertWithOnConflict(
-                    "bai_nguon",
-                    null,
-                    b,
-                    SQLiteDatabase.CONFLICT_REPLACE
-            );
-
-            db.setTransactionSuccessful();
-            return true;
-
-        } catch (Exception e) {
-            android.util.Log.e(
-                    "APP_CK_DIA_DIEM",
-                    "Khong luu duoc nguon",
-                    e
-            );
-
-            return false;
-
-        } finally {
-            db.endTransaction();
-        }
-    }
 
     // =====================================================
     // XOA DIA DIEM

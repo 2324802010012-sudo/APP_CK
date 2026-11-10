@@ -39,6 +39,7 @@ public final class KhoTaiKhoan {
     }
 
     public String doiMatKhauDaDangNhap(long id, String matKhauCu, String matKhauMoi) {
+        if(matKhauCu==null || matKhauMoi==null) return null;
         if (!PhienDangNhap.coQuyenHoSo(context,helper.getReadableDatabase(),id,false)) return null;
         if (id <= 0 || matKhauMoi.length() < 8 || matKhauMoi.equals(matKhauCu)) return null;
         try (Cursor c = helper.getReadableDatabase().query("tai_khoan", new String[]{"muoi","mat_khau_bam"},
@@ -82,6 +83,7 @@ public final class KhoTaiKhoan {
     }
 
     public boolean dangKy(String ten, String matKhau, String maKhoiPhuc) {
+        if(!hopLeDangKy(ten,matKhau) || maKhoiPhuc==null || maKhoiPhuc.trim().isEmpty()) return false;
         try {
             byte[] salt = muoiMoi();
             ContentValues cv = new ContentValues();
@@ -97,6 +99,7 @@ public final class KhoTaiKhoan {
     }
 
     public boolean dangKy(String ten, String matKhau) {
+        if(!hopLeDangKy(ten,matKhau)) return false;
         try {
             byte[] salt = muoiMoi(); ContentValues cv = new ContentValues();
             cv.put("ten_dang_nhap", chuanHoa(ten));
@@ -107,6 +110,32 @@ public final class KhoTaiKhoan {
             cv.put("mat_khau_bam", bam(matKhau, salt));
             return helper.getWritableDatabase().insert("tai_khoan", null, cv) != -1;
         } catch (Exception ex) { return false; }
+    }
+
+    private boolean hopLeDangKy(String ten,String matKhau) {
+        return ten!=null && !ten.trim().isEmpty() && ten.trim().length()<=80
+                && matKhau!=null && matKhau.length()>=8;
+    }
+
+    public boolean daCoQuanTri() {
+        try(Cursor c=helper.getReadableDatabase().rawQuery("SELECT 1 FROM tai_khoan WHERE vai_tro='ADMIN' LIMIT 1",null)) {
+            return c.moveToFirst();
+        }
+    }
+
+    /** Thiết lập có chủ đích trên máy chưa có ADMIN, xác thực lại bằng mật khẩu. */
+    public boolean khoiTaoQuanTri(String ten,String matKhau) {
+        if(ten==null || matKhau==null) return false;
+        android.database.sqlite.SQLiteDatabase db=helper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            if(daCoQuanTri()) return false;
+            long id=dangNhap(ten,matKhau);
+            if(id<=0) return false;
+            ContentValues v=new ContentValues();v.put("vai_tro",HoSoTaiKhoan.ADMIN);
+            if(db.update("tai_khoan",v,"id=? AND trang_thai='ACTIVE' AND vai_tro='USER'",new String[]{""+id})!=1) return false;
+            db.setTransactionSuccessful();return true;
+        } finally {db.endTransaction();}
     }
 
     public boolean taiKhoanBiKhoa(String ten, String matKhau) {
@@ -154,6 +183,7 @@ public final class KhoTaiKhoan {
     }
 
     public String doiMatKhauBangMa(String ten, String maKhoiPhuc, String matKhauMoi) {
+        if(ten==null || maKhoiPhuc==null || matKhauMoi==null) return null;
         if (matKhauMoi.length() < 8 || maKhoiPhuc.trim().isEmpty()) return null;
         try (Cursor c = helper.getReadableDatabase().query("tai_khoan", new String[]{"id","muoi","ma_khoi_phuc_bam"}, "ten_dang_nhap=? AND trang_thai='ACTIVE'", new String[]{chuanHoa(ten)},null,null,null)) {
             if (!c.moveToFirst() || c.isNull(2)) return null;
@@ -172,6 +202,7 @@ public final class KhoTaiKhoan {
     }
 
     public boolean capNhatMaKhoiPhuc(long id, String matKhauHienTai, String maMoi) {
+        if(matKhauHienTai==null || maMoi==null || maMoi.trim().isEmpty()) return false;
         if (!PhienDangNhap.coQuyenHoSo(context,helper.getReadableDatabase(),id,false)) return false;
         try (Cursor c = helper.getReadableDatabase().query("tai_khoan",new String[]{"muoi","mat_khau_bam"},"id=? AND trang_thai='ACTIVE'",new String[]{String.valueOf(id)},null,null,null)) {
             if (!c.moveToFirst()) return false;

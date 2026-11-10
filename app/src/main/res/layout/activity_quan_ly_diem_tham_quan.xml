@@ -17,6 +17,8 @@
     </LinearLayout>
     <LinearLayout android:id="@+id/dtKhungDanhSach" android:layout_width="match_parent"
         android:layout_height="match_parent" android:orientation="vertical" android:paddingHorizontal="18dp">
+        <Button android:id="@+id/dtQuanLySoDo" android:layout_width="match_parent"
+            android:layout_height="48dp" android:text="@string/quan_ly_so_do" android:textAllCaps="false" />
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="ĐỊA ĐIỂM DU LỊCH CHÍNH" android:textSize="12sp" android:textStyle="bold"
             android:textColor="#2C7351" />

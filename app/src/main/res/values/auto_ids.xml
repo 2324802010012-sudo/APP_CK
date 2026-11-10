@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- HuongDanTour assigns these IDs to the shared layouts for the Con Dao tour. -->
+    <item name="conDaoCheDo" type="id" />
+    <item name="conDaoBatAuto" type="id" />
+    <item name="conDaoTrangThai" type="id" />
+    <item name="conDaoBuocDemo" type="id" />
+    <item name="conDaoDemo" type="id" />
+    <item name="conDaoGps" type="id" />
+</resources>

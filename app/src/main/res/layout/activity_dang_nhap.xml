@@ -147,6 +147,20 @@
             android:clickable="true"
             android:focusable="true"/>
 
+        <TextView
+            android:id="@+id/btnThietLapQuanTri"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="@string/thiet_lap_quan_tri"
+            android:textColor="#4F7C5A"
+            android:textSize="14sp"
+            android:visibility="gone"
+            android:clickable="true"
+            android:focusable="true" />
+
         <!-- PHAN TRANG TRI -->
         <TextView
             android:layout_width="match_parent"

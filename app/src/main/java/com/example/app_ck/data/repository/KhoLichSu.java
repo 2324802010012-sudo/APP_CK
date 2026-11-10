@@ -14,6 +14,31 @@ public final class KhoLichSu {
     public static final String THU_CONG = MANUAL, AUTO_GPS = "AUTO_GPS";
     private KhoLichSu() {}
 
+    public static boolean ghi(android.content.Context context, SQLiteDatabase db, long taiKhoan,
+            int diaDiem, int diem, String cheDo, long thoiGian, String maLuot) {
+        db.beginTransaction();
+        try {
+            if(!com.example.app_ck.session.PhienDangNhap.coQuyenHoSo(context,db,taiKhoan,false)) return false;
+            boolean ok=ghi(db,taiKhoan,diaDiem,diem,cheDo,thoiGian,maLuot);
+            if(ok) db.setTransactionSuccessful();
+            return ok;
+        } finally {db.endTransaction();}
+    }
+
+    public static ArrayList<Luot> doc(android.content.Context context,SQLiteDatabase db,long taiKhoan) {
+        if(!com.example.app_ck.session.PhienDangNhap.coQuyenHoSo(context,db,taiKhoan,false)) return new ArrayList<>();
+        return doc(db,taiKhoan);
+    }
+
+    public static void xoa(android.content.Context context,SQLiteDatabase db,long taiKhoan,Long id) {
+        db.beginTransaction();
+        try {
+            if(!com.example.app_ck.session.PhienDangNhap.coQuyenHoSo(context,db,taiKhoan,false))
+                throw new SecurityException("Chỉ được xóa lịch sử của phiên hiện tại");
+            xoa(db,taiKhoan,id);db.setTransactionSuccessful();
+        } finally {db.endTransaction();}
+    }
+
     public static void taoBang(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS lich_su_nghe (id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "tai_khoan_id INTEGER NOT NULL, dia_diem_id INTEGER NOT NULL, diem_id INTEGER, "
@@ -52,6 +77,8 @@ public final class KhoLichSu {
         return cheDo;
     }
 
+    /** API dữ liệu mức thấp cho migration/fixture; UI phải dùng bản có Context. */
+    @Deprecated
     public static boolean ghi(SQLiteDatabase db, long taiKhoan, int diaDiem, int diem,
             String cheDo, long thoiGian, String maLuot) {
         cheDo = chuanHoaCheDo(cheDo, diem);
@@ -88,6 +115,7 @@ public final class KhoLichSu {
         }
     }
 
+    @Deprecated
     public static ArrayList<Luot> doc(SQLiteDatabase db, long taiKhoan) {
         ArrayList<Luot> ds = new ArrayList<>();
         if (taiKhoan <= 0) return ds;
@@ -102,6 +130,7 @@ public final class KhoLichSu {
         return ds;
     }
 
+    @Deprecated
     public static void xoa(SQLiteDatabase db, long taiKhoan, Long id) {
         if (taiKhoan <= 0) return;
         db.delete("lich_su_nghe", "tai_khoan_id=?" + (id == null ? "" : " AND id=?"),

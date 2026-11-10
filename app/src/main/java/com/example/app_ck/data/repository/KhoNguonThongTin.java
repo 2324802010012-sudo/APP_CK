@@ -13,6 +13,31 @@ import java.util.List;
 public final class KhoNguonThongTin {
     private KhoNguonThongTin() {}
 
+    /** Cùng transaction với địa điểm/điểm, không REPLACE hàng cha đang có FK. */
+    public static void luuNguonRieng(android.content.Context context, SQLiteDatabase db,
+            int place, int point, String ten, String url) {
+        com.example.app_ck.session.PhienDangNhap.yeuCauQuanTri(context,db);
+        String t=ten==null ? "" : ten.trim(), u=url==null ? "" : url.trim();
+        if ((!t.isEmpty() || !u.isEmpty()) && (t.isEmpty() || !u.matches("(?i)^https?://[^\\s]+$")))
+            throw new IllegalArgumentException("Tên nguồn và URL không hợp lệ");
+        String ma=point==0 ? "admin_dd_"+place : "admin_diem_"+place+"_"+point;
+        String[] a={""+place,""+point,ma};
+        if(t.isEmpty()) {
+            db.delete("bai_nguon","dia_diem_id=? AND diem_id=? AND ma_nguon=?",a);
+            db.delete("nguon_thong_tin","ma=? AND NOT EXISTS(SELECT 1 FROM bai_nguon WHERE ma_nguon=?)",new String[]{ma,ma});
+            return;
+        }
+        ContentValues n=new ContentValues();n.put("ten",t);n.put("url",u);n.put("co_quan",t);
+        if(db.update("nguon_thong_tin",n,"ma=?",new String[]{ma})==0) {
+            n.put("ma",ma);db.insertOrThrow("nguon_thong_tin",null,n);
+        }
+        ContentValues b=new ContentValues();b.put("thu_tu",999);
+        if(db.update("bai_nguon",b,"dia_diem_id=? AND diem_id=? AND ma_nguon=?",a)==0) {
+            b.put("dia_diem_id",place);b.put("diem_id",point);b.put("ma_nguon",ma);
+            db.insertOrThrow("bai_nguon",null,b);
+        }
+    }
+
     public static final class Nguon {
         public final String ten, url, coQuan;
         public Nguon(String ten, String url, String coQuan) {

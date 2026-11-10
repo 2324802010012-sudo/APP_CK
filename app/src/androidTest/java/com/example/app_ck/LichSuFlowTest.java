@@ -197,7 +197,7 @@ public class LichSuFlowTest {
                 assertFalse(moTong.getBooleanExtra(ChiTietDiaDiemActivity.PHAT_TU_VI_TRI,false));
                 KhoLichSu.ghi(db.getWritableDatabase(),a,i,cuoi[i],KhoLichSu.THU_CONG,100+i,"diem"+i);
                 Intent moDiem=LichSuActivity.taoIntentMoLai(context,doc(a).get(0));
-                assertEquals("com.example.app_ck."+lop[i],moDiem.getComponent().getClassName());
+                assertEquals("com.example.app_ck.ui.tour."+lop[i],moDiem.getComponent().getClassName());
                 assertEquals(cuoi[i],moDiem.getIntExtra("idMarker",-1));
             }
         }
@@ -230,7 +230,7 @@ public class LichSuFlowTest {
                     s.onActivity(x -> {
                         try {
                             Object hd=truong(x,"huongDan");
-                            Field mode=hd.getClass().getDeclaredField("cheDo"); mode.setAccessible(true); mode.setInt(hd,trangThai);
+                            Field mode=com.example.app_ck.location.HuongDanTour.class.getDeclaredField("cheDo"); mode.setAccessible(true); mode.setInt(hd,trangThai);
                             boolean ok=x instanceof DaiNoiHueThamQuanActivity
                                     ? ((DaiNoiHueThamQuanActivity)x).phatDiemTuDong(1)
                                     : x instanceof ConDaoThamQuanActivity

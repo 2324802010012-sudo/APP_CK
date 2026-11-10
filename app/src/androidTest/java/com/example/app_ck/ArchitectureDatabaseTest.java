@@ -56,7 +56,7 @@ public class ArchitectureDatabaseTest {
     @Test public void freshInstallSeedsAllToursAndNoAdminAccount() {
         try(AppDatabase helper=new AppDatabase(context)) {
             SQLiteDatabase db=helper.getWritableDatabase();
-            assertEquals(15,db.getVersion()); assertEquals(5,count(db,"SELECT COUNT(*) FROM dia_diem"));
+            assertEquals(AppDatabase.VERSION,db.getVersion()); assertEquals(5,count(db,"SELECT COUNT(*) FROM dia_diem"));
             int total=0;
             for(BaiThuyetMinh seed:DuLieuNoiDungThamQuan.DIA_DIEM) {
                 assertEquals(seed.noiDung(),KhoNoiDungThamQuan.lay(db,seed.id,0).noiDung());
@@ -76,8 +76,10 @@ public class ArchitectureDatabaseTest {
             assertTrue(helper.dangKy("old_user","password123","recovery-code"));
             user=helper.dangNhap("old_user","password123");
             credentials=text(db,"SELECT muoi||':'||mat_khau_bam||':'||ma_khoi_phuc_bam FROM tai_khoan WHERE id="+user);
+            PhienDangNhap.luu(context,user,"old_user");
             helper.datYeuThich(user,2,true);
             assertTrue(KhoLichSu.ghi(db,user,2,1,KhoLichSu.MANUAL,100,"old-listen"));
+            db.setForeignKeyConstraintsEnabled(false);
             db.execSQL("DROP TABLE diem_tham_quan_chung"); db.execSQL("DROP TABLE so_do_tham_quan");
             db.execSQL("INSERT INTO khu_vuc VALUES(91,0,'Tầng tùy chỉnh',9,'custom_floor_image')");
             db.execSQL("INSERT INTO diem_tham_quan(id,khu_vuc_id,ten,mo_ta,toa_do_x,toa_do_y,ten_anh) VALUES(91,91,'Điểm riêng Dinh','Mô tả riêng',0.123,0.789,'custom_photo')");
@@ -177,7 +179,7 @@ public class ArchitectureDatabaseTest {
         }
         try(AppDatabase helper=new AppDatabase(context)) {
             SQLiteDatabase db=helper.getReadableDatabase();
-            assertEquals(15,db.getVersion()); assertEquals("Điểm chờ nhập",KhoDuLieuThamQuan.lay(db,0,91).ten);
+            assertEquals(AppDatabase.VERSION,db.getVersion()); assertEquals("Điểm chờ nhập",KhoDuLieuThamQuan.lay(db,0,91).ten);
         }
     }
 

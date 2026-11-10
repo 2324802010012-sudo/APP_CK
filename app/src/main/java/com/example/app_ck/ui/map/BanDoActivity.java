@@ -498,9 +498,7 @@ public class BanDoActivity extends BaseActivity {
 
         viTriDaChon = chiSo;
 
-        anhDiaDiemBanDo.setImageResource(
-                ANH_DIA_DIEM[chiSo]
-        );
+        com.example.app_ck.ui.common.AnhDiaDiem.hien(anhDiaDiemBanDo,TEN_ANH[chiSo]);
 
         tenDiaDiem.setText(
                 TEN_DIA_DIEM[chiSo]

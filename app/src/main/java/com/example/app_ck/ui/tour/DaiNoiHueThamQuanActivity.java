@@ -192,8 +192,8 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanT
         tieuDe.setPadding(dp(3), dp(12), dp(3), dp(12));
         khungDanhSach.addView(tieuDe);
 
-        int anh = getResources().getIdentifier(tenAnhSoDo, "drawable", getPackageName());
-        if (anh == 0) {
+        Bitmap anh=com.example.app_ck.ui.common.AnhDiaDiem.doc(this,tenAnhSoDo);
+        if (anh == null) {
             TextView thieuAnh = new TextView(this);
             thieuAnh.setText("Chưa có ảnh sơ đồ. Bạn vẫn chọn điểm trong danh sách để xem và nghe thuyết minh.");
             thieuAnh.setTextSize(13);
@@ -334,11 +334,9 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanT
         private float xTruoc, yTruoc, xBanDau, yBanDau;
         private boolean daKeo, daDaChamHaiNgon;
 
-        SoDoView(Context context, int anhId) {
+        SoDoView(Context context, Bitmap bitmap) {
             super(context);
-            BitmapFactory.Options tuyChonAnh = new BitmapFactory.Options();
-            tuyChonAnh.inScaled = false;
-            anh = BitmapFactory.decodeResource(getResources(), anhId, tuyChonAnh);
+            anh = bitmap;
             matDo = getResources().getDisplayMetrics().density;
             nguongKeo = ViewConfiguration.get(context).getScaledTouchSlop();
             boThuPhong = new ScaleGestureDetector(context,

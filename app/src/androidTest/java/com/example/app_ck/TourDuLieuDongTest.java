@@ -175,7 +175,7 @@ public class TourDuLieuDongTest {
     }
 
     private View timNhan(View root, String text) {
-        if (root instanceof TextView && text.contentEquals(((TextView) root).getText())) return root;
+        if (root instanceof TextView && text.equals(((TextView) root).getText().toString().split("\n",2)[0])) return root;
         if (root instanceof ViewGroup) {
             ViewGroup group = (ViewGroup) root;
             for (int i = 0; i < group.getChildCount(); i++) {
