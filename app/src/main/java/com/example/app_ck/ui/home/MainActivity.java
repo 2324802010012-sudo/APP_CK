@@ -9,6 +9,7 @@ import com.example.app_ck.ui.map.BanDoActivity;
 import com.example.app_ck.ui.place.ChiTietDiaDiemActivity;
 import com.example.app_ck.ui.profile.LichSuActivity;
 import com.example.app_ck.ui.profile.YeuThichActivity;
+import com.example.app_ck.session.PhienDangNhap;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -75,7 +76,16 @@ public class MainActivity extends BaseActivity {
 
     private TextView thongBaoViTri;
     private LinearLayout danhSachGanToi;
+    private final android.os.Handler boDemNoiBat =
+            new android.os.Handler(
+                    android.os.Looper.getMainLooper()
+            );
 
+    private Runnable tacVuCuonNoiBat;
+
+    private long lanChamNoiBat = 0;
+
+    private boolean cuonSangPhai = true;
     private final ActivityResultLauncher<String[]> xinQuyenViTri =
             registerForActivityResult(
                     new ActivityResultContracts.RequestMultiplePermissions(),
@@ -131,20 +141,14 @@ public class MainActivity extends BaseActivity {
             return;
         }
 // CAP NHAT ANH VA TEN CUA 5 THE TU SQLITE
-        capNhatTheDiaDiemTuSQLite();
-        taoTheDaiNoiHue();
-        taoCacTheBoSung();
+        taoTheNoiBat();
 
         khoiTaoThuyetMinh();
 
-        // KHOI TAO CAC CHUC NANG TRANG CHU
+// KHOI TAO CAC CHUC NANG TRANG CHU
         xuLyTimKiem();
         xuLyChucNang();
-        xuLyDiaDiem();
         xuLyDieuHuong();
-        xuLyDanhMuc();
-        xuLyDiaDiemGoiY();
-        xuLyDiaDiemGanToi();
 
         // AN THANH DIEU HUONG SAMSUNG
         WindowInsetsControllerCompat controller =
@@ -283,7 +287,15 @@ public class MainActivity extends BaseActivity {
                 .setItems(danhSach, (dialog, viTri) -> moChiTiet(maKetQua[viTri]))
                 .setNegativeButton("Đóng", null).show();
     }
+    @Override
+    protected void onPause() {
 
+        if (tacVuCuonNoiBat != null) {
+            boDemNoiBat.removeCallbacks(tacVuCuonNoiBat);
+        }
+
+        super.onPause();
+    }
     private void moChiTiet(int viTri) {
         if (viTriTheoId(viTri) < 0) return;
         Intent intent = new Intent(this, ChiTietDiaDiemActivity.class);
@@ -294,43 +306,28 @@ public class MainActivity extends BaseActivity {
     // XU LY CAC CHUC NANG CHINH
     private void xuLyChucNang() {
 
-        ganSuKien(R.id.nutTaiKhoan, () ->
-                hienThiMenuTaiKhoan());
-        ganSuKien(R.id.nutLichSu, () -> startActivity(new Intent(this, LichSuActivity.class)));
-
-
+        // Mo menu tai khoan
         ganSuKien(
-                R.id.nutBanDo,
-                () -> {
-                    Intent intent = new Intent(
-                            MainActivity.this,
-                            BanDoActivity.class
-                    );
-
-                    startActivity(intent);
-                }
-        );
-        ganSuKien(
-                R.id.nutThuyetMinh,
-                this::hienThiDanhSachThuyetMinh
-        );
-        ganSuKien(
-                R.id.nutYeuThich,
-                () -> {
-                    Intent intent = new Intent(
-                            MainActivity.this,
-                            YeuThichActivity.class
-                    );
-
-                    startActivity(intent);
-                }
+                R.id.nutTaiKhoan,
+                this::hienThiMenuTaiKhoan
         );
 
-
-        ganSuKien(R.id.nutXemTatCa, () ->
-                hienThiDanhSachDiaDiem());
-
-        ganSuKien(R.id.nutTraiNghiem, this::hienThiDanhSachThuyetMinh);
+        // Mo man hinh Kham pha
+        ganSuKien(
+                R.id.nutXemTatCa,
+                () -> startActivity(
+                        new Intent(
+                                MainActivity.this,
+                                KhamPhaActivity.class
+                        )
+                )
+        );
+        ganSuKien(
+                R.id.nutTraiNghiem,
+                () -> startActivity(
+                        new Intent(this, KhamPhaActivity.class)
+                )
+        );
     }
 
     // XU LY CHON DIA DIEM NOI BAT
@@ -996,18 +993,238 @@ public class MainActivity extends BaseActivity {
     }
 
     private void lamMoiDiaDiem() {
-        if (!taiDiaDiemTuSQLite()) return;
-        for (View card : cacTheTaoDong) {
-            if (card.getParent() instanceof ViewGroup) ((ViewGroup) card.getParent()).removeView(card);
+
+        if (!taiDiaDiemTuSQLite()) {
+            return;
         }
-        cacTheTaoDong.clear();
-        theDiaDiem.clear();
-        diaDiemDaiNoi = null;
-        capNhatTheDiaDiemTuSQLite();
-        taoTheDaiNoiHue();
-        taoCacTheBoSung();
-        locDiaDiemTheoDanhMuc(danhMucDangChon);
-        if (viTriGanToiCuoi != null && danhSachGanToi != null) hienThiDiaDiemGanToi(viTriGanToiCuoi);
+
+        taoTheNoiBat();
+    }
+
+    private void hienThiTiepTucThamQuan() {
+
+        View khung = findViewById(
+                R.id.khungTiepTucThamQuan
+        );
+
+        if (khung == null) return;
+
+        // Mac dinh an neu chua co lich su.
+        khung.setVisibility(View.GONE);
+
+        if (!PhienDangNhap.daDangNhap(this)) {
+            return;
+        }
+
+        try (AppDatabase db = new AppDatabase(this)) {
+
+            ArrayList<KhoLichSu.Luot> danhSach =
+                    KhoLichSu.doc(
+                            this,
+                            db.getReadableDatabase(),
+                            PhienDangNhap.id(this)
+                    );
+
+            KhoLichSu.Luot luotGanNhat = null;
+
+            for (KhoLichSu.Luot luot : danhSach) {
+
+                if (viTriTheoId(luot.diaDiem) >= 0) {
+                    luotGanNhat = luot;
+                    break;
+                }
+            }
+
+            if (luotGanNhat == null) {
+                return;
+            }
+
+            int viTri = viTriTheoId(
+                    luotGanNhat.diaDiem
+            );
+
+            DiaDiem diaDiem = duLieuDiaDiem[viTri];
+
+            if (diaDiem == null) return;
+
+            ImageView anh = findViewById(
+                    R.id.anhTiepTucThamQuan
+            );
+
+            TextView ten = findViewById(
+                    R.id.tenTiepTucThamQuan
+            );
+
+            TextView moTa = findViewById(
+                    R.id.moTaTiepTucThamQuan
+            );
+
+            AnhDiaDiem.hien(
+                    anh,
+                    diaDiem.tenAnh
+            );
+
+            ten.setText(diaDiem.ten);
+
+            moTa.setText(
+                    luotGanNhat.diem > 0
+                            ? "Đã nghe: " + luotGanNhat.tenDiem
+                            : "Đã nghe giới thiệu địa điểm"
+            );
+
+            final KhoLichSu.Luot luotMoLai = luotGanNhat;
+
+            findViewById(
+                    R.id.theTiepTucThamQuan
+            ).setOnClickListener(v -> {
+
+                try {
+
+                    startActivity(
+                            LichSuActivity.taoIntentMoLai(
+                                    this,
+                                    luotMoLai
+                            )
+                    );
+
+                } catch (Exception e) {
+
+                    Toast.makeText(
+                            this,
+                            "Không thể mở lại điểm tham quan.",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
+
+            khung.setVisibility(View.VISIBLE);
+
+        } catch (Exception e) {
+
+            android.util.Log.e(
+                    "TRANG_CHU",
+                    "Khong tai duoc lich su tham quan",
+                    e
+            );
+        }
+    }
+
+    private void batTuCuonNoiBat() {
+
+        android.widget.HorizontalScrollView cuon =
+                findViewById(R.id.cuonNoiBat);
+
+        LinearLayout danhSach =
+                findViewById(R.id.danhSachNoiBat);
+
+        if (cuon == null || danhSach == null) {
+            return;
+        }
+
+        // Huy lich cu de khong chay trung.
+        if (tacVuCuonNoiBat != null) {
+            boDemNoiBat.removeCallbacks(tacVuCuonNoiBat);
+        }
+
+        // Ghi nhan khi nguoi dung tuong tac.
+        View.OnTouchListener khiCham = (v, event) -> {
+
+            int hanhDong = event.getActionMasked();
+
+            if (hanhDong == android.view.MotionEvent.ACTION_DOWN
+                    || hanhDong == android.view.MotionEvent.ACTION_MOVE
+                    || hanhDong == android.view.MotionEvent.ACTION_UP) {
+
+                lanChamNoiBat =
+                        android.os.SystemClock.uptimeMillis();
+            }
+
+            // Khong chan thao tac vuot hoac bam vao the.
+            return false;
+        };
+
+        cuon.setOnTouchListener(khiCham);
+
+        for (int i = 0; i < danhSach.getChildCount(); i++) {
+            danhSach.getChildAt(i)
+                    .setOnTouchListener(khiCham);
+        }
+
+        tacVuCuonNoiBat = new Runnable() {
+
+            @Override
+            public void run() {
+
+                if (isFinishing()
+                        || !cuon.isAttachedToWindow()) {
+                    return;
+                }
+
+                long thoiGianTuLanCham =
+                        android.os.SystemClock.uptimeMillis()
+                                - lanChamNoiBat;
+
+                // Tam dung sau khi nguoi dung cham/vuot.
+                if (thoiGianTuLanCham < 9000) {
+
+                    boDemNoiBat.postDelayed(this, 5000);
+                    return;
+                }
+
+                int doRongNoiDung = danhSach.getWidth();
+
+                int doRongKhung = cuon.getWidth();
+
+                int cuonToiDa = Math.max(
+                        0,
+                        doRongNoiDung - doRongKhung
+                );
+
+                if (cuonToiDa > 0
+                        && danhSach.getChildCount() > 1) {
+
+                    int buocCuon = Math.round(
+                            196 * getResources()
+                                    .getDisplayMetrics().density
+                    );
+
+                    int viTriHienTai = cuon.getScrollX();
+
+                    // Dao chieu o hai dau danh sach.
+                    if (viTriHienTai >= cuonToiDa - 5) {
+                        cuonSangPhai = false;
+                    } else if (viTriHienTai <= 5) {
+                        cuonSangPhai = true;
+                    }
+
+                    int viTriMoi = viTriHienTai
+                            + (cuonSangPhai
+                            ? buocCuon
+                            : -buocCuon);
+
+                    viTriMoi = Math.max(
+                            0,
+                            Math.min(viTriMoi, cuonToiDa)
+                    );
+
+                    cuon.smoothScrollTo(
+                            viTriMoi,
+                            0
+                    );
+                }
+
+                // 5,5 giay moi chuyen lan tiep theo.
+                boDemNoiBat.postDelayed(
+                        this,
+                        5500
+                );
+            }
+        };
+
+        boDemNoiBat.postDelayed(
+                tacVuCuonNoiBat,
+                5500
+        );
     }
 
     @Override protected void onResume() {
@@ -1015,6 +1232,8 @@ public class MainActivity extends BaseActivity {
         if (isFinishing()) return;
         if (daHienThiTrangChu) lamMoiDiaDiem();
         daHienThiTrangChu = true;
+        hienThiTiepTucThamQuan();
+        batTuCuonNoiBat();
     }
 
     private int dpThe(float soDp) {
@@ -1200,5 +1419,41 @@ public class MainActivity extends BaseActivity {
             ttsTrangChu.stop();
         }
     }
+
+    private void taoTheNoiBat() {
+
+        LinearLayout danhSach = findViewById(
+                R.id.danhSachNoiBat
+        );
+
+        if (danhSach == null) {
+            android.util.Log.e(
+                    "TRANG_CHU",
+                    "Khong tim thay danhSachNoiBat trong XML"
+            );
+            return;
+        }
+
+        if (duLieuDiaDiem == null) {
+            android.util.Log.e(
+                    "TRANG_CHU",
+                    "Du lieu dia diem chua duoc tai"
+            );
+            return;
+        }
+
+        android.util.Log.d(
+                "TRANG_CHU",
+                "So dia diem: " + duLieuDiaDiem.length
+        );
+
+        TheDiaDiemTrangChu.hienThi(
+                this,
+                danhSach,
+                duLieuDiaDiem,
+                idDiaDiem -> moChiTiet(idDiaDiem)
+        );
+    }
+
 
 }

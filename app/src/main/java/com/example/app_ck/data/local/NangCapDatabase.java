@@ -17,6 +17,7 @@ import com.example.app_ck.data.seed.DuLieuNoiDungThamQuan;
 import com.example.app_ck.data.seed.DuLieuSoDoThamQuan;
 import com.example.app_ck.data.seed.KhoiTaoDuLieu;
 import com.example.app_ck.location.CauHinhAutoDiSan;
+import com.example.app_ck.data.seed.DanhMucAnhMacDinh;
 
 import org.json.JSONObject;
 
@@ -34,14 +35,31 @@ public final class NangCapDatabase {
 
     // 1. Điều phối schema và kiểm tra liên kết.
     public static void thucHien(SQLiteDatabase db, int phienBanCu) {
-        if(phienBanCu==16) {
-            khoiTaoBoDem(db);
+        if (phienBanCu >= 17) {
+
+            boSungAnhMacDinh(db);
             kiemTraLienKet(db);
+
+            return;
+        }
+        if (phienBanCu == 16) {
+
+            khoiTaoBoDem(db);
+
+            boSungAnhMacDinh(db);
+
+            kiemTraLienKet(db);
+
             return;
         }
         if (phienBanCu >= 15) {
+
             cungCoToanVen(db);
+
+            boSungAnhMacDinh(db);
+
             kiemTraLienKet(db);
+
             return;
         }
         KhoiTaoDuLieu.taoBangDuLich(db);
@@ -62,6 +80,9 @@ public final class NangCapDatabase {
         if(phienBanCu==0) chuyenDoiDuLieuThamQuan(db,false);
         else KhoDuLieuThamQuan.nangCap(db);
         KhoNguonThongTin.khoiTao(db);
+
+        boSungAnhMacDinh(db);
+
         cungCoToanVen(db);
         kiemTraLienKet(db);
     }
@@ -70,7 +91,43 @@ public final class NangCapDatabase {
         if (!KhoDuLieuThamQuan.coCot(db, bang, cot))
             db.execSQL("ALTER TABLE " + bang + " ADD COLUMN " + cot + " " + khaiBao);
     }
+    private static void boSungAnhMacDinh(
+            SQLiteDatabase db
+    ) {
 
+        for (int idDiaDiem = 0; idDiaDiem < 5; idDiaDiem++) {
+
+            int soDiem =
+                    DanhMucAnhMacDinh.soDiem(idDiaDiem);
+
+            for (int idDiem = 1; idDiem <= soDiem; idDiem++) {
+
+                String tenAnh = DanhMucAnhMacDinh.lay(
+                        idDiaDiem,
+                        idDiem
+                );
+
+                if (tenAnh.isEmpty()) {
+                    continue;
+                }
+
+                // Chi bo sung cho ban ghi chua co anh.
+                // Khong ghi de anh Admin da luu.
+                db.execSQL(
+                        "UPDATE " + KhoDuLieuThamQuan.BANG_DIEM
+                                + " SET ten_anh=? "
+                                + "WHERE dia_diem_id=? AND id=? "
+                                + "AND (ten_anh IS NULL "
+                                + "OR trim(ten_anh)='')",
+                        new Object[]{
+                                tenAnh,
+                                idDiaDiem,
+                                idDiem
+                        }
+                );
+            }
+        }
+    }
     private static void kiemTraLienKet(SQLiteDatabase db) {
         kiemTraKhoaNgoai(db);
         try (Cursor c = db.rawQuery("SELECT p.dia_diem_id,p.id FROM " + KhoDuLieuThamQuan.BANG_DIEM + " p "
@@ -112,9 +169,15 @@ public final class NangCapDatabase {
                 v.put("dia_diem_id", place); v.put("id", bai.id); v.put("ten", bai.ten);
                 v.put("mo_ta", bai.noiDung()); v.put("noi_dung_thuyet_minh", bai.noiDung());
                 v.put("thu_tu", bai.id); v.put("so_hien_thi", bai.id); v.put("tang", 0);
+                v.put(
+                        "ten_anh",
+                        DanhMucAnhMacDinh.lay(place, bai.id)
+                );
                 if (place==0) {
                     DuLieuDinhDocLap.DiemThamQuan d = DuLieuDinhDocLap.timTheoId(bai.id);
-                    v.put("tang", d.tang); v.put("x_ty_le", d.x); v.put("y_ty_le", d.y); v.put("ten_anh", d.hinhAnh);
+                    v.put("tang", d.tang);
+                    v.put("x_ty_le", d.x);
+                    v.put("y_ty_le", d.y);
                 } else if (place==1) {
                     float[] d = DuLieuSoDoThamQuan.BAO_TANG[bai.id-1];
                     v.put("tang", (int)d[0]); v.put("x_ty_le", d[1]); v.put("y_ty_le", d[2]);

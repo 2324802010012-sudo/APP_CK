@@ -52,6 +52,13 @@ public final class DuLieuDinhDocLap {
         ds.add(new DiemThamQuan(23, "Xe Mercedes", 6, 350f/533f, 393f/578f));
         ds.add(new DiemThamQuan(24, "Phim tư liệu", 6, 238f/533f, 328f/578f));
         ds.add(new DiemThamQuan(25, "Phòng tập bắn", 6, 283f/533f, 286f/578f));
+        for (DiemThamQuan diem : ds) {
+
+            diem.hinhAnh = DanhMucAnhMacDinh.lay(
+                    0,
+                    diem.id
+            );
+        }
         return ds;
     }
     public static List<DiemThamQuan> layDiemTheoTang(int tang) {
