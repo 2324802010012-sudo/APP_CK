@@ -8,6 +8,7 @@ import com.example.app_ck.data.repository.KhoLichSu;
 import com.example.app_ck.location.CauHinhAutoDiSan;
 import com.example.app_ck.location.HuongDanTour;
 import com.example.app_ck.ui.common.BaseActivity;
+import com.example.app_ck.ui.common.BoHienThiAnh;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -153,6 +154,10 @@ public class VanMieuThamQuanActivity extends BaseActivity implements HuongDanTou
     private void hienThi() {
         tenKhuVuc.setText(tenDiem.get(viTri));
         moTaKhuVuc.setText(moTaDiem.get(viTri));
+        BoHienThiAnh.hienAnhDiem(
+                findViewById(R.id.tqAnhDiemThanhPhan),
+                cacDiem.get(viTri).tenAnh
+        );
         ganNguonThongTin(4, danhSachId.get(viTri));
         demKhuVuc.setText("Điểm " + (viTri + 1) + "/" + tenDiem.size());
         tienTrinh.setProgress((viTri + 1) * 100 / tenDiem.size());

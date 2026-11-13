@@ -845,8 +845,10 @@ public class QuanLyDiemThamQuanActivity
 
 
         // Ho tro ten drawable hoac anh_may: da luu.
-        if (anhDiemMoi == null && !tenAnhMoi.isEmpty()
-                && !tenAnhMoi.startsWith("anh_may:")) {
+        if (anhDiemMoi == null
+                && !tenAnhMoi.isEmpty()
+                && !tenAnhMoi.startsWith("anh_may:")
+                && !AnhDiaDiem.KHONG_ANH.equals(tenAnhMoi)) {
 
             int anhId = getResources().getIdentifier(
                     tenAnhMoi,
@@ -995,7 +997,25 @@ public class QuanLyDiemThamQuanActivity
         nutMay.setAllCaps(false);
         nutMay.setOnClickListener(v -> chonAnhDiem.launch("image/*"));
         layout.addView(nutMay, viTri++);
+        Button nutBoAnh = new Button(this);
 
+        nutBoAnh.setText("Bỏ ảnh riêng của điểm");
+        nutBoAnh.setAllCaps(false);
+
+        nutBoAnh.setOnClickListener(v -> {
+
+            anhDiemMoi = null;
+
+            tenAnh.setText(
+                    AnhDiaDiem.KHONG_ANH
+            );
+
+            anhDiemXemTruoc.setImageResource(
+                    android.R.drawable.ic_menu_gallery
+            );
+        });
+
+        layout.addView(nutBoAnh, viTri++);
         TextView nhanNguon = new TextView(this);
         nhanNguon.setText("Nguồn riêng của điểm tham quan");
         nhanNguon.setTextSize(15);

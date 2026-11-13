@@ -6,6 +6,7 @@
     android:orientation="vertical"
     android:background="#F6F8F5">
 
+    <!-- NOI DUNG CO THE CUON -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -17,49 +18,66 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="28dp">
 
-            <!-- THONG TIN TAI KHOAN -->
-            <LinearLayout
+            <!-- TIEU DE -->
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/ui_profile_hero"
-                android:gravity="center_vertical"
+                android:text="Cá nhân"
+                android:textColor="#20382A"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:paddingBottom="16dp" />
+
+            <!-- THE HO SO -->
+            <LinearLayout
+                android:id="@+id/cnKhungHoSo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="116dp"
                 android:orientation="horizontal"
-                android:padding="20dp">
+                android:gravity="center_vertical"
+                android:padding="18dp"
+                android:background="@drawable/ui_profile_hero">
 
                 <TextView
                     android:id="@+id/cnAvatar"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:background="@drawable/ui_profile_avatar"
                     android:gravity="center"
+                    android:text="K"
                     android:textColor="#FFFFFF"
-                    android:textSize="24sp"
+                    android:textSize="22sp"
                     android:textStyle="bold"
                     android:importantForAccessibility="no" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_weight="1"
+                    android:layout_marginStart="15dp"
                     android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/cnTen"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:text="Chào bạn!"
                         android:textColor="#20382A"
-                        android:textSize="20sp"
+                        android:textSize="19sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/cnTenDangNhap"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="4dp"
+                        android:text="Khám phá Việt Nam"
                         android:textColor="#607467"
                         android:textSize="13sp" />
 
@@ -67,141 +85,221 @@
                         android:id="@+id/cnTrangThai"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="7dp"
+                        android:text="Khách tham quan"
                         android:textColor="#2C7351"
                         android:textSize="12sp"
                         android:textStyle="bold" />
+
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- THONG KE -->
+            <!-- THONG KE: CHI HIEN KHI DANG NHAP -->
             <LinearLayout
+                android:id="@+id/cnThongKe"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal">
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:visibility="gone">
 
-                <TextView
-                    android:id="@+id/cnSoYeuThich"
+                <!-- SO DIA DIEM YEU THICH -->
+                <LinearLayout
+                    android:id="@+id/cnThongKeYeuThich"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:minHeight="86dp"
+                    android:minHeight="100dp"
+                    android:padding="14dp"
+                    android:orientation="vertical"
                     android:background="@drawable/ui_card"
-                    android:gravity="center"
-                    android:padding="12dp"
-                    android:textColor="#2C7351"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
                     android:clickable="true"
-                    android:focusable="true" />
+                    android:focusable="true">
 
-                <TextView
-                    android:id="@+id/cnSoDiaDiem"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/cnSoYeuThich"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="0"
+                            android:textColor="#2C7351"
+                            android:textSize="25sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ui_ic_heart"
+                            android:importantForAccessibility="no" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Địa điểm đã lưu"
+                        android:textSize="12sp"
+                        android:textColor="#607467" />
+                </LinearLayout>
+
+                <!-- SO LUOT NGHE -->
+                <LinearLayout
+                    android:id="@+id/cnThongKeLichSu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="12dp"
-                    android:minHeight="86dp"
+                    android:minHeight="100dp"
+                    android:padding="14dp"
+                    android:orientation="vertical"
                     android:background="@drawable/ui_card"
-                    android:gravity="center"
-                    android:padding="12dp"
-                    android:textColor="#2C7351"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
                     android:clickable="true"
-                    android:focusable="true" />
+                    android:focusable="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/cnSoLichSu"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="0"
+                            android:textColor="#2C7351"
+                            android:textSize="25sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ui_ic_history"
+                            android:importantForAccessibility="no" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Lượt đã nghe"
+                        android:textSize="12sp"
+                        android:textColor="#607467" />
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- CHUA DANG NHAP -->
+            <!-- GIAO DIEN KHACH -->
             <LinearLayout
                 android:id="@+id/cnKhach"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/ui_card"
+                android:layout_marginTop="18dp"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="18dp"
+                android:background="@drawable/ui_card">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Lưu giữ những điểm đến yêu thích"
-                    android:textColor="#20382A"
+                    android:text="Lưu lại hành trình của bạn"
                     android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textColor="#20382A" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Đăng nhập để quản lý bộ sưu tập và hồ sơ của bạn."
+                    android:text="Đăng nhập để lưu địa điểm yêu thích và xem lại lịch sử thuyết minh."
+                    android:textSize="13sp"
                     android:textColor="#718277"
-                    android:textSize="14sp" />
+                    android:lineSpacingExtra="3dp" />
 
                 <Button
                     android:id="@+id/cnDangNhap"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:minHeight="52dp"
-                    android:backgroundTint="#2C7351"
+                    android:minHeight="50dp"
+                    android:layout_marginTop="16dp"
                     android:text="Đăng nhập"
+                    android:textSize="14sp"
                     android:textAllCaps="false"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#2C7351" />
 
                 <Button
                     android:id="@+id/cnDangKy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="48dp"
-                    android:backgroundTint="#EAF1E8"
                     android:text="Tạo tài khoản"
+                    android:textSize="14sp"
                     android:textAllCaps="false"
-                    android:textColor="#2C7351" />
+                    android:textColor="#2C7351"
+                    android:backgroundTint="#EAF1E8" />
             </LinearLayout>
 
-            <!-- DA DANG NHAP -->
+            <!-- CHUC NANG KHI DA DANG NHAP -->
             <LinearLayout
                 android:id="@+id/cnDaDangNhap"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_marginTop="22dp"
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="26dp"
                     android:layout_marginBottom="10dp"
                     android:text="TÀI KHOẢN CỦA BẠN"
-                    android:textColor="#718277"
                     android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textColor="#718277" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ui_card"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:background="@drawable/ui_card">
 
                     <include
                         android:id="@+id/cnSuaHoSo"
                         layout="@layout/item_ca_nhan_action" />
 
-                    <include
-                        android:id="@+id/cnYeuThich"
-                        layout="@layout/item_ca_nhan_action" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="68dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="#EDF1ED" />
 
                     <include
                         android:id="@+id/cnLichSu"
                         layout="@layout/item_ca_nhan_action" />
 
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="68dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="#EDF1ED" />
+
                     <include
                         android:id="@+id/cnDoiMatKhau"
                         layout="@layout/item_ca_nhan_action" />
+
                 </LinearLayout>
 
-                <!-- CHI HIEN THI VOI ADMIN -->
+                <!-- CHI DANH CHO ADMIN -->
                 <LinearLayout
                     android:id="@+id/cnVungAdmin"
                     android:layout_width="match_parent"
@@ -215,59 +313,77 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="10dp"
                         android:text="QUẢN TRỊ HỆ THỐNG"
-                        android:textColor="#2C7351"
                         android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:textColor="#718277" />
 
                     <Button
                         android:id="@+id/cnAdmin"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="54dp"
-                        android:backgroundTint="#2C7351"
-                        android:text="Quay lại trang quản trị"
+                        android:minHeight="50dp"
+                        android:text="Mở trang quản trị"
                         android:textAllCaps="false"
+                        android:textSize="14sp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp" />
+                        android:backgroundTint="#2C7351" />
                 </LinearLayout>
-
-                <Button
-                    android:id="@+id/cnDangXuat"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:minHeight="52dp"
-                    android:backgroundTint="#F4EAE7"
-                    android:text="Đăng xuất"
-                    android:textAllCaps="false"
-                    android:textColor="#9C493B" />
             </LinearLayout>
 
             <!-- THONG TIN UNG DUNG -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="10dp"
+                android:text="ỨNG DỤNG"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#718277" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/ui_card"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="@drawable/ui_card">
 
                 <include
                     android:id="@+id/cnHuongDan"
                     layout="@layout/item_ca_nhan_action" />
             </LinearLayout>
 
+            <!-- DANG XUAT -->
+            <TextView
+                android:id="@+id/cnDangXuat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="52dp"
+                android:layout_marginTop="14dp"
+                android:padding="12dp"
+                android:gravity="center"
+                android:text="Đăng xuất"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#A25248"
+                android:background="@drawable/ui_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone" />
+
+            <!-- THONG TIN CUOI TRANG -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="24dp"
                 android:gravity="center"
-                android:text="APP_CK · Khám phá Việt Nam"
-                android:textColor="#849387"
-                android:textSize="12sp" />
+                android:text="Vọng Việt · Khám phá Việt Nam"
+                android:textSize="12sp"
+                android:textColor="#8B9A8E" />
+
         </LinearLayout>
     </ScrollView>
 
-    <!-- GIU THANH DIEU HUONG CU -->
+    <!-- GIU NGUYEN THANH DIEU HUONG HIEN TAI -->
     <include layout="@layout/view_thanh_dieu_huong_duoi" />
 
 </LinearLayout>

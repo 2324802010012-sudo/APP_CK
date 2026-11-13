@@ -41,6 +41,9 @@ public final class ThamQuanTuDong implements LocationListener {
     private final LocationManager viTri;
     private final List<DiaDiem> cacDiem;
     private final View bang;
+    // Trang thai thu gon / mo rong bang huong dan
+    private boolean dangMoRong = false;
+    private boolean moRongAuto = false;
     private final Spinner chonDemo;
     private BoNhanDienDiaDiem nhanDien;
     private DiaDiem diemDangMoi, diemDemo;
@@ -48,6 +51,7 @@ public final class ThamQuanTuDong implements LocationListener {
     private int cheDo, phien, buocDemo;
     private long lucBuocDemo, lucNhanGps;
     private Location mauGps;
+    private boolean moChiTietGps = false;
     private final List<CancellationSignal> yeuCauViTri = new ArrayList<>();
 
     public ThamQuanTuDong(MainActivity activity) {
@@ -78,8 +82,62 @@ public final class ThamQuanTuDong implements LocationListener {
             }
         });
         bang.findViewById(R.id.autoMoChiTiet).setOnClickListener(v -> moChiTiet(false));
-    }
+        caiDatThuGonAuto();
+        // Bam tieu de de mo rong hoac thu gon
+        bang.findViewById(R.id.autoTieuDeThuGon)
+                .setOnClickListener(v -> {
+                    datTrangThaiMoRong(!dangMoRong, true);
+                });
 
+// Mac dinh thu gon khi vao trang chu
+        datTrangThaiMoRong(false, false);
+    }
+    private void datTrangThaiMoRong(
+            boolean moRong,
+            boolean coHieuUng
+    ) {
+
+        View noiDung = bang.findViewById(
+                R.id.autoNoiDungMoRong
+        );
+
+        TextView muiTen = bang.findViewById(
+                R.id.autoMuiTen
+        );
+
+        View tieuDe = bang.findViewById(
+                R.id.autoTieuDeThuGon
+        );
+
+        if (noiDung == null || muiTen == null) {
+            return;
+        }
+
+        // Hieu ung mo va dong nhe
+        if (coHieuUng) {
+            android.transition.TransitionManager
+                    .beginDelayedTransition((ViewGroup) bang);
+        }
+
+        dangMoRong = moRong;
+
+        // Hien / an noi dung
+        noiDung.setVisibility(
+                moRong ? View.VISIBLE : View.GONE
+        );
+
+        // Thay doi mui ten
+        muiTen.setText(
+                moRong ? "▲" : "▼"
+        );
+
+        // Ho tro truy cap
+        tieuDe.setContentDescription(
+                moRong
+                        ? "Thu gọn hướng dẫn theo vị trí"
+                        : "Mở rộng hướng dẫn theo vị trí"
+        );
+    }
     private void moChiTiet(boolean phatSauXacNhan) {
         if (diemDangMoi == null) return;
         int id = diemDangMoi.id;
@@ -110,6 +168,9 @@ public final class ThamQuanTuDong implements LocationListener {
         chu(R.id.autoKhoangCach, "");
         bang.findViewById(R.id.autoKhoangCach).setVisibility(View.GONE);
         bang.findViewById(R.id.autoDemoDenGan).setVisibility(View.GONE);
+        bang.findViewById(
+                R.id.autoGanNhat
+        ).setVisibility(View.GONE);
         trangThai(lyDo);
     }
     private boolean batDau(int loai) {
@@ -120,7 +181,12 @@ public final class ThamQuanTuDong implements LocationListener {
         diemDangMoi = null;
         lucNhanGps = 0;
         bang.findViewById(R.id.autoMoChiTiet).setVisibility(View.GONE);
-        chu(R.id.autoCheDo, loai == DEMO ? "DEMO · Vị trí mô phỏng" : "GPS thật · Hướng dẫn theo vị trí");
+        chu(
+                R.id.autoCheDo,
+                loai == DEMO
+                        ? "● Đang chạy Demo"
+                        : "● GPS đang bật"
+        );
         chu(R.id.autoViTri, loai == GPS
                 ? "Đã bật theo dõi · Đang chờ vị trí từ thiết bị…"
                 : "DEMO · Đang chuẩn bị vị trí mô phỏng");
@@ -130,6 +196,8 @@ public final class ThamQuanTuDong implements LocationListener {
         return true;
     }
     public void batDemo() {
+        hienThiNoiDungAuto(true);
+        datTrangThaiMoRong(true, false);
         if (!batDau(DEMO)) return;
         diemDemo = cacDiem.get(chonDemo.getSelectedItemPosition());
         buocDemo = 0;
@@ -160,6 +228,8 @@ public final class ThamQuanTuDong implements LocationListener {
         hen.postDelayed(() -> nhip(phienNhip), 1000);
     }
     public void batGps() {
+        hienThiNoiDungAuto(true);
+        datTrangThaiMoRong(true, false);
         dung("Đang chuẩn bị GPS thật…");
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             activity.xinQuyenGpsThamQuan();
@@ -234,6 +304,12 @@ public final class ThamQuanTuDong implements LocationListener {
     }
 
     private void hienThiMauGps(Location location, long now) {
+        TextView oGanNhat = bang.findViewById(
+                R.id.autoGanNhat
+        );
+
+// Xoa ket qua cu truoc khi xu ly mau GPS moi.
+        oGanNhat.setVisibility(View.GONE);
         long lucDo = location.getElapsedRealtimeNanos() / 1000000;
         String tuoi = lucDo <= 0 || lucDo > now ? "không rõ thời điểm đo"
                 : String.format(Locale.ROOT, "đo cách đây %d giây", (now - lucDo) / 1000);
@@ -264,7 +340,23 @@ public final class ThamQuanTuDong implements LocationListener {
             double kc = khoangCachDen(location, d);
             if (kc < khoangCach) { khoangCach = kc; gan = d; }
         }
-        if (gan != null) noiDung += "\nGần nhất: " + gan.ten + " · " + dinhDangKhoangCach(khoangCach);
+        if (gan != null) {
+
+            noiDung += "\nGần nhất: "
+                    + gan.ten
+                    + " · "
+                    + dinhDangKhoangCach(khoangCach);
+
+            oGanNhat.setText(
+                    "Gần nhất: "
+                            + gan.ten
+                            + "\n"
+                            + dinhDangKhoangCach(khoangCach)
+                            + " · Đường chim bay"
+            );
+
+            oGanNhat.setVisibility(View.VISIBLE);
+        }
         chu(R.id.autoViTri, noiDung);
         thuTu.sort((a, b) -> Double.compare(khoangCachDen(location, a), khoangCachDen(location, b)));
         StringBuilder danhSach = new StringBuilder("Khoảng cách đường chim bay từ vị trí thiết bị:");
@@ -318,6 +410,89 @@ public final class ThamQuanTuDong implements LocationListener {
         if (phienHoi != phien) return;
         nhanDien.traLoi(id, false);
         trangThai("Đã bỏ qua " + diemDangMoi.ten + ". Không phát âm thanh và không hỏi lại địa điểm này trong lượt hiện tại.");
+    }
+
+    private void hienThiNoiDungAuto(boolean moRong) {
+
+        moRongAuto = moRong;
+
+        View noiDung = bang.findViewById(
+                R.id.autoNoiDungMoRong
+        );
+
+        TextView muiTen = bang.findViewById(
+                R.id.autoMuiTen
+        );
+
+        View tieuDe = bang.findViewById(
+                R.id.autoTieuDeThuGon
+        );
+
+        noiDung.setVisibility(
+                moRong ? View.VISIBLE : View.GONE
+        );
+
+        muiTen.setText(moRong ? "▴" : "▾");
+
+        tieuDe.setContentDescription(
+                moRong
+                        ? "Thu gọn hướng dẫn theo vị trí"
+                        : "Mở rộng hướng dẫn theo vị trí"
+        );
+    }
+
+    private void hienThiThongTinKyThuat(boolean hien) {
+
+        moChiTietGps = hien;
+
+        View thongTin = bang.findViewById(
+                R.id.autoThongTinKyThuat
+        );
+
+        TextView muiTen = bang.findViewById(
+                R.id.autoMuiTenGPS
+        );
+
+        thongTin.setVisibility(
+                hien ? View.VISIBLE : View.GONE
+        );
+
+        muiTen.setText(hien ? "▴" : "▾");
+
+        bang.findViewById(
+                R.id.autoNutChiTietGPS
+        ).setContentDescription(
+                hien
+                        ? "Ẩn thông tin GPS chi tiết"
+                        : "Mở thông tin GPS chi tiết"
+        );
+    }
+
+    private void caiDatThuGonAuto() {
+
+        // Khi mo trang chu, mac dinh thu gon.
+        hienThiNoiDungAuto(false);
+        hienThiThongTinKyThuat(false);
+
+        bang.findViewById(
+                R.id.autoTieuDeThuGon
+        ).setOnClickListener(v -> {
+
+            android.transition.TransitionManager
+                    .beginDelayedTransition((ViewGroup) bang);
+
+            hienThiNoiDungAuto(!moRongAuto);
+        });
+
+        bang.findViewById(
+                R.id.autoNutChiTietGPS
+        ).setOnClickListener(v -> {
+
+            android.transition.TransitionManager
+                    .beginDelayedTransition((ViewGroup) bang);
+
+            hienThiThongTinKyThuat(!moChiTietGps);
+        });
     }
     @Override public void onProviderDisabled(String provider) {
         if (cheDo == GPS && LocationManager.GPS_PROVIDER.equals(provider)) dung("GPS đã tắt. Bật lại vị trí và bấm GPS thật.");
