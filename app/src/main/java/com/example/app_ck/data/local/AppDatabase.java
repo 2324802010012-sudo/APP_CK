@@ -14,7 +14,7 @@ import java.util.ArrayList;
 /** Một SQLiteOpenHelper cho toàn ứng dụng. API cũ ủy quyền sang repository để giữ tương thích. */
 public class AppDatabase extends SQLiteOpenHelper {
     public static final String DB = "du_lich_tai_khoan.db";
-    public static final int VERSION = 17;
+    public static final int VERSION = 18;
     private final KhoTaiKhoan taiKhoan;
     private final KhoYeuThich yeuThich;
     private final KhoDiaDiem diaDiem;

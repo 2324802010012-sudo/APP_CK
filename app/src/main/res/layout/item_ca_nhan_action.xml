@@ -1,14 +1,59 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="76dp"
-    android:orientation="horizontal" android:gravity="center_vertical" android:padding="16dp"
-    android:background="?attr/selectableItemBackground" android:clickable="true" android:focusable="true">
-    <ImageView android:id="@+id/cnActionIcon" android:layout_width="24dp" android:layout_height="24dp" android:importantForAccessibility="no" />
-    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-        android:orientation="vertical" android:layout_marginStart="14dp" android:layout_marginEnd="12dp">
-        <TextView android:id="@+id/cnActionTitle" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:textSize="15sp" android:textStyle="bold" android:textColor="#20382A" />
-        <TextView android:id="@+id/cnActionDetail" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" android:textSize="12sp" android:textColor="#718277" />
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="72dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <ImageView
+        android:id="@+id/cnActionIcon"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:padding="10dp"
+        android:background="@drawable/ui_cn_icon_bg"
+        android:tint="#2C7351"
+        android:importantForAccessibility="no" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/cnActionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#20382A" />
+
+        <TextView
+            android:id="@+id/cnActionDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:textSize="12sp"
+            android:textColor="#718277" />
+
     </LinearLayout>
-    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ui_ic_chevron" android:importantForAccessibility="no" />
+
+    <ImageView
+        android:layout_width="19dp"
+        android:layout_height="19dp"
+        android:src="@drawable/ui_ic_chevron"
+        android:tint="#8B9A8E"
+        android:importantForAccessibility="no" />
+
 </LinearLayout>

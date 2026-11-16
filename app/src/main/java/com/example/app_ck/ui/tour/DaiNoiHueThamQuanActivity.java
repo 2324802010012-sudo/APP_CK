@@ -31,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.app_ck.ui.common.BoHienThiAnh;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -257,6 +258,10 @@ public class DaiNoiHueThamQuanActivity extends BaseActivity implements HuongDanT
         capNhatSoDo();
         tenKhuVuc.setText(danhSachTen.get(viTriHienTai));
         moTaKhuVuc.setText(danhSachMoTa.get(viTriHienTai));
+        BoHienThiAnh.hienAnhDiem(
+                findViewById(R.id.tqAnhDiemThanhPhan),
+                cacDiem.get(viTriHienTai).tenAnh
+        );
         ganNguonThongTin(2, danhSachId.get(viTriHienTai));
         demKhuVuc.setText("Điểm " + (viTriHienTai + 1) + "/" + danhSachId.size());
         tienTrinh.setProgress((viTriHienTai + 1) * 100 / danhSachId.size());

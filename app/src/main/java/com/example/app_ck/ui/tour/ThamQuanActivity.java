@@ -29,7 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import android.view.View;
-import com.example.app_ck.ui.common.AnhDiaDiem;
+import com.example.app_ck.ui.common.BoHienThiAnh;
 /** Tour dùng chung: ID điểm và tầng được đọc từ SQLite, độc lập thứ tự danh sách. */
 public class ThamQuanActivity extends BaseActivity implements HuongDanTour.ManHinh {
     private final List<DiemThamQuan> cacDiem = new ArrayList<>();
@@ -138,7 +138,10 @@ public class ThamQuanActivity extends BaseActivity implements HuongDanTour.ManHi
             for (DiaDiem diaDiem : dbHelper.danhSachDiaDiem()) {
                 if (diaDiem.id != idDiaDiem) continue;
                 tenDiaDiem.setText(diaDiem.ten);
-                AnhDiaDiem.hien(anh, diaDiem.tenAnh);
+                BoHienThiAnh.hienAnhDiaDiem(
+                        anh,
+                        diaDiem.tenAnh
+                );
                 break;
             }
             return true;
@@ -213,56 +216,11 @@ public class ThamQuanActivity extends BaseActivity implements HuongDanTour.ManHi
         int viTri = diem == null ? -1 : viTriDiem(diem.id);
         tenKhuVuc.setText(diem == null ? "Chưa có điểm tham quan" : diem.ten);
 
-// Dong bo anh rieng cua Marker dang chon
-        ImageView anhDiem = findViewById(
-                R.id.tqAnhDiemThanhPhan
+// Hien thi anh cua diem tham quan dang chon.
+        BoHienThiAnh.hienAnhDiem(
+                findViewById(R.id.tqAnhDiemThanhPhan),
+                diem == null ? "" : diem.tenAnh
         );
-
-        String tenAnhDiem = diem == null
-                ? ""
-                : diem.tenAnh;
-
-        boolean coAnh = false;
-
-        if (tenAnhDiem != null
-                && !tenAnhDiem.trim().isEmpty()) {
-
-            if (tenAnhDiem.startsWith("anh_may:")) {
-                String tenFile = tenAnhDiem.substring(8);
-
-                if (!tenFile.isEmpty()
-                        && !tenFile.contains("/")
-                        && !tenFile.contains("\\")
-                        && !tenFile.contains("..")) {
-
-                    java.io.File file = new java.io.File(
-                            new java.io.File(
-                                    getFilesDir(),
-                                    "anh_dia_diem"
-                            ),
-                            tenFile
-                    );
-
-                    coAnh = file.isFile();
-                }
-
-            } else {
-                coAnh = getResources().getIdentifier(
-                        tenAnhDiem,
-                        "drawable",
-                        getPackageName()
-                ) != 0;
-            }
-        }
-
-        if (coAnh) {
-            AnhDiaDiem.hien(anhDiem, tenAnhDiem);
-            anhDiem.setVisibility(View.VISIBLE);
-        } else {
-            anhDiem.setImageDrawable(null);
-            anhDiem.setVisibility(View.GONE);
-        }
-
         moTaKhuVuc.setText(diem == null
                 ? "Nội dung tham quan cho khu vực này đang được bổ sung."
                 : diem.noiDung == null || diem.noiDung.trim().isEmpty() ? diem.moTa : diem.noiDung);

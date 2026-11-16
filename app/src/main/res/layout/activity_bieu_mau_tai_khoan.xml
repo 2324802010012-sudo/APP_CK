@@ -1,15 +1,112 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent"
-    android:fillViewport="true" android:background="#F6F8F5" android:scrollbars="none">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
-        <TextView android:id="@+id/hoSoQuayLai" android:layout_width="48dp" android:layout_height="48dp" android:gravity="center"
-            android:text="‹" android:textSize="32sp" android:textColor="#2C7351" android:contentDescription="Quay lại" android:clickable="true" android:focusable="true" />
-        <TextView android:id="@+id/hoSoTieuDe" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="24dp" android:textSize="27sp" android:textStyle="bold" android:textColor="#20382A" />
-        <TextView android:id="@+id/hoSoMoTa" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="10dp" android:textSize="14sp" android:lineSpacingExtra="4dp" android:textColor="#718277" />
-        <LinearLayout android:id="@+id/hoSoCacTruong" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="28dp" android:orientation="vertical" />
-        <Button android:id="@+id/hoSoLuu" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp"
-            android:textAllCaps="false" android:textSize="16sp" android:backgroundTint="#2C7351" android:textColor="#FFFFFF" />
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none"
+    android:background="#F6F8F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="28dp">
+
+        <!-- THANH QUAY LAI -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/hoSoQuayLai"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:text="‹"
+                android:textSize="32sp"
+                android:textColor="#20382A"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Quay lại" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tài khoản"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#607467" />
+        </LinearLayout>
+
+        <!-- TIEU DE -->
+        <TextView
+            android:id="@+id/hoSoTieuDe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#20382A" />
+
+        <TextView
+            android:id="@+id/hoSoMoTa"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="14sp"
+            android:lineSpacingExtra="4dp"
+            android:textColor="#718277" />
+
+        <!-- THONG TIN TAI KHOAN KHONG CHINH SUA -->
+        <TextView
+            android:id="@+id/hoSoTaiKhoan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:padding="16dp"
+            android:textSize="14sp"
+            android:textColor="#2C7351"
+            android:background="@drawable/ui_profile_hero"
+            android:visibility="gone" />
+
+        <!-- CAC TRUONG DUOC TAO BANG JAVA -->
+        <LinearLayout
+            android:id="@+id/hoSoCacTruong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical" />
+
+        <!-- GHI CHU -->
+        <TextView
+            android:id="@+id/hoSoGhiChu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="12sp"
+            android:lineSpacingExtra="4dp"
+            android:textColor="#718277"
+            android:visibility="gone" />
+
+        <!-- NUT CHINH -->
+        <Button
+            android:id="@+id/hoSoLuu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="54dp"
+            android:layout_marginTop="22dp"
+            android:backgroundTint="#2C7351"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textAllCaps="false" />
+
     </LinearLayout>
 </ScrollView>

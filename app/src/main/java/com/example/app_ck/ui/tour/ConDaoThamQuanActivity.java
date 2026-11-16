@@ -9,6 +9,7 @@ import com.example.app_ck.location.CauHinhAutoDiSan;
 import com.example.app_ck.location.HuongDanConDao;
 import com.example.app_ck.location.HuongDanTour;
 import com.example.app_ck.ui.common.BaseActivity;
+import com.example.app_ck.ui.common.BoHienThiAnh;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -151,6 +152,10 @@ public class ConDaoThamQuanActivity extends BaseActivity implements HuongDanTour
         int soDiem = danhSachId.size();
         tenKhuVuc.setText(danhSachTen.get(viTriHienTai));
         moTaKhuVuc.setText(danhSachMoTa.get(viTriHienTai));
+        BoHienThiAnh.hienAnhDiem(
+                findViewById(R.id.tqAnhDiemThanhPhan),
+                cacDiem.get(viTriHienTai).tenAnh
+        );
         ganNguonThongTin(3, danhSachId.get(viTriHienTai));
         demKhuVuc.setText("Điểm " + (viTriHienTai + 1) + "/" + soDiem);
         tienTrinh.setProgress((viTriHienTai + 1) * 100 / soDiem);

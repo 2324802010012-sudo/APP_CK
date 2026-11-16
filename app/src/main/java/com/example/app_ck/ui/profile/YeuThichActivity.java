@@ -7,12 +7,14 @@ import com.example.app_ck.session.PhienDangNhap;
 import com.example.app_ck.ui.auth.DangNhapActivity;
 import com.example.app_ck.ui.common.BaseActivity;
 import com.example.app_ck.ui.common.ThanhDieuHuongDuoi;
+import com.example.app_ck.ui.home.KhamPhaActivity;
 import com.example.app_ck.ui.place.ChiTietDiaDiemActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -29,24 +31,41 @@ public class YeuThichActivity extends BaseActivity {
     private final ActivityResultLauncher<Intent> dangNhap = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> hienThi());
 
-    @Override protected void onCreate(Bundle state) {
+
+    @Override
+    protected void onCreate(Bundle state) {
         super.onCreate(state);
+
         setContentView(R.layout.activity_yeu_thich);
         apDungKhoangTrongHeThong();
+
         danhSach = findViewById(R.id.ytDanhSach);
-        findViewById(R.id.ytQuayLai).setOnClickListener(v -> finish());
-        ThanhDieuHuongDuoi.gan(this, ThanhDieuHuongDuoi.YEU_THICH);
-        findViewById(R.id.ytDangNhap).setOnClickListener(v -> moDangNhap(false));
-        findViewById(R.id.ytDangKy).setOnClickListener(v -> moDangNhap(true));
-        findViewById(R.id.ytDangXuat).setOnClickListener(v ->
-                new com.google.android.material.dialog.MaterialAlertDialogBuilder(this).setTitle("Đăng xuất?")
-                        .setMessage("Địa điểm đã lưu sẽ được giữ lại trong tài khoản của bạn.")
-                        .setPositiveButton("Đăng xuất", (d, w) -> {
-                            PhienDangNhap.dangXuat(this);
-                            hienThi();
-                        }).setNegativeButton("Hủy", null).show());
-        if (state == null && !PhienDangNhap.daDangNhap(this)) moDangNhap(false);
+
+        // Gan thanh dieu huong chung
+        ThanhDieuHuongDuoi.gan(
+                this,
+                ThanhDieuHuongDuoi.YEU_THICH
+        );
+
+        // Dang nhap va dang ky khi nguoi dung muon
+        findViewById(R.id.ytDangNhap)
+                .setOnClickListener(v -> moDangNhap(false));
+
+        findViewById(R.id.ytDangKy)
+                .setOnClickListener(v -> moDangNhap(true));
+
+        // Mo man hinh kham pha khi bo suu tap trong
+        findViewById(R.id.ytKhamPha)
+                .setOnClickListener(v ->
+                        startActivity(
+                                new Intent(
+                                        this,
+                                        KhamPhaActivity.class
+                                )
+                        )
+                );
     }
+
 
     @Override protected void onResume() {
         super.onResume();
@@ -62,64 +81,219 @@ public class YeuThichActivity extends BaseActivity {
         ((TextView) findViewById(id)).setText(noiDung);
     }
 
+
     private void hienThi() {
+
         if (danhSach == null) return;
+
         danhSach.removeAllViews();
-        boolean daDangNhap = PhienDangNhap.daDangNhap(this);
-        findViewById(R.id.ytDangXuat).setVisibility(daDangNhap ? View.VISIBLE : View.GONE);
-        findViewById(R.id.ytDangNhap).setVisibility(daDangNhap ? View.GONE : View.VISIBLE);
-        findViewById(R.id.ytDangKy).setVisibility(daDangNhap ? View.GONE : View.VISIBLE);
-        findViewById(R.id.ytKhamPha).setVisibility(View.GONE);
-        findViewById(R.id.ytTrangThai).setVisibility(View.VISIBLE);
+
+        boolean daDangNhap =
+                PhienDangNhap.daDangNhap(this);
+
+        View trangThai = findViewById(
+                R.id.ytTrangThai
+        );
+
+        View nutDangNhap = findViewById(
+                R.id.ytDangNhap
+        );
+
+        View nutDangKy = findViewById(
+                R.id.ytDangKy
+        );
+
+        Button nutKhamPha = findViewById(
+                R.id.ytKhamPha
+        );
+
+        nutDangNhap.setVisibility(
+                daDangNhap ? View.GONE : View.VISIBLE
+        );
+
+        nutDangKy.setVisibility(
+                daDangNhap ? View.GONE : View.VISIBLE
+        );
+
+        nutKhamPha.setVisibility(View.GONE);
+
+        trangThai.setVisibility(View.GONE);
+
+        // Chua dang nhap
         if (!daDangNhap) {
-            chu(R.id.ytTongSo, "Những điểm đến dành riêng cho bạn");
-            chu(R.id.ytTaiKhoan, "Đăng nhập để xem bộ sưu tập");
-            chu(R.id.ytTieuDeTrangThai, "Lưu lại hành trình của bạn");
-            chu(R.id.ytMoTaTrangThai, "Đăng nhập hoặc tạo tài khoản để xem và quản lý các địa điểm yêu thích.");
-            return; // Không đọc danh sách khi chưa đăng nhập.
+
+            chu(
+                    R.id.ytTongSo,
+                    "Bộ sưu tập của bạn"
+            );
+
+            chu(
+                    R.id.ytTieuDeTrangThai,
+                    "Lưu lại điểm đến yêu thích"
+            );
+
+            chu(
+                    R.id.ytMoTaTrangThai,
+                    "Đăng nhập để xem và quản lý những địa điểm bạn đã lưu."
+            );
+
+            trangThai.setVisibility(View.VISIBLE);
+            return;
         }
 
-        chu(R.id.ytTaiKhoan, "Tài khoản: " + PhienDangNhap.ten(this));
+        // Mac dinh nut kham pha dung cho bo suu tap trong
+        nutKhamPha.setText("Khám phá địa điểm");
+
+        nutKhamPha.setOnClickListener(v ->
+                startActivity(
+                        new Intent(
+                                this,
+                                KhamPhaActivity.class
+                        )
+                )
+        );
+
         try (AppDatabase db = new AppDatabase(this)) {
-            Map<Integer, DiaDiem> theoId = new HashMap<>();
-            for (DiaDiem d : db.danhSachDiaDiem()) theoId.put(d.id, d);
-            ArrayList<Integer> cacId = db.danhSachYeuThich(PhienDangNhap.id(this));
+
+            Map<Integer, DiaDiem> theoId =
+                    new HashMap<>();
+
+            for (DiaDiem d : db.danhSachDiaDiem()) {
+                theoId.put(d.id, d);
+            }
+
+            ArrayList<Integer> cacId =
+                    db.danhSachYeuThich(
+                            PhienDangNhap.id(this)
+                    );
+
             int soLuong = 0;
+
             for (int id : cacId) {
+
                 DiaDiem d = theoId.get(id);
+
                 if (d == null) continue;
+
                 themThe(d);
                 soLuong++;
             }
-            chu(R.id.ytTongSo, soLuong + " địa điểm đã lưu");
-            findViewById(R.id.ytTrangThai).setVisibility(soLuong == 0 ? View.VISIBLE : View.GONE);
-            chu(R.id.ytTieuDeTrangThai, "Chưa có địa điểm yêu thích");
-            chu(R.id.ytMoTaTrangThai, "Chạm vào trái tim ở trang chi tiết để lưu điểm đến cho hành trình tiếp theo.");
+
+            chu(
+                    R.id.ytTongSo,
+                    soLuong + " địa điểm đã lưu"
+            );
+
+            if (soLuong == 0) {
+
+                chu(
+                        R.id.ytTieuDeTrangThai,
+                        "Chưa có địa điểm yêu thích"
+                );
+
+                chu(
+                        R.id.ytMoTaTrangThai,
+                        "Khám phá và chạm vào trái tim để lưu những điểm đến bạn yêu thích."
+                );
+
+                nutKhamPha.setVisibility(View.VISIBLE);
+                trangThai.setVisibility(View.VISIBLE);
+
+            } else {
+
+                trangThai.setVisibility(View.GONE);
+            }
+
         } catch (Exception e) {
-            Log.e("YeuThichActivity", "Không thể tải yêu thích", e);
+
+            Log.e(
+                    "YeuThichActivity",
+                    "Khong tai duoc yeu thich",
+                    e
+            );
+
             danhSach.removeAllViews();
-            chu(R.id.ytTongSo, "Chưa tải được bộ sưu tập");
-            chu(R.id.ytTieuDeTrangThai, "Không thể tải danh sách");
-            chu(R.id.ytMoTaTrangThai, "Vui lòng thử tải lại danh sách yêu thích.");
-            chu(R.id.ytKhamPha, "Thử lại");
-            findViewById(R.id.ytKhamPha).setVisibility(View.VISIBLE);
-            findViewById(R.id.ytKhamPha).setOnClickListener(v -> hienThi());
-            return;
+
+            chu(
+                    R.id.ytTongSo,
+                    "Chưa tải được danh sách"
+            );
+
+            chu(
+                    R.id.ytTieuDeTrangThai,
+                    "Không thể tải địa điểm"
+            );
+
+            chu(
+                    R.id.ytMoTaTrangThai,
+                    "Vui lòng kiểm tra và thử lại."
+            );
+
+            nutKhamPha.setText("Thử lại");
+
+            nutKhamPha.setOnClickListener(
+                    v -> hienThi()
+            );
+
+            nutKhamPha.setVisibility(View.VISIBLE);
+            trangThai.setVisibility(View.VISIBLE);
         }
     }
 
+
+
     private void themThe(DiaDiem d) {
-        View the = getLayoutInflater().inflate(R.layout.item_yeu_thich, danhSach, false);
-        ((TextView) the.findViewById(R.id.ytTenDiaDiem)).setText(d.ten);
-        ((TextView) the.findViewById(R.id.ytDanhMuc)).setText(d.danhMuc);
-        ((TextView) the.findViewById(R.id.ytDiaChi)).setText(d.diaChi);
-        com.example.app_ck.ui.common.AnhDiaDiem.hien(the.findViewById(R.id.ytAnhDiaDiem),d.tenAnh);
-        the.setOnClickListener(v -> startActivity(new Intent(this, ChiTietDiaDiemActivity.class)
-                .putExtra("viTriDiaDiem", d.id)));
-        the.findViewById(R.id.ytBoLuu).setContentDescription("Bỏ yêu thích " + d.ten);
-        the.findViewById(R.id.ytBoLuu).setOnClickListener(v -> xacNhanBo(d));
+
+        View the = getLayoutInflater().inflate(
+                R.layout.item_yeu_thich,
+                danhSach,
+                false
+        );
+
+        TextView ten = the.findViewById(
+                R.id.ytTenDiaDiem
+        );
+
+        ImageView anh = the.findViewById(
+                R.id.ytAnhDiaDiem
+        );
+
+        View nutTim = the.findViewById(
+                R.id.ytBoLuu
+        );
+
+        ten.setText(d.ten);
+
+        com.example.app_ck.ui.common.AnhDiaDiem.hien(
+                anh,
+                d.tenAnh
+        );
+
+        the.setContentDescription(
+                "Xem chi tiết " + d.ten
+        );
+
+        the.setOnClickListener(v ->
+                startActivity(
+                        new Intent(
+                                this,
+                                ChiTietDiaDiemActivity.class
+                        ).putExtra(
+                                "viTriDiaDiem",
+                                d.id
+                        )
+                )
+        );
+
+        nutTim.setContentDescription(
+                "Bỏ yêu thích " + d.ten
+        );
+
+        nutTim.setOnClickListener(v -> xacNhanBo(d));
+
         danhSach.addView(the);
     }
+
 
     private void xacNhanBo(DiaDiem d) {
         long taiKhoan = PhienDangNhap.id(this);

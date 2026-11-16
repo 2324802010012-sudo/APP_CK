@@ -12,6 +12,7 @@ import java.util.UUID;
 /** Hỗ trợ tên drawable cũ và ảnh do quản trị viên chọn trên thiết bị. */
 public final class AnhDiaDiem {
     private static final String PREFIX = "anh_may:";
+    public static final String KHONG_ANH = "khong_anh";
     private AnhDiaDiem() {}
 
     private static File tep(Context context,String tenAnh) {
@@ -22,7 +23,17 @@ public final class AnhDiaDiem {
     }
 
     /** Ảnh được tham chiếu từ SQLite có thể là drawable hoặc tệp quản trị đã nhập. */
-    public static android.graphics.Bitmap doc(Context context,String tenAnh) {
+    public static android.graphics.Bitmap doc(
+            Context context,
+            String tenAnh
+    ) {
+
+        if (tenAnh == null
+                || tenAnh.trim().isEmpty()
+                || KHONG_ANH.equals(tenAnh)) {
+            return null;
+        }
+
         try {
             BitmapFactory.Options options=new BitmapFactory.Options();options.inScaled=false;
             File file=tep(context,tenAnh);
@@ -66,14 +77,76 @@ public final class AnhDiaDiem {
         return PREFIX + name;
     }
 
-    public static void hien(ImageView view, String tenAnh) {
-        if(tenAnh!=null && tenAnh.startsWith(PREFIX)) {
-            android.graphics.Bitmap bitmap=doc(view.getContext(),tenAnh);
-            if(bitmap!=null) {view.setImageBitmap(bitmap);return;}
-            view.setImageResource(android.R.drawable.ic_menu_gallery);return;
+    // Gan anh neu tai nguyen ton tai va doc duoc.
+    public static boolean ganNeuCo(
+            ImageView anh,
+            String tenAnh
+    ) {
+
+        if (anh == null
+                || tenAnh == null
+                || tenAnh.trim().isEmpty()
+                || KHONG_ANH.equals(tenAnh)) {
+            return false;
         }
-        int id = view.getResources().getIdentifier(tenAnh == null ? "" : tenAnh,
-                "drawable", view.getContext().getPackageName());
-        view.setImageResource(id == 0 ? android.R.drawable.ic_menu_gallery : id);
+
+        try {
+
+            // Anh do Admin chon tu thiet bi.
+            if (tenAnh.startsWith(PREFIX)) {
+
+                android.graphics.Bitmap bitmap =
+                        doc(anh.getContext(), tenAnh);
+
+                if (bitmap == null) {
+                    return false;
+                }
+
+                anh.setImageBitmap(bitmap);
+
+                return true;
+            }
+
+            // Anh co san trong drawable.
+            int idAnh = anh.getResources().getIdentifier(
+                    tenAnh,
+                    "drawable",
+                    anh.getContext().getPackageName()
+            );
+
+            if (idAnh == 0) {
+                return false;
+            }
+
+            anh.setImageResource(idAnh);
+
+            return true;
+
+        } catch (RuntimeException e) {
+
+            android.util.Log.e(
+                    "AnhDiaDiem",
+                    "Khong hien thi duoc anh: " + tenAnh,
+                    e
+            );
+
+            return false;
+        }
+    }
+
+    // Hien thi anh, hoac anh thay the neu bi loi.
+    public static void hien(
+            ImageView anh,
+            String tenAnh
+    ) {
+
+        if (anh == null) return;
+
+        if (!ganNeuCo(anh, tenAnh)) {
+
+            anh.setImageResource(
+                    android.R.drawable.ic_menu_gallery
+            );
+        }
     }
 }

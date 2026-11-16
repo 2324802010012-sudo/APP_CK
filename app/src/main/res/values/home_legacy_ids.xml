@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ID cu trong MainActivity: giu build khi bo cac View khong can thiet -->
+    <item type="id" name="anhGoiYBaoTang" />
+    <item type="id" name="anhGoiYDinhDocLap" />
+    <item type="id" name="anhTheBaoTang" />
+    <item type="id" name="anhTheConDao" />
+    <item type="id" name="anhTheDinhDocLap" />
+    <item type="id" name="anhTheVanMieu" />
+    <item type="id" name="danhMucSinhThai" />
+    <item type="id" name="danhMucTamLinh" />
+    <item type="id" name="danhMucTatCa" />
+    <item type="id" name="danhMucThienNhien" />
+    <item type="id" name="danhMucVanHoa" />
+    <item type="id" name="danhSachGanToi" />
+    <item type="id" name="diaDiemBaoTang" />
+    <item type="id" name="diaDiemConDao" />
+    <item type="id" name="diaDiemDinhDocLap" />
+    <item type="id" name="diaDiemVanMieu" />
+    <item type="id" name="goiYBaoTang" />
+    <item type="id" name="goiYDinhDocLap" />
+    <item type="id" name="nutBanDo" />
+    <item type="id" name="nutLichSu" />
+    <item type="id" name="nutThuyetMinh" />
+    <item type="id" name="nutTimGanToi" />
+    <item type="id" name="nutTraiNghiem" />
+    <item type="id" name="nutXemGoiY" />
+    <item type="id" name="nutYeuThich" />
+    <item type="id" name="tenGoiYBaoTang" />
+    <item type="id" name="tenGoiYDinhDocLap" />
+    <item type="id" name="tenTheBaoTang" />
+    <item type="id" name="tenTheConDao" />
+    <item type="id" name="tenTheDinhDocLap" />
+    <item type="id" name="tenTheVanMieu" />
+    <item type="id" name="thanhChucNang" />
+    <item type="id" name="thongBaoViTri" />
+    <item type="id" name="tieuDeNoiBat" />
+</resources>

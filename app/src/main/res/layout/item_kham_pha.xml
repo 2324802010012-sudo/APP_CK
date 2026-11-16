@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E6ECE7"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp">
+
+        <!-- ANH NGANG -->
+        <ImageView
+            android:id="@+id/kpItemAnh"
+            android:layout_width="140dp"
+            android:layout_height="112dp"
+            android:background="@drawable/ui_kp_anh_bo_goc"
+            android:clipToOutline="true"
+            android:scaleType="centerCrop"
+            android:importantForAccessibility="no" />
+
+        <!-- THONG TIN DIA DIEM -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="112dp"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <!-- TEN VA TIM CUNG HANG -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/kpItemTen"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="#20382A"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
+
+                <ImageButton
+                    android:id="@+id/kpItemTim"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="9dp"
+                    android:src="@drawable/ui_kp_tim_chua_luu"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Lưu yêu thích" />
+            </LinearLayout>
+
+            <!-- DANH MUC -->
+            <TextView
+                android:id="@+id/kpItemDanhMuc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textSize="11sp"
+                android:textColor="#39805A"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- DIA CHI -->
+            <TextView
+                android:id="@+id/kpItemDiaChi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="10sp"
+                android:textColor="#829087"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- KHOANG TRONG -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- ICON MO CHI TIET -->
+            <FrameLayout
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="end"
+                android:background="@drawable/ui_kp_action_bg"
+                android:importantForAccessibility="no">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ui_kp_arrow_up_right"
+                    android:importantForAccessibility="no" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
