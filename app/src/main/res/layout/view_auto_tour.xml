@@ -1,29 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/tourBangAuto" android:layout_width="match_parent"
-    android:layout_height="wrap_content" android:layout_marginTop="16dp"
-    android:padding="16dp" android:orientation="vertical" android:background="@drawable/nen_tq_the">
-    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="Tự động thuyết minh theo vị trí" android:textSize="17sp"
-        android:textStyle="bold" android:textColor="#24382D" />
-    <TextView android:id="@+id/tourCheDo" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:layout_marginTop="4dp"
-        android:text="Thủ công · Chưa bật AUTO" android:textSize="13sp" android:textColor="#526456" />
-    <TextView android:id="@+id/tourPhamVi" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:layout_marginTop="8dp"
-        android:textSize="13sp" android:textColor="#526456" />
-    <com.google.android.material.button.MaterialButton android:id="@+id/tourBatAuto"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:minHeight="48dp" android:text="Bật AUTO" android:textAllCaps="false"
-        android:textColor="#FFFFFF" app:backgroundTint="#4F7C5A" app:cornerRadius="14dp" />
-    <TextView android:id="@+id/tourTrangThai" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:layout_marginTop="4dp"
-        android:visibility="gone" android:textColor="#526456" android:textSize="13sp"
-        android:accessibilityLiveRegion="polite" />
-    <com.google.android.material.button.MaterialButton android:id="@+id/tourBuocDemo"
+    android:id="@+id/tourBangAuto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@drawable/ui_ct_audio_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:padding="10dp"
+            android:src="@drawable/ui_ic_route"
+            android:background="@drawable/ui_ct_floating_circle"
+            android:importantForAccessibility="no"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hướng dẫn vị trí"
+                android:textSize="14sp"
+                android:textColor="#182D22"
+                android:fontFamily="sans-serif-medium"/>
+
+            <TextView
+                android:id="@+id/tourCheDo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Thủ công · Chưa bật AUTO"
+                android:textSize="12sp"
+                android:textColor="#687B6E"/>
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tourBatAuto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="88dp"
+            android:minHeight="48dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="Bật AUTO"
+            android:textAllCaps="false"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#2C7351"
+            app:cornerRadius="24dp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tourPhamVi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColor="#687B6E"
+        android:textSize="12sp"
+        android:lineSpacingExtra="3dp"/>
+
+    <TextView
+        android:id="@+id/tourTrangThai"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="12dp"
+        android:background="@drawable/ui_ct_action_bg"
+        android:textColor="#2C7351"
+        android:textSize="13sp"
+        android:lineSpacingExtra="3dp"
+        android:visibility="gone"
+        android:accessibilityLiveRegion="polite"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/tourBuocDemo"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:minHeight="48dp" android:text="Demo: tiến gần điểm" android:textAllCaps="false"
-        android:textColor="#4F7C5A" android:visibility="gone" app:strokeColor="#4F7C5A" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:layout_marginTop="6dp"
+        android:text="Demo: tiến gần điểm"
+        android:textAllCaps="false"
+        android:textColor="#2C7351"
+        android:textSize="13sp"
+        android:visibility="gone"
+        app:strokeColor="#C8DCC9"
+        app:backgroundTint="#FFFFFF"
+        app:cornerRadius="14dp"/>
+
 </LinearLayout>

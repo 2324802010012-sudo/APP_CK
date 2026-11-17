@@ -200,15 +200,15 @@
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="14dp"
             android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:text="⌖"
-            android:textSize="29sp"
-            android:textColor="#286C49"
-            android:background="@drawable/ui_bd_panel"
+            android:padding="12dp"
+            android:drawableStart="@drawable/ui_tq_gps"
+            android:background="@drawable/ui_ct_floating_circle"
+            android:backgroundTint="#FFFFFF"
+            android:foreground="?attr/selectableItemBackground"
             android:elevation="5dp"
             android:clickable="true"
             android:focusable="true"
-            android:contentDescription="Vị trí của tôi" />
+            android:contentDescription="Vị trí của tôi"/>
 
         <!-- NGUON BAN DO -->
         <TextView

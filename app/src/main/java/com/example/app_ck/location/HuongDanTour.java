@@ -74,8 +74,10 @@ public class HuongDanTour implements LocationListener {
         ganIdConDao(bang);
         cha.addView(bang);
         ((TextView) timView(bang, R.id.tourPhamVi)).setText(
-                "AUTO có chọn lọc · " + cacDiem.size() + "/" + cauHinh.cacDiem.size()
-                + " điểm trong " + cauHinh.ten + ". Bạn luôn có thể chọn bất kỳ điểm nào trên sơ đồ để nghe thủ công.");
+                "Hỗ trợ AUTO tại " + cacDiem.size()
+                        + "/" + cauHinh.cacDiem.size()
+                        + " điểm. Luôn có thể nghe thủ công."
+        );
         viTri = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
         tuyChonView = activity.getLayoutInflater().inflate(R.layout.sheet_auto_tour, cha, false);
         ganIdConDao(tuyChonView);

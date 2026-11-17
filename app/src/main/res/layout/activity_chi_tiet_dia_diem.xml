@@ -6,379 +6,485 @@
     android:orientation="vertical"
     android:background="#FFFFFF">
 
-    <!-- THANH TIEU DE -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:paddingHorizontal="16dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:background="#FFFFFF"
-        >
-
-        <TextView
-            android:id="@+id/nutQuayLai"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:gravity="center"
-            android:text="‹"
-            android:textSize="36sp"
-            android:textColor="#087B5A"
-            android:contentDescription="Quay lại"
-            android:clickable="true"
-            android:focusable="true"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_weight="1"
-            android:text="Chi tiết địa điểm"
-            android:textColor="#354C2B"
-            android:textSize="21sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/nutTimYeuThich"
-            android:layout_width="48dp"
-            android:layout_height="44dp"
-            android:layout_marginTop="5dp"
-            android:clickable="true"
-            android:contentDescription="Yêu thích"
-            android:focusable="true"
-            android:gravity="center"
-            android:text="♡"
-            android:textColor="#ED3157"
-            android:textSize="32sp" />
-
-    </LinearLayout>
-
-    <!-- NOI DUNG CUON -->
+    <!-- NỘI DUNG CUỘN -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:fillViewport="true"
         android:scrollbars="none"
-        android:background="#FFFFFF">
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
-            <!-- ANH DIA DIEM -->
+            <!-- ẢNH ĐỊA ĐIỂM TỰ ĐỘNG CHUYỂN -->
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="230dp"
-                android:background="@drawable/nen_the_trang"
-                android:clipToOutline="true">
+                android:layout_height="300dp"
+                android:background="#E6EFE7">
 
                 <ImageView
                     android:id="@+id/anhChiTiet"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:contentDescription="Ảnh địa điểm"/>
+                    android:contentDescription="Hình ảnh địa điểm"
+                    android:clickable="true"
+                    android:focusable="true"/>
 
+                <!-- LỚP GRADIENT -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/ui_ct_hero_gradient"
+                    android:importantForAccessibility="no"/>
+
+                <!-- NÚT QUAY LẠI -->
+                <ImageView
+                    android:id="@+id/nutQuayLai"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="top|start"
+                    android:layout_margin="16dp"
+                    android:padding="13dp"
+                    android:rotation="180"
+                    android:src="@drawable/ui_ic_chevron"
+                    android:tint="#20382A"
+                    android:background="@drawable/ui_ct_floating_circle"
+                    android:contentDescription="Quay lại"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <!-- NÚT YÊU THÍCH -->
                 <TextView
-                    android:id="@+id/soLuongAnh"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/nutTimYeuThich"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_gravity="top|end"
-                    android:layout_margin="12dp"
-                    android:padding="9dp"
-                    android:text="▣ 1/1"
-                    android:textColor="#FFFFFF"
-                    android:background="@drawable/nen_dem_anh"/>
+                    android:layout_margin="16dp"
+                    android:background="@drawable/ui_ct_floating_circle"
+                    android:gravity="center"
+                    android:text="♡"
+                    android:textSize="29sp"
+                    android:textColor="#2C7351"
+                    android:contentDescription="Lưu địa điểm"
+                    android:clickable="true"
+                    android:focusable="true"/>
 
-            </FrameLayout>
-
-            <!-- TEN DIA DIEM -->
-            <TextView
-                android:id="@+id/tenChiTiet"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Dinh Độc Lập"
-                android:textColor="#354C2B"
-                android:textSize="27sp"
-                android:textStyle="bold"/>
-
-            <!-- DANH MUC -->
-            <TextView
-                android:id="@+id/danhMucChiTiet"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Văn hóa – lịch sử"
-                android:textSize="13sp"
-                android:textColor="#697E50"/>
-
-            <!-- DIA CHI VA GIO THAM QUAN -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/diaChiChiTiet"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="#697E50"
-                    android:text="⌖ TP. Hồ Chí Minh"/>
-
-                <TextView
-                    android:id="@+id/gioMoCua"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="◷ Xem giờ tham quan"
-                    android:textSize="12sp"
-                    android:textColor="#4E653D"/>
-
-            </LinearLayout>
-
-            <!-- GIOI THIEU -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Giới thiệu địa điểm"
-                android:textStyle="bold"
-                android:textSize="19sp"
-                android:textColor="#354C2B"/>
-
-            <TextView
-                android:id="@+id/moTaChiTiet"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textSize="15sp"
-                android:lineSpacingExtra="4dp"
-                android:textColor="#60705A"
-                android:maxLines="3"
-                android:ellipsize="end"/>
-
-            <TextView
-                android:id="@+id/nutXemThem"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:gravity="end|center_vertical"
-                android:text="Xem thêm  ⌄"
-                android:textColor="#4E653D"
-                android:textStyle="bold"
-                android:clickable="true"
-                android:focusable="true"/>
-
-            <TextView
-                android:id="@+id/nguonChiTiet"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:gravity="center_vertical"
-                android:text="Nguồn thông tin chính thức ↗"
-                android:textColor="#176D53"
-                android:textSize="14sp"
-                android:clickable="true"
-                android:focusable="true"/>
-
-            <!-- BON TIEN ICH: BAN DO, CHI DUONG, THUYET MINH, YEU THICH -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="vertical">
-
+                <!-- THÔNG TIN ẢNH ĐANG HIỂN THỊ -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="34dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/ctTenAnh"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="12dp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textSize="13sp"
+                        android:textColor="#FFFFFF"
+                        android:shadowColor="#99000000"
+                        android:shadowRadius="4"
+                        android:fontFamily="sans-serif-medium"/>
+
+                    <TextView
+                        android:id="@+id/soLuongAnh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:gravity="center"
+                        android:background="@drawable/ui_ct_category"
+                        android:backgroundTint="#B3000000"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <!-- KHỐI NỘI DUNG BO GÓC -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-22dp"
+                android:orientation="vertical"
+                android:background="@drawable/ui_ct_content_bg"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="18dp">
+
+                <!-- DANH MỤC VÀ THƯ VIỆN -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/danhMucChiTiet"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="#2C7351"
+                        android:textSize="11sp"
+                        android:letterSpacing="0.08"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/nutThuVien"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:gravity="center"
+                        android:drawableStart="@android:drawable/ic_menu_gallery"
+                        android:drawableTint="#2C7351"
+                        android:drawablePadding="5dp"
+                        android:text="Hình ảnh"
+                        android:textColor="#2C7351"
+                        android:textSize="12sp"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                </LinearLayout>
+
+                <!-- TÊN ĐỊA ĐIỂM -->
+                <TextView
+                    android:id="@+id/tenChiTiet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="30sp"
+                    android:textColor="#182D22"
+                    android:fontFamily="sans-serif-medium"
+                    android:lineSpacingExtra="2dp"/>
+
+                <!-- ĐỊA CHỈ CÓ ICON VỊ TRÍ -->
+                <TextView
+                    android:id="@+id/diaChiChiTiet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:drawableStart="@drawable/ui_ct_location"
+                    android:drawablePadding="7dp"
+                    android:textColor="#64766A"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="3dp"/>
+
+                <!-- BA NÚT TIỆN ÍCH -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/nutXemBanDo"
                         android:layout_width="0dp"
-                        android:layout_height="78dp"
+                        android:layout_height="76dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
+                        android:layout_marginEnd="9dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="11dp"
                         android:gravity="center"
-                        android:text="⌖\nXem bản đồ"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="#354C2B"
-                        android:background="@drawable/nen_tien_ich_xanh"
+                        android:background="@drawable/ui_ct_audio_bg"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:drawableTop="@drawable/ui_ic_map"
+                        android:drawablePadding="6dp"
+                        android:text="Bản đồ"
+                        android:textColor="#20382A"
+                        android:textSize="13sp"
                         android:clickable="true"
                         android:focusable="true"/>
 
                     <TextView
                         android:id="@+id/nutChiDuong"
                         android:layout_width="0dp"
-                        android:layout_height="78dp"
+                        android:layout_height="76dp"
                         android:layout_weight="1"
+                        android:layout_marginEnd="9dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="11dp"
                         android:gravity="center"
-                        android:text="➤\nChỉ đường"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="#354C2B"
-                        android:background="@drawable/nen_tien_ich_xanh"
+                        android:background="@drawable/ui_ct_audio_bg"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:drawableTop="@drawable/ui_ic_route"
+                        android:drawablePadding="6dp"
+                        android:text="Chỉ đường"
+                        android:textColor="#20382A"
+                        android:textSize="13sp"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <TextView
+                        android:id="@+id/gioMoCua"
+                        android:layout_width="0dp"
+                        android:layout_height="76dp"
+                        android:layout_weight="1"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="11dp"
+                        android:gravity="center"
+                        android:background="@drawable/ui_ct_audio_bg"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:drawableTop="@android:drawable/ic_menu_info_details"
+                        android:drawableTint="#2C7351"
+                        android:drawablePadding="6dp"
+                        android:text="Thông tin"
+                        android:textColor="#20382A"
+                        android:textSize="13sp"
                         android:clickable="true"
                         android:focusable="true"/>
 
                 </LinearLayout>
 
+                <!-- NGHE THUYẾT MINH -->
                 <LinearLayout
+                    android:id="@+id/nutNgheThuyetMinh"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:minHeight="84dp"
+                    android:padding="14dp"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/ui_ct_audio_bg"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ui_ic_audio"
+                        android:background="@drawable/ui_ct_floating_circle"
+                        android:backgroundTint="#D8E9D9"
+                        android:importantForAccessibility="no"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Nghe thuyết minh"
+                            android:textColor="#20382A"
+                            android:textSize="16sp"
+                            android:fontFamily="sans-serif-medium"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Câu chuyện di sản"
+                            android:textColor="#64766A"
+                            android:textSize="12sp"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/nutPhatLon"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:gravity="center"
+                        android:background="@drawable/ui_ct_floating_circle"
+                        android:backgroundTint="#2C7351"
+                        android:text="▶"
+                        android:textColor="#FFFFFF"
+                        android:textSize="19sp"
+                        android:contentDescription="Phát thuyết minh"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/trangThaiThuyetMinh"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:orientation="horizontal">
+                    android:textColor="#2C7351"
+                    android:textSize="13sp"
+                    android:accessibilityLiveRegion="polite"
+                    android:visibility="gone"/>
+
+                <!-- GIỚI THIỆU -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:text="Giới thiệu"
+                    android:textColor="#182D22"
+                    android:textSize="20sp"
+                    android:fontFamily="sans-serif-medium"/>
+
+                <TextView
+                    android:id="@+id/moTaChiTiet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:textColor="#53685A"
+                    android:textSize="15sp"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="5dp"/>
+
+                <TextView
+                    android:id="@+id/nutXemThem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:text="Đọc thêm  ↓"
+                    android:textColor="#2C7351"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:background="#E6EBE6"/>
+
+                <!-- DANH SÁCH ĐIỂM THAM QUAN -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Khám phá bên trong"
+                            android:textSize="19sp"
+                            android:textColor="#182D22"
+                            android:fontFamily="sans-serif-medium"/>
+
+                        <TextView
+                            android:id="@+id/ctSoDiemThamQuan"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:textSize="12sp"
+                            android:textColor="#687B6E"/>
+
+                    </LinearLayout>
 
                     <TextView
-                        android:id="@+id/nutNgheThuyetMinh"
-                        android:layout_width="0dp"
-                        android:layout_height="78dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
+                        android:id="@+id/nutXemTatCaDiem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
                         android:gravity="center"
-                        android:text="♫\nThuyết minh"
-                        android:textSize="14sp"
+                        android:text="Xem sơ đồ ›"
+                        android:textColor="#2C7351"
+                        android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#354C2B"
-                        android:background="@drawable/nen_tien_ich_lam"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <TextView
-                        android:id="@+id/nutLuuYeuThich"
-                        android:layout_width="0dp"
-                        android:layout_height="78dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="♡\nYêu thích"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="#354C2B"
-                        android:background="@drawable/nen_tien_ich_cam"
                         android:clickable="true"
                         android:focusable="true"/>
 
                 </LinearLayout>
-            </LinearLayout>
 
-            <!-- NUT PHAT THUYET MINH -->
-            <TextView
-                android:id="@+id/nutPhatLon"
-                android:layout_width="match_parent"
-                android:layout_height="58dp"
-                android:layout_marginTop="16dp"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="20dp"
-                android:text="▶   Nghe thuyết minh     ›"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:background="@drawable/nen_cta_xanh"
-                android:clickable="true"
-                android:focusable="true"/>
-
-            <TextView
-                android:id="@+id/trangThaiThuyetMinh"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:textSize="13sp"
-                android:textColor="#607467"
-                android:accessibilityLiveRegion="polite"
-                android:visibility="gone" />
-
-            <!-- DUNG THUYET MINH -->
-            <TextView
-                android:id="@+id/nutDungThuyetMinh"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:gravity="center"
-                android:text="■  Dừng thuyết minh"
-                android:textColor="#4E653D"
-                android:clickable="true"
-                android:focusable="true"/>
-
-            <!-- THU VIEN ANH -->
-            <TextView
-                android:id="@+id/nutThuVien"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="16dp"
-                android:text="▣   Xem hình ảnh &amp; phim tư liệu     ›"
-                android:textColor="#4E653D"
-                android:textSize="16sp"
-                android:background="@drawable/nen_tien_ich_xanh"
-                android:clickable="true"
-                android:focusable="true"/>
-
-            <!-- DIEM THAM QUAN NOI BAT -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Các điểm tham quan nổi bật"
-                    android:textStyle="bold"
-                    android:textSize="18sp"
-                    android:textColor="#354C2B"/>
+                    android:layout_marginTop="13dp"
+                    android:scrollbars="none"
+                    android:overScrollMode="never">
 
+                    <LinearLayout
+                        android:id="@+id/danhSachDiemNoiBat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="8dp"/>
+
+                </HorizontalScrollView>
+
+                <!-- NGUỒN THAM KHẢO -->
                 <TextView
-                    android:id="@+id/nutXemTatCaDiem"
-                    android:layout_width="wrap_content"
-                    android:layout_height="44dp"
-                    android:gravity="center"
-                    android:text="Xem tất cả  ›"
-                    android:textColor="#4E653D"
+                    android:id="@+id/nguonChiTiet"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="14dp"
+                    android:gravity="center_vertical"
+                    android:drawableEnd="@drawable/ui_ic_chevron"
+                    android:text="Nguồn thông tin tham khảo"
+                    android:textColor="#687B6E"
+                    android:textSize="13sp"
                     android:clickable="true"
                     android:focusable="true"/>
 
-            </LinearLayout>
-
-            <!-- DANH SACH DIEM THAM QUAN -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:id="@+id/danhSachDiemNoiBat"
+                <!-- GIỮ ID ĐỂ TƯƠNG THÍCH CODE CŨ -->
+                <TextView
+                    android:id="@+id/nutLuuYeuThich"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingBottom="8dp"/>
+                    android:visibility="gone"/>
 
-            </HorizontalScrollView>
+                <TextView
+                    android:id="@+id/nutDungThuyetMinh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"/>
 
-            <!-- BAT DAU THAM QUAN -->
-            <TextView
-                android:id="@+id/nutBatDauThamQuan"
-                android:layout_width="match_parent"
-                android:layout_height="62dp"
-                android:layout_marginTop="16dp"
-                android:gravity="center"
-                android:text="➤   Bắt đầu tham quan    →"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:background="@drawable/nen_cta_xanh"
-                android:clickable="true"
-                android:focusable="true"/>
+            </LinearLayout>
 
         </LinearLayout>
+
     </ScrollView>
+
+    <!-- NÚT BẮT ĐẦU CỐ ĐỊNH -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:elevation="5dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:id="@+id/nutBatDauThamQuan"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center"
+            android:background="@drawable/ui_ct_category"
+            android:backgroundTint="#2C7351"
+            android:foreground="?attr/selectableItemBackground"
+            android:text="Bắt đầu tham quan"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            android:clickable="true"
+            android:focusable="true"/>
+
+    </LinearLayout>
 
 </LinearLayout>

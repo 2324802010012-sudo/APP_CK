@@ -1,82 +1,412 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:padding="20dp">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:gravity="center_vertical" android:orientation="horizontal">
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:orientation="vertical">
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="THUYẾT MINH ĐIỂM THAM QUAN" android:textSize="10sp"
-                android:letterSpacing="0.08" android:textColor="#4F7C5A" android:textStyle="bold" />
-            <TextView android:id="@+id/ngheTenDiem" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:layout_marginTop="6dp"
-                android:textSize="20sp" android:textStyle="bold" android:textColor="#24382D"
-                android:maxLines="2" android:ellipsize="end" />
-        </LinearLayout>
-        <com.google.android.material.button.MaterialButton android:id="@+id/ngheDong"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="48dp" android:layout_height="48dp" android:minWidth="0dp"
-            android:padding="0dp" android:text="×" android:textSize="28sp"
-            android:textColor="#4F7C5A" android:contentDescription="Đóng khung thuyết minh"
-            app:backgroundTint="#EEF4EA" app:cornerRadius="24dp" />
-    </LinearLayout>
-    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1" android:layout_marginTop="14dp" android:fillViewport="false">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <com.google.android.material.imageview.ShapeableImageView android:id="@+id/ngheAnh"
-                android:layout_width="match_parent" android:layout_height="140dp"
-                android:scaleType="centerCrop" android:contentDescription="Ảnh tổng quan địa điểm"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.APP_CK.Dialog" />
-            <TextView android:id="@+id/ngheDiaDiem" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:layout_marginTop="8dp"
-                android:textSize="12sp" android:textColor="#647568" />
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" android:text="Câu chuyện điểm đến"
-                android:textSize="15sp" android:textStyle="bold" android:textColor="#24382D" />
-            <TextView android:id="@+id/ngheNguonThongTin" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:minHeight="48dp"
-                android:gravity="center_vertical" android:text="Nguồn thông tin chính thức ↗"
-                android:textSize="14sp" android:textColor="#176D53"
-                android:clickable="true" android:focusable="true" />
-            <TextView android:id="@+id/ngheNoiDung" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:layout_marginTop="8dp"
-                android:paddingBottom="12dp" android:textSize="14sp" android:lineSpacingExtra="5dp"
-                android:textColor="#526456" android:textIsSelectable="true" />
-        </LinearLayout>
-    </ScrollView>
-    <TextView android:id="@+id/ngheTrangThai" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:layout_marginTop="10dp" android:textSize="12sp"
-        android:text="Sẵn sàng nghe thuyết minh" android:textColor="#647568"
-        android:accessibilityLiveRegion="polite" />
-    <ProgressBar android:id="@+id/ngheChuanBi" style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent" android:layout_height="3dp"
-        android:indeterminate="true" android:indeterminateTint="#4F7C5A" android:visibility="gone" />
-    <SeekBar android:id="@+id/ngheThanhTua" android:layout_width="match_parent"
-        android:layout_height="40dp" android:enabled="false" android:max="1000"
-        android:progressTint="#4F7C5A" android:thumbTint="#4F7C5A"
-        android:progressBackgroundTint="#E5EDE3" android:contentDescription="Tua bài thuyết minh" />
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/ui_ct_content_bg"
+    android:paddingStart="22dp"
+    android:paddingEnd="22dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="18dp">
+
+    <!-- THANH TIÊU ĐỀ -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
-        <TextView android:id="@+id/ngheDaPhat" android:layout_width="0dp"
-            android:layout_height="wrap_content" android:layout_weight="1" android:text="00:00"
-            android:textSize="12sp" android:textColor="#647568" />
-        <TextView android:id="@+id/ngheTongThoiGian" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="--:--" android:textSize="12sp"
-            android:textColor="#647568" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Thuyết minh"
+            android:textColor="#182D22"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-medium"/>
+
+        <ImageButton
+            android:id="@+id/ngheDong"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="13dp"
+            android:src="@drawable/ui_nghe_close"
+            android:scaleType="centerInside"
+            android:background="@drawable/ui_ct_floating_circle"
+            android:backgroundTint="#EAF2E8"
+            android:foreground="?attr/selectableItemBackground"
+            android:contentDescription="Đóng thuyết minh"/>
+
     </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginTop="6dp" android:orientation="horizontal" android:gravity="center_vertical">
-        <com.google.android.material.button.MaterialButton android:id="@+id/nghePhatTamDung"
-            android:layout_width="0dp" android:layout_height="52dp" android:layout_weight="1"
-            android:text="▶  Nghe thuyết minh" android:textAllCaps="false" android:textColor="#FFFFFF"
-            app:backgroundTint="#4F7C5A" app:cornerRadius="14dp" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/ngheDung"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content" android:layout_height="52dp"
-            android:layout_marginStart="10dp" android:text="■  Dừng" android:textAllCaps="false"
-            android:textColor="#4F7C5A" app:strokeColor="#DFE7DC" app:cornerRadius="14dp" />
+
+    <!-- ẢNH TỰ CO GIÃN THEO KHÔNG GIAN CÒN LẠI -->
+
+    <ImageView
+        android:id="@+id/ngheAnh"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/ui_ct_thumb"
+        android:clipToOutline="true"
+        android:scaleType="centerCrop"
+        android:contentDescription="Ảnh điểm tham quan"/>
+
+    <!-- TÊN ĐIỂM THUYẾT MINH -->
+
+    <TextView
+        android:id="@+id/ngheTenDiem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textColor="#182D22"
+        android:textSize="24sp"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:lineSpacingExtra="2dp"/>
+
+    <!-- ĐỊA ĐIỂM HOẶC LOẠI THUYẾT MINH -->
+
+    <TextView
+        android:id="@+id/ngheDiaDiem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:drawableStart="@drawable/ui_ct_location"
+        android:drawablePadding="7dp"
+        android:textColor="#687B6E"
+        android:textSize="13sp"
+        android:maxLines="2"
+        android:ellipsize="end"/>
+
+    <!-- TIẾP TỤC TỪ VỊ TRÍ ĐÃ LƯU -->
+
+    <TextView
+        android:id="@+id/ngheTiep"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:gravity="center_vertical"
+        android:background="@drawable/ui_ct_audio_bg"
+        android:foreground="?attr/selectableItemBackground"
+        android:drawableStart="@drawable/ui_ic_history"
+        android:drawableEnd="@drawable/ui_ic_chevron"
+        android:drawablePadding="8dp"
+        android:textColor="#2C7351"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"/>
+
+    <!--
+        GIỮ ID CŨ ĐỂ TƯƠNG THÍCH JAVA.
+        Không hiển thị phần này trên giao diện.
+    -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:importantForAccessibility="noHideDescendants">
+
+        <TextView
+            android:id="@+id/ngheNoiDung"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="3"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:id="@+id/ngheMoRong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/ngheNguonThongTin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
+
+    <!-- TRÌNH ĐIỀU KHIỂN ÂM THANH -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical">
+
+        <!-- TRẠNG THÁI PHÁT -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- SÓNG ÂM ĐỘNG -->
+
+            <LinearLayout
+                android:id="@+id/ngheSongAm"
+                android:layout_width="36dp"
+                android:layout_height="26dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:importantForAccessibility="no">
+
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="10dp"
+                    android:layout_marginEnd="3dp"
+                    android:background="@drawable/ui_ct_category"
+                    android:backgroundTint="#2C7351"/>
+
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="19dp"
+                    android:layout_marginEnd="3dp"
+                    android:background="@drawable/ui_ct_category"
+                    android:backgroundTint="#2C7351"/>
+
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="26dp"
+                    android:layout_marginEnd="3dp"
+                    android:background="@drawable/ui_ct_category"
+                    android:backgroundTint="#2C7351"/>
+
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="14dp"
+                    android:layout_marginEnd="3dp"
+                    android:background="@drawable/ui_ct_category"
+                    android:backgroundTint="#2C7351"/>
+
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="21dp"
+                    android:background="@drawable/ui_ct_category"
+                    android:backgroundTint="#2C7351"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/ngheTrangThai"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="7dp"
+                android:text="Sẵn sàng nghe thuyết minh"
+                android:textColor="#2C7351"
+                android:textSize="13sp"
+                android:maxWidth="240dp"
+                android:accessibilityLiveRegion="polite"/>
+
+        </LinearLayout>
+
+        <!-- TIẾN TRÌNH CHUẨN BỊ -->
+
+        <ProgressBar
+            android:id="@+id/ngheChuanBi"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginTop="8dp"
+            android:indeterminate="true"
+            android:indeterminateTint="#2C7351"
+            android:visibility="gone"/>
+
+        <!-- THANH TUA -->
+
+        <SeekBar
+            android:id="@+id/ngheThanhTua"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_marginTop="5dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:max="1000"
+            android:progress="0"
+            android:enabled="false"
+            android:splitTrack="false"
+            android:progressTint="#2C7351"
+            android:thumbTint="#2C7351"
+            android:progressBackgroundTint="#D5E4D5"
+            android:contentDescription="Tua bài thuyết minh"/>
+
+        <!-- THỜI GIAN -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/ngheDaPhat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="00:00"
+                android:textColor="#2C7351"
+                android:textSize="12sp"
+                android:fontFeatureSettings="tnum"
+                android:fontFamily="sans-serif-medium"/>
+
+            <TextView
+                android:id="@+id/ngheTongThoiGian"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--:--"
+                android:textColor="#687B6E"
+                android:textSize="12sp"
+                android:fontFeatureSettings="tnum"/>
+
+        </LinearLayout>
+
+        <!-- ĐIỀU KHIỂN TRUNG TÂM -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- TUA LÙI 10 GIÂY -->
+
+            <ImageButton
+                android:id="@+id/ngheLui10"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:padding="10dp"
+                android:src="@drawable/ui_nghe_lui10"
+                android:scaleType="centerInside"
+                android:background="@drawable/ui_ct_floating_circle"
+                android:backgroundTint="#F4F7F2"
+                android:foreground="?attr/selectableItemBackground"
+                android:contentDescription="Lùi 10 giây"
+                android:enabled="false"/>
+
+            <!-- PHÁT / TẠM DỪNG / NGHE LẠI -->
+
+            <ImageButton
+                android:id="@+id/nghePhatTamDung"
+                android:layout_width="74dp"
+                android:layout_height="74dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
+                android:padding="20dp"
+                android:src="@drawable/ui_nghe_play"
+                android:scaleType="centerInside"
+                android:background="@drawable/ui_ct_floating_circle"
+                android:backgroundTint="#2C7351"
+                android:foreground="?attr/selectableItemBackground"
+                android:elevation="3dp"
+                android:contentDescription="Phát thuyết minh"/>
+
+            <!-- TUA TỚI 10 GIÂY -->
+
+            <ImageButton
+                android:id="@+id/ngheToi10"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:padding="10dp"
+                android:src="@drawable/ui_nghe_toi10"
+                android:scaleType="centerInside"
+                android:background="@drawable/ui_ct_floating_circle"
+                android:backgroundTint="#F4F7F2"
+                android:foreground="?attr/selectableItemBackground"
+                android:contentDescription="Tới 10 giây"
+                android:enabled="false"/>
+
+        </LinearLayout>
+
+        <!-- TỐC ĐỘ VÀ DỪNG -->
+
+
+        <!-- TỐC ĐỘ - NỘI DUNG - DỪNG -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- TỐC ĐỘ PHÁT -->
+
+            <TextView
+                android:id="@+id/ngheTocDo"
+                android:layout_width="0dp"
+                android:layout_height="58dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:gravity="center"
+                android:background="@drawable/ui_ct_audio_bg"
+                android:foreground="?attr/selectableItemBackground"
+                android:text="1.0×"
+                android:textColor="#2C7351"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium"
+                android:contentDescription="Tốc độ phát"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <!-- ĐỌC NỘI DUNG -->
+
+            <TextView
+                android:id="@+id/ngheDocNoiDung"
+                android:layout_width="0dp"
+                android:layout_height="58dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="6dp"
+                android:gravity="center"
+                android:background="@drawable/ui_ct_audio_bg"
+                android:foreground="?attr/selectableItemBackground"
+                android:drawableTop="@drawable/ui_nghe_noi_dung"
+                android:drawablePadding="3dp"
+                android:text="Nội dung"
+                android:textColor="#2C7351"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:contentDescription="Đọc nội dung thuyết minh"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <!-- DỪNG ÂM THANH -->
+
+            <TextView
+                android:id="@+id/ngheDung"
+                android:layout_width="0dp"
+                android:layout_height="58dp"
+                android:layout_weight="1"
+                android:paddingTop="8dp"
+                android:paddingBottom="6dp"
+                android:gravity="center"
+                android:background="@drawable/ui_ct_audio_bg"
+                android:foreground="?attr/selectableItemBackground"
+                android:drawableTop="@drawable/ui_nghe_stop"
+                android:drawablePadding="3dp"
+                android:text="Dừng"
+                android:textColor="#2C7351"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:contentDescription="Dừng thuyết minh"
+                android:clickable="true"
+                android:focusable="true"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 </LinearLayout>
