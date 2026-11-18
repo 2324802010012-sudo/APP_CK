@@ -1,14 +1,10 @@
-package com.example.app_ck.ui.tour;
 
-import com.example.app_ck.R;
-import com.example.app_ck.data.local.AppDatabase;
-import com.example.app_ck.data.model.DiemThamQuan;
-import com.example.app_ck.data.repository.KhoDuLieuThamQuan;
+package com.example.app_ck.ui.tour;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -17,140 +13,484 @@ import android.graphics.Typeface;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.example.app_ck.R;
+import com.example.app_ck.data.local.AppDatabase;
+import com.example.app_ck.data.model.DiemThamQuan;
+import com.example.app_ck.data.repository.KhoDuLieuThamQuan;
+import com.example.app_ck.ui.common.AnhDiaDiem;
+
 import java.util.ArrayList;
 import java.util.List;
 
-/** Hiển thị sơ đồ theo metadata SQLite; điểm không có marker vẫn nằm trong danh sách. */
 public final class AnhSoDoTour {
-    private AnhSoDoTour() {}
 
-    public interface ChonDiem { void chon(int id); }
+    private AnhSoDoTour() {
+    }
+
+    public interface ChonDiem {
+
+        void chon(int id);
+    }
 
     private static int dp(Context context, float value) {
-        return Math.round(value * context.getResources().getDisplayMetrics().density);
+
+        return Math.round(value * context.getResources()
+                .getDisplayMetrics().density);
     }
 
-    public static void ganAnhDaiDien(Activity activity, String tenAnh) {
-        ImageView anh = activity.findViewById(R.id.tqAnhDiaDiem);
-        com.example.app_ck.ui.common.AnhDiaDiem.hien(anh,tenAnh);
-        anh.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    public static void ganAnhDaiDien(
+            Activity activity,
+            String tenAnh) {
+
+        ImageView anh = activity.findViewById(
+                R.id.tqAnhDiaDiem
+        );
+
+        AnhDiaDiem.hien(anh, tenAnh);
+
+        anh.setScaleType(
+                ImageView.ScaleType.CENTER_CROP
+        );
     }
 
-    public static void themSoDo(Activity activity, LinearLayout khung, int place, int tang,
-                                int idDangChon, ChonDiem chon) {
-        String tenAnh;
-        List<DiemThamQuan> markers = new ArrayList<>();
-        try (AppDatabase helper = new AppDatabase(activity)) {
-            android.database.sqlite.SQLiteDatabase db = helper.getReadableDatabase();
-            tenAnh = KhoDuLieuThamQuan.anhSoDo(db, place, tang);
-            for (DiemThamQuan d : KhoDuLieuThamQuan.danhSach(db, place)) {
-                if (d.tang == tang && d.coMarker()) markers.add(d);
+    // Uu tien anh so do sach neu co ban thay the
+
+    public static Bitmap docAnhSoDo(
+            Context context,
+            String tenAnh) {
+
+        if (tenAnh == null || tenAnh.trim().isEmpty()) {
+
+            return null;
+        }
+
+        // Chi ap dung cho tai nguyen drawable.
+        // Khong thay doi anh Admin nhap tu may.
+
+        if (tenAnh.matches("[a-z][a-z0-9_]*")
+                && !tenAnh.endsWith("_sach")) {
+
+            Bitmap anhSach = AnhDiaDiem.doc(
+                    context,
+                    tenAnh + "_sach"
+            );
+
+            if (anhSach != null) {
+
+                return anhSach;
             }
         }
+
+        return AnhDiaDiem.doc(context, tenAnh);
+    }
+
+    // =====================================================
+    // HIEN THI SO DO TU SQLITE
+    // =====================================================
+
+    public static void themSoDo(
+            Activity activity,
+            LinearLayout khung,
+            int place,
+            int tang,
+            int idDangChon,
+            ChonDiem chon) {
+
+        String tenAnh;
+
+        List<DiemThamQuan> markers = new ArrayList<>();
+
+        try (AppDatabase helper = new AppDatabase(activity)) {
+
+            SQLiteDatabase db = helper.getReadableDatabase();
+
+            tenAnh = KhoDuLieuThamQuan.anhSoDo(
+                    db, place, tang
+            );
+
+            for (DiemThamQuan diem :
+                    KhoDuLieuThamQuan.danhSach(db, place)) {
+
+                if (diem.tang == tang && diem.coMarker()) {
+
+                    markers.add(diem);
+                }
+            }
+        }
+
         TextView nhan = new TextView(activity);
-        nhan.setText("⌖  Sơ đồ tham quan");
-        nhan.setTextSize(18);
-        nhan.setTypeface(null, Typeface.BOLD);
-        nhan.setTextColor(Color.parseColor("#24382D"));
-        nhan.setPadding(0, dp(activity, 16), 0, dp(activity, 10));
+
+        nhan.setText("Sơ đồ tham quan");
+
+        nhan.setTextSize(17);
+
+        nhan.setTypeface(
+                Typeface.create(
+                        "sans-serif-medium",
+                        Typeface.NORMAL
+                )
+        );
+
+        nhan.setTextColor(
+                Color.parseColor("#182D22")
+        );
+
+        nhan.setPadding(
+                0,
+                dp(activity, 8),
+                0,
+                dp(activity, 12)
+        );
+
         khung.addView(nhan);
 
-        Bitmap anh=com.example.app_ck.ui.common.AnhDiaDiem.doc(activity,tenAnh);
+        Bitmap anh = docAnhSoDo(activity, tenAnh);
+
         if (anh == null) {
+
             TextView thieu = new TextView(activity);
-            thieu.setText("Chưa có ảnh sơ đồ. Bạn vẫn chọn điểm trong danh sách để xem và nghe thuyết minh.");
-            thieu.setTextColor(Color.parseColor("#647568"));
-            thieu.setPadding(dp(activity, 14), dp(activity, 16), dp(activity, 14), dp(activity, 16));
+
+            thieu.setText(
+                    "Chưa có sơ đồ. Bạn vẫn có thể "
+                            + "chọn điểm trong tab Danh sách."
+            );
+
+            thieu.setTextSize(14);
+
+            thieu.setTextColor(
+                    Color.parseColor("#687B6E")
+            );
+
+            thieu.setPadding(
+                    dp(activity, 12),
+                    dp(activity, 20),
+                    dp(activity, 12),
+                    dp(activity, 20)
+            );
+
             khung.addView(thieu);
+
             return;
         }
-        SoDoTrongTrang view = new SoDoTrongTrang(activity, anh, markers, idDangChon, chon);
-        SoDoThuPhongLayout.themVao(khung, view, dp(activity, place == 3 ? 440 : 385));
-        TextView ghiChu = new TextView(activity);
-        ghiChu.setText(markers.isEmpty()
-                ? "Chưa có tọa độ marker. Bạn có thể chọn điểm trong danh sách."
-                : "Chạm vào marker để chọn điểm. Tọa độ trên sơ đồ độc lập với GPS.");
-        ghiChu.setTextSize(12);
-        ghiChu.setTextColor(Color.parseColor("#647568"));
-        ghiChu.setPadding(0, dp(activity, 9), 0, dp(activity, 16));
-        khung.addView(ghiChu);
+
+        SoDoTrongTrang view = new SoDoTrongTrang(
+                activity,
+                anh,
+                markers,
+                idDangChon,
+                chon
+        );
+
+        float density = activity.getResources()
+                .getDisplayMetrics().density;
+
+        float manHinhDp = activity.getResources()
+                .getDisplayMetrics().heightPixels / density;
+
+        float chieuCao = Math.max(
+                240f,
+                Math.min(
+                        place == 3 ? 440f : 385f,
+                        manHinhDp * 0.45f
+                )
+        );
+
+        SoDoThuPhongLayout.themVao(
+                khung,
+                view,
+                dp(activity, chieuCao)
+        );
+
+        if (markers.isEmpty()) {
+
+            TextView thongBao = new TextView(activity);
+
+            thongBao.setText(
+                    "Chưa có marker. Hãy chọn điểm từ danh sách."
+            );
+
+            thongBao.setTextSize(12);
+
+            thongBao.setTextColor(
+                    Color.parseColor("#687B6E")
+            );
+
+            khung.addView(thongBao);
+        }
     }
 
+    // =====================================================
+    // CAP NHAT MARKER KHONG DAT LAI ZOOM
+    // =====================================================
+
+    public static void capNhatMarker(
+            View khung,
+            int idDangChon) {
+
+        if (khung instanceof SoDoTrongTrang) {
+
+            SoDoTrongTrang soDo = (SoDoTrongTrang) khung;
+
+            soDo.idDangChon = idDangChon;
+
+            soDo.invalidate();
+
+            if (soDo.getParent() instanceof View) {
+
+                ((View) soDo.getParent()).invalidate();
+            }
+
+            return;
+        }
+
+        if (khung instanceof ViewGroup) {
+
+            ViewGroup group = (ViewGroup) khung;
+
+            for (int i = 0; i < group.getChildCount(); i++) {
+
+                capNhatMarker(
+                        group.getChildAt(i),
+                        idDangChon
+                );
+            }
+        }
+    }
+
+    // =====================================================
+    // VIEW VE SO DO
+    // =====================================================
+
     private static final class SoDoTrongTrang extends View {
-        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        private final Paint paint = new Paint(
+                Paint.ANTI_ALIAS_FLAG
+                        | Paint.FILTER_BITMAP_FLAG
+        );
+
         private final RectF vungAnh = new RectF();
+
         private final List<DiemThamQuan> markers;
-        private final int idDangChon;
+
         private final ChonDiem chon;
+
         private final Bitmap anh;
+
         private final GestureDetector cuChi;
 
-        SoDoTrongTrang(Context context, Bitmap bitmap, List<DiemThamQuan> markers,
-                       int idDangChon, ChonDiem chon) {
+        private int idDangChon;
+
+        SoDoTrongTrang(
+                Context context,
+                Bitmap bitmap,
+                List<DiemThamQuan> markers,
+                int idDangChon,
+                ChonDiem chon) {
+
             super(context);
-            anh = bitmap;
+
+            this.anh = bitmap;
+
             this.markers = markers;
+
             this.idDangChon = idDangChon;
+
             this.chon = chon;
+
             setClickable(true);
-            setContentDescription("Sơ đồ tham quan có Marker tương tác");
-            cuChi = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-                @Override public boolean onDown(MotionEvent e) { return true; }
-                @Override public boolean onSingleTapUp(MotionEvent e) {
-                    chonTai(e.getX(), e.getY());
-                    performClick();
-                    return true;
-                }
-            });
+
+            setContentDescription(
+                    "Sơ đồ tham quan có marker tương tác"
+            );
+
+            cuChi = new GestureDetector(
+                    context,
+                    new GestureDetector.SimpleOnGestureListener() {
+
+                        @Override
+                        public boolean onDown(MotionEvent e) {
+
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onSingleTapUp(MotionEvent e) {
+
+                            chonTai(e.getX(), e.getY());
+
+                            performClick();
+
+                            return true;
+                        }
+                    }
+            );
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        private float layZoom() {
+
+            if (getParent() instanceof SoDoThuPhongLayout) {
+
+                return ((SoDoThuPhongLayout) getParent())
+                        .mucZoom();
+            }
+
+            return 1f;
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+
             super.onDraw(canvas);
-            canvas.drawColor(Color.parseColor("#F1F4EE"));
-            if (anh == null) return;
-            float scale = Math.min(getWidth() / (float) anh.getWidth(), getHeight() / (float) anh.getHeight());
-            float w = anh.getWidth() * scale, h = anh.getHeight() * scale;
-            vungAnh.set((getWidth() - w) / 2, (getHeight() - h) / 2,
-                    (getWidth() + w) / 2, (getHeight() + h) / 2);
-            canvas.drawBitmap(anh, null, vungAnh, paint);
-            for (DiemThamQuan d : markers) {
-                float x = vungAnh.left + (float) d.x * w;
-                float y = vungAnh.top + (float) d.y * h;
-                boolean selected = d.id == idDangChon;
-                float radius = (d.diaDiemId == 3 ? (selected ? 10 : 8) : 16) * scale;
-                paint.setColor(Color.WHITE);
-                canvas.drawCircle(x, y, radius, paint);
-                paint.setColor(Color.parseColor(selected ? "#E8A600" : "#087B5A"));
-                canvas.drawCircle(x, y, radius * 13 / 16, paint);
-                paint.setColor(Color.WHITE);
-                paint.setTextAlign(Paint.Align.CENTER);
-                paint.setTypeface(Typeface.DEFAULT_BOLD);
-                paint.setTextSize(radius * 10 / 16);
-                canvas.drawText(String.valueOf(d.soHienThi > 0 ? d.soHienThi : d.id), x,
-                        y - (paint.ascent() + paint.descent()) / 2, paint);
+
+            canvas.drawColor(
+                    Color.parseColor("#F1F4EE")
+            );
+
+            if (anh == null
+                    || anh.isRecycled()
+                    || getWidth() <= 0
+                    || getHeight() <= 0) {
+
+                return;
+            }
+
+            // Giu dung ti le anh goc
+
+            float scale = Math.min(
+                    getWidth() / (float) anh.getWidth(),
+                    getHeight() / (float) anh.getHeight()
+            );
+
+            float w = anh.getWidth() * scale;
+
+            float h = anh.getHeight() * scale;
+
+            vungAnh.set(
+                    (getWidth() - w) / 2f,
+                    (getHeight() - h) / 2f,
+                    (getWidth() + w) / 2f,
+                    (getHeight() + h) / 2f
+            );
+
+            paint.setColor(Color.WHITE);
+
+            paint.setAlpha(255);
+
+            canvas.drawBitmap(
+                    anh, null, vungAnh, paint
+            );
+
+            DiemThamQuan diemChon = null;
+
+            for (DiemThamQuan diem : markers) {
+
+                if (diem.id == idDangChon) {
+
+                    diemChon = diem;
+
+                } else {
+
+                    veMarker(canvas, diem, false);
+                }
+            }
+
+            // Marker dang chon luon duoc ve sau cung
+
+            if (diemChon != null) {
+
+                veMarker(canvas, diemChon, true);
             }
         }
+
+        private void veMarker(
+                Canvas canvas,
+                DiemThamQuan diem,
+                boolean dangChon) {
+
+            float x = vungAnh.left
+                    + (float) diem.x * vungAnh.width();
+
+            float y = vungAnh.top
+                    + (float) diem.y * vungAnh.height();
+
+            int so = diem.soHienThi > 0
+                    ? diem.soHienThi
+                    : diem.id;
+
+            GiaoDienSoDo.veMarker(
+                    getContext(),
+                    canvas,
+                    paint,
+                    x,
+                    y,
+                    so,
+                    dangChon,
+                    diem.diaDiemId == 3,
+                    layZoom()
+            );
+        }
+
+        // =================================================
+        // CHON MARKER GAN NHAT
+        // =================================================
 
         private void chonTai(float x, float y) {
-            if (!vungAnh.contains(x, y)) return;
-            double distance = Math.pow(dp(getContext(), 28), 2);
-            DiemThamQuan nearest = null;
-            for (DiemThamQuan d : markers) {
-                double dx = x - vungAnh.left - d.x * vungAnh.width();
-                double dy = y - vungAnh.top - d.y * vungAnh.height();
-                double candidate = dx * dx + dy * dy;
-                if (candidate <= distance) { distance = candidate; nearest = d; }
+
+            float radius = GiaoDienSoDo.banKinhCham(
+                    getContext(), layZoom()
+            );
+
+            float khoangCach = radius * radius;
+
+            DiemThamQuan ganNhat = null;
+
+            for (DiemThamQuan diem : markers) {
+
+                float markerX = vungAnh.left
+                        + (float) diem.x * vungAnh.width();
+
+                float markerY = vungAnh.top
+                        + (float) diem.y * vungAnh.height();
+
+                float dx = x - markerX;
+
+                float dy = y - markerY;
+
+                float kc = dx * dx + dy * dy;
+
+                if (kc <= khoangCach) {
+
+                    khoangCach = kc;
+
+                    ganNhat = diem;
+                }
             }
-            if (nearest != null && chon != null) chon.chon(nearest.id);
+
+            if (ganNhat != null && chon != null) {
+
+                chon.chon(ganNhat.id);
+            }
         }
 
-        @Override public boolean onTouchEvent(MotionEvent event) {
-            return cuChi.onTouchEvent(event) || event.getAction() == MotionEvent.ACTION_UP;
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+
+            return cuChi.onTouchEvent(event)
+                    || event.getAction()
+                    == MotionEvent.ACTION_UP;
         }
 
-        @Override public boolean performClick() { super.performClick(); return true; }
+        @Override
+        public boolean performClick() {
+
+            super.performClick();
+
+            return true;
+        }
     }
 }
