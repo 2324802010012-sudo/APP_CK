@@ -38,7 +38,7 @@ import androidx.core.content.ContextCompat;
 import android.widget.ImageView;
 import android.view.ViewGroup;
 import android.graphics.drawable.GradientDrawable;
-import java.text.Normalizer;
+import static com.example.app_ck.util.VanBanTimKiem.chuanHoa;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
@@ -220,19 +220,7 @@ public class MainActivity extends BaseActivity {
     }
 
     // CHUAN HOA CHUOI TIM KIEM
-    private String chuanHoa(String noiDung) {
 
-        String chuoi = Normalizer.normalize(
-                noiDung.toLowerCase(Locale.ROOT),
-                Normalizer.Form.NFD
-        );
-
-        chuoi = chuoi.replaceAll("\\p{M}+", "");
-
-        return chuoi.replace("đ", "d")
-                .trim()
-                .replaceAll("\\s+", " ");
-    }
 
     // XU LY TIM KIEM DIA DIEM
     private void xuLyTimKiem() {

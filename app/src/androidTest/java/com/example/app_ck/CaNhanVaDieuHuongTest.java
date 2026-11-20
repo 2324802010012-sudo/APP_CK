@@ -75,33 +75,34 @@ public class CaNhanVaDieuHuongTest {
             onView(withId(R.id.cnTen)).check(matches(withText(ten)));
             onView(withId(R.id.navCaNhan)).check(matches(isSelected()));
             onView(withId(R.id.navKhamPha)).perform(click());
-            onView(withId(R.id.oTimKiem)).check(matches(isDisplayed()));
-            nhap(R.id.oTimKiem, "chung tich");
-            onView(withId(R.id.nutTimKiem)).perform(click());
-            onView(withText("Bảo tàng Chứng tích Chiến tranh")).inRoot(UiKiemThu.hoiThoai()).perform(click());
-            onView(withId(R.id.nutTimYeuThich)).check(matches(withText("♥")));
+            onView(withId(R.id.kpTimKiem)).check(matches(isDisplayed()));
+            nhap(R.id.kpTimKiem, "chung tich");
+            onView(withId(R.id.kpItemTen)).perform(scrollTo(), click());
+            onView(withId(R.id.nutTimYeuThich)).check(matches(isSelected()));
             androidx.test.espresso.Espresso.pressBack();
-            onView(withId(R.id.navGoiY)).perform(click());
-            onView(withId(R.id.navGoiY)).check(matches(isSelected()));
-            onView(withId(R.id.kpSoLuong)).check(matches(withText("4 địa điểm gợi ý")));
+            onView(withId(R.id.navBanDo)).perform(click());
+            onView(withId(R.id.navBanDo)).check(matches(isSelected()));
+            onView(withId(R.id.banDoTuongTac)).check(matches(isDisplayed()));
             onView(withId(R.id.navTrangChu)).perform(click());
             onView(withId(R.id.navTrangChu)).inRoot(androidx.test.espresso.matcher.RootMatchers.withDecorView(
                     hasDescendant(withId(R.id.vungCuonTrangChu)))).check(matches(isSelected()));
             onView(withId(R.id.oTimKiem)).perform(scrollTo(), replaceText("Hue"), closeSoftKeyboard());
             onView(withId(R.id.vungCuonTrangChu)).perform(swipeUp(), swipeUp());
             onView(withId(R.id.navKhamPha)).perform(click());
-            onView(withId(R.id.oTimKiem)).check(matches(isDisplayed()));
-            onView(withId(R.id.oTimKiem)).check(matches(withText("Hue")));
+            onView(withId(R.id.kpTimKiem)).check(matches(isDisplayed()));
+            nhap(R.id.kpTimKiem, "Hue");
+            onView(withId(R.id.kpSoLuong)).check(matches(withText("1 điểm đến")));
         }
     }
 
     @Test public void suaHoSoKiemTraEmailVaLuuQuaLanMoLai() throws Exception {
         try (ActivityScenario<CaNhanActivity> scenario = ActivityScenario.launch(CaNhanActivity.class)) {
-            onView(withId(R.id.cnSoYeuThich)).check(matches(withText("1\nĐịa điểm đã lưu")));
+            onView(withId(R.id.cnSoYeuThich)).check(matches(withText("1")));
+            onView(withId(R.id.cnThongKeYeuThich)).check(matches(withContentDescription("1 địa điểm đã lưu. Nhấn để xem.")));
             onView(withId(R.id.cnSuaHoSo)).perform(scrollTo(), click());
             nhap(R.id.hsHoTen, "Nguyễn Minh Anh"); nhap(R.id.hsEmail, "email-sai");
             onView(withId(R.id.hoSoLuu)).perform(scrollTo(), click());
-            onView(withId(R.id.hsEmail)).check(matches(hasErrorText("Email không hợp lệ")));
+            onView(withId(R.id.hsEmail)).check(matches(hasErrorText("Email không hợp lệ.")));
             nhap(R.id.hsEmail, "minhanh@example.com");
             onView(withId(R.id.hoSoLuu)).perform(scrollTo(), click());
             onView(withId(R.id.cnTen)).check(matches(withText("Nguyễn Minh Anh")));
@@ -122,14 +123,15 @@ public class CaNhanVaDieuHuongTest {
             nhap(R.id.hsMatKhauCu, "SaiMatKhau");
             nhap(R.id.hsMatKhauMoi, "MatKhauMoi456!"); nhap(R.id.hsXacNhan, "MatKhauMoi456!");
             onView(withId(R.id.hoSoLuu)).perform(scrollTo(), click());
-            onView(withId(R.id.hsMatKhauCu)).check(matches(hasErrorText("Mật khẩu hiện tại không đúng hoặc không thể cập nhật")));
+            onView(withId(R.id.hsMatKhauCu)).check(matches(hasErrorText("Mật khẩu hiện tại không đúng hoặc không thể cập nhật.")));
             nhap(R.id.hsMatKhauCu, MAT_KHAU);
             onView(withId(R.id.hoSoLuu)).perform(scrollTo(), click());
             onView(withText("Đổi mật khẩu thành công")).check(matches(isDisplayed()));
             final String[] ma = new String[1];
-            onView(withId(android.R.id.message)).check((view, error) -> {
+            onView(withId(R.id.mkMa)).inRoot(UiKiemThu.hoiThoai()).check((view, error) -> {
                 if (error != null) throw error;
-                ma[0] = ((TextView) view).getText().toString().split("\n\n")[1];
+                ma[0] = ((TextView) view).getText().toString();
+                assertFalse(ma[0].isEmpty());
             });
             onView(withText("Tôi đã lưu mã")).perform(click());
             onView(withId(R.id.cnTen)).check(matches(withText(ten)));

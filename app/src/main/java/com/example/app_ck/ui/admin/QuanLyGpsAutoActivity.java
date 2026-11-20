@@ -1,24 +1,21 @@
 package com.example.app_ck.ui.admin;
 
-import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.activity.OnBackPressedCallback;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.app_ck.R;
 import androidx.appcompat.widget.SwitchCompat;
 
 import com.example.app_ck.data.local.AppDatabase;
@@ -38,15 +35,16 @@ import java.util.Locale;
  */
 public class QuanLyGpsAutoActivity extends BaseActivity {
     private static final String TAG = "APP_CK_AUTO_ADMIN";
-    private static final int GREEN = Color.rgb(44, 115, 81);
-    private static final int INK = Color.rgb(32, 56, 42);
-    private static final int MUTED = Color.rgb(105, 124, 110);
 
     private final ArrayList<DiaDiem> diaDiem = new ArrayList<>();
     private final ArrayList<DiemThamQuan> diemThamQuan = new ArrayList<>();
     private Spinner spDiaDiem, spDiem;
     private EditText edtLat, edtLon, edtRadius, edtNguon;
-    private TextView moTaCheDo, trangThai;
+    private TextView moTaCheDo, trangThai, doiTuong, trangThaiLuu;
+    private Button luu;
+    private int selectedPlaceId = -1, selectedPointId;
+    private String initial = "";
+    private boolean loadingFields;
     private SwitchCompat swChoPhep;
     private LinearLayout khungNguon;
     private boolean dangNap = false;
@@ -56,8 +54,27 @@ public class QuanLyGpsAutoActivity extends BaseActivity {
         super.onCreate(state);
         if (!coQuyen()) { finish(); return; }
         taoGiaoDien();
+        AdminGiaoDien.apDung(this);
         apDungKhoangTrongHeThong();
+        AdminGiaoDien.hoTroBanPhim(this);
+        if (state != null) {
+            selectedPlaceId = state.getInt("admin_place", -1);
+            selectedPointId = state.getInt("admin_point", 0);
+        }
         napDiaDiem();
+        if (state != null && luu.isEnabled()) {
+            loadingFields = true;
+            String[] values = state.getStringArray("admin_values");
+            EditText[] fields = {edtLat, edtLon, edtRadius, edtNguon};
+            if (values != null) for (int i = 0; i < fields.length; i++) fields[i].setText(values[i]);
+            swChoPhep.setChecked(state.getBoolean("admin_auto"));
+            initial = state.getString("admin_initial", initial);
+            loadingFields = false;
+            capNhatTrangThai();
+        }
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override public void handleOnBackPressed() { hoiBoThayDoi(QuanLyGpsAutoActivity.this::finish, null); }
+        });
     }
 
     private boolean coQuyen() {
@@ -71,155 +88,87 @@ public class QuanLyGpsAutoActivity extends BaseActivity {
         }
     }
 
-    private int dp(int n) {
-        return Math.round(n * getResources().getDisplayMetrics().density);
-    }
-
-    private TextView nhan(String value, int size, boolean bold) {
-        TextView t = new TextView(this);
-        t.setText(value);
-        t.setTextSize(size);
-        t.setTextColor(INK);
-        if (bold) t.setTypeface(null, android.graphics.Typeface.BOLD);
-        return t;
-    }
-
-    private EditText oSo(String hint) {
-        EditText e = new EditText(this);
-        e.setHint(hint);
-        e.setTextSize(15);
-        e.setSingleLine(true);
-        e.setTextColor(INK);
-        e.setInputType(InputType.TYPE_CLASS_NUMBER |
-                InputType.TYPE_NUMBER_FLAG_DECIMAL |
-                InputType.TYPE_NUMBER_FLAG_SIGNED);
-        return e;
-    }
-
-    private void addLabel(LinearLayout parent, String text) {
-        TextView v = nhan(text, 14, true);
-        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(-1, -2);
-        p.topMargin = dp(16);
-        parent.addView(v, p);
-    }
-
-    private String text(EditText e) {
-        return e.getText().toString().trim();
-    }
+    private String text(EditText e) { return e.getText().toString().trim(); }
 
     private void taoGiaoDien() {
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.rgb(246, 248, 245));
-        setContentView(root);
-
-        LinearLayout header = new LinearLayout(this);
-        header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setPadding(dp(16), dp(12), dp(16), dp(12));
-        root.addView(header, new LinearLayout.LayoutParams(-1, dp(68)));
-
-        TextView back = nhan("‹", 32, false);
-        back.setGravity(Gravity.CENTER);
-        header.addView(back, new LinearLayout.LayoutParams(dp(48), -1));
-        back.setContentDescription("Quay về quản trị");
-        back.setOnClickListener(v -> finish());
-
-        TextView title = nhan("Cấu hình GPS AUTO", 21, true);
-        header.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
-
-        ScrollView scroller = new ScrollView(this);
-        scroller.setFillViewport(true);
-        root.addView(scroller, new LinearLayout.LayoutParams(-1, 0, 1));
-
-        LinearLayout content = new LinearLayout(this);
-        content.setOrientation(LinearLayout.VERTICAL);
-        content.setPadding(dp(20), dp(8), dp(20), dp(28));
-        scroller.addView(content);
-
-        TextView hint = nhan("Chỉ cấu hình dữ liệu GPS thực. Marker X/Y trên ảnh sơ đồ không bị thay đổi.", 13, false);
-        hint.setTextColor(MUTED);
-        content.addView(hint);
-
-        addLabel(content, "Địa điểm du lịch");
-        spDiaDiem = new Spinner(this);
-        content.addView(spDiaDiem, new LinearLayout.LayoutParams(-1, dp(52)));
-
-        addLabel(content, "Mốc cấu hình");
-        spDiem = new Spinner(this);
-        content.addView(spDiem, new LinearLayout.LayoutParams(-1, dp(52)));
-
-        moTaCheDo = nhan("", 13, false);
-        moTaCheDo.setTextColor(MUTED);
-        LinearLayout.LayoutParams m = new LinearLayout.LayoutParams(-1, -2);
-        m.topMargin = dp(8);
-        content.addView(moTaCheDo, m);
-
-        swChoPhep = new SwitchCompat(this);
-        swChoPhep.setText("Cho phép GPS AUTO tại điểm thành phần");
-        swChoPhep.setTextColor(INK);
-        LinearLayout.LayoutParams swp = new LinearLayout.LayoutParams(-1, -2);
-        swp.topMargin = dp(18);
-        content.addView(swChoPhep, swp);
-
-        addLabel(content, "Vĩ độ GPS (latitude)");
-        edtLat = oSo("Ví dụ: 10.777000");
-        content.addView(edtLat);
-
-        addLabel(content, "Kinh độ GPS (longitude)");
-        edtLon = oSo("Ví dụ: 106.695300");
-        content.addView(edtLon);
-
-        addLabel(content, "Bán kính kích hoạt (mét)");
-        edtRadius = oSo("Ví dụ: 35");
-        edtRadius.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        content.addView(edtRadius);
-
-        khungNguon = new LinearLayout(this);
-        khungNguon.setOrientation(LinearLayout.VERTICAL);
-        addLabel(khungNguon, "Nguồn / ghi chú xác minh tọa độ GPS");
-        edtNguon = new EditText(this);
-        edtNguon.setTextColor(INK);
-        edtNguon.setTextSize(14);
-        edtNguon.setSingleLine(false);
-        edtNguon.setMinLines(2);
-        edtNguon.setHint("Ví dụ: đo GPS thực địa; tài liệu tọa độ đã kiểm chứng");
-        khungNguon.addView(edtNguon);
-        content.addView(khungNguon);
-
-        trangThai = nhan("", 13, false);
-        trangThai.setTextColor(MUTED);
-        LinearLayout.LayoutParams stp = new LinearLayout.LayoutParams(-1, -2);
-        stp.topMargin = dp(20);
-        content.addView(trangThai, stp);
-
-        Button save = new Button(this);
-        save.setText("Lưu cấu hình GPS AUTO");
-        save.setAllCaps(false);
-        save.setTextColor(Color.WHITE);
-        save.setBackgroundTintList(ColorStateList.valueOf(GREEN));
-        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(-1, dp(54));
-        bp.topMargin = dp(20);
-        content.addView(save, bp);
-        save.setOnClickListener(v -> xacNhanLuu());
-
-        TextView disclaimer = nhan("Lưu cấu hình không tự bật GPS hay phát thuyết minh. Ứng dụng chỉ nhận diện khi người dùng chủ động bật GPS thật. AUTO điểm thành phần cần bộ theo dõi GPS sử dụng cấu hình này.", 12, false);
-        disclaimer.setTextColor(MUTED);
-        LinearLayout.LayoutParams dp2 = new LinearLayout.LayoutParams(-1, -2);
-        dp2.topMargin = dp(14);
-        content.addView(disclaimer, dp2);
-
+        setContentView(R.layout.activity_quan_ly_gps_auto);
+        AdminGiaoDien.header(this, "Cấu hình GPS AUTO", "Thiết lập vùng kích hoạt thuyết minh",
+                () -> hoiBoThayDoi(this::finish, null));
+        spDiaDiem = findViewById(R.id.gpsDiaDiem);
+        spDiem = findViewById(R.id.gpsDiem);
+        edtLat = findViewById(R.id.gpsViDo);
+        edtLon = findViewById(R.id.gpsKinhDo);
+        edtRadius = findViewById(R.id.gpsBanKinh);
+        edtNguon = findViewById(R.id.gpsNguon);
+        swChoPhep = findViewById(R.id.gpsChoPhep);
+        khungNguon = findViewById(R.id.gpsKhungNguon);
+        moTaCheDo = findViewById(R.id.gpsMoTa);
+        trangThai = findViewById(R.id.gpsTrangThai);
+        doiTuong = findViewById(R.id.gpsDoiTuong);
+        trangThaiLuu = findViewById(R.id.gpsTrangThaiLuu);
+        luu = findViewById(R.id.gpsLuu);
+        luu.setOnClickListener(v -> xacNhanLuu());
+        android.text.TextWatcher watcher = new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int c, int f) {}
+            @Override public void onTextChanged(CharSequence s, int a, int b, int c) { if (!loadingFields) capNhatTrangThai(); }
+            @Override public void afterTextChanged(android.text.Editable e) {}
+        };
+        for (EditText field : new EditText[]{edtLat, edtLon, edtRadius, edtNguon}) field.addTextChangedListener(watcher);
+        swChoPhep.setOnCheckedChangeListener((button, checked) -> { if (!loadingFields) capNhatTrangThai(); });
         spDiaDiem.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(AdapterView<?> p, View v, int position, long id) {
-                if (!dangNap) napDiem();
+                if (dangNap || position < 0 || position >= diaDiem.size()) return;
+                int nextId = diaDiem.get(position).id;
+                if (nextId == selectedPlaceId) return;
+                hoiBoThayDoi(() -> { selectedPlaceId = nextId; selectedPointId = 0; napDiem(); },
+                        QuanLyGpsAutoActivity.this::khoiPhucLuaChon);
             }
-            @Override public void onNothingSelected(AdapterView<?> p) { }
+            @Override public void onNothingSelected(AdapterView<?> p) {}
         });
         spDiem.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(AdapterView<?> p, View v, int position, long id) {
-                if (!dangNap) hienCauHinh();
+                if (dangNap || position < 0 || position > diemThamQuan.size()) return;
+                int nextId = position == 0 ? 0 : diemThamQuan.get(position - 1).id;
+                if (nextId == selectedPointId) return;
+                hoiBoThayDoi(() -> { selectedPointId = nextId; hienCauHinh(); },
+                        QuanLyGpsAutoActivity.this::khoiPhucLuaChon);
             }
-            @Override public void onNothingSelected(AdapterView<?> p) { }
+            @Override public void onNothingSelected(AdapterView<?> p) {}
         });
+    }
+
+    private void khoiPhucLuaChon() {
+        dangNap = true;
+        for (int i = 0; i < diaDiem.size(); i++) if (diaDiem.get(i).id == selectedPlaceId) spDiaDiem.setSelection(i);
+        int pointPosition = 0;
+        for (int i = 0; i < diemThamQuan.size(); i++) if (diemThamQuan.get(i).id == selectedPointId) pointPosition = i + 1;
+        spDiem.setSelection(pointPosition);
+        dangNap = false;
+    }
+
+    private String snapshot() {
+        return android.text.TextUtils.join("\u001f", new String[]{edtLat.getText().toString(), edtLon.getText().toString(),
+                edtRadius.getText().toString(), edtNguon.getText().toString(), String.valueOf(swChoPhep.isChecked())});
+    }
+
+    private void hoiBoThayDoi(Runnable proceed, Runnable cancel) {
+        if (initial.equals(snapshot())) proceed.run();
+        else AdminGiaoDien.hoiBoThayDoi(this, proceed, cancel);
+    }
+
+    private void capNhatTrangThai() {
+        boolean main = selectedPointId == 0;
+        boolean enabled = diaDiemDangChon() != null;
+        boolean auto = main || swChoPhep.isChecked();
+        trangThai.setTextColor(getColor(enabled && auto ? R.color.admin_primary : R.color.admin_secondary));
+        trangThaiLuu.setText(!enabled ? "Chưa có địa điểm để cấu hình" : initial.equals(snapshot()) ? "Đã lưu cấu hình" : "Chưa lưu");
+        trangThai.setText(!enabled ? "Chưa có dữ liệu" :
+                (main ? "GPS MAIN" : auto ? "AUTO đang bật" : "AUTO đang tắt")
+                        + (text(edtRadius).isEmpty() ? " · Chưa có bán kính" : " · Bán kính " + text(edtRadius) + " m"));
+        // Khi tắt AUTO, quy trình lưu chỉ đổi cờ cho phép; không ghi các ô vị trí.
+        for (EditText field : new EditText[]{edtLat, edtLon, edtRadius, edtNguon}) field.setEnabled(enabled && auto);
+        swChoPhep.setEnabled(enabled);
+        luu.setEnabled(enabled);
     }
 
     private void napDiaDiem() {
@@ -229,9 +178,14 @@ public class QuanLyGpsAutoActivity extends BaseActivity {
             ArrayList<String> names = new ArrayList<>();
             for (DiaDiem d : diaDiem) names.add(d.ten);
             dangNap = true;
-            ArrayAdapter<String> a = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, names);
-            a.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            if (names.isEmpty()) names.add("Chưa có địa điểm");
+            ArrayAdapter<String> a = AdminGiaoDien.adapter(this, names);
             spDiaDiem.setAdapter(a);
+            boolean found = false;
+            for (DiaDiem place : diaDiem) if (place.id == selectedPlaceId) found = true;
+            if (!found) { selectedPlaceId = diaDiem.isEmpty() ? -1 : diaDiem.get(0).id; selectedPointId = 0; }
+            spDiaDiem.setEnabled(!diaDiem.isEmpty());
+            khoiPhucLuaChon();
             dangNap = false;
             napDiem();
         } catch (Exception e) {
@@ -241,13 +195,13 @@ public class QuanLyGpsAutoActivity extends BaseActivity {
     }
 
     private DiaDiem diaDiemDangChon() {
-        int i = spDiaDiem.getSelectedItemPosition();
-        return i >= 0 && i < diaDiem.size() ? diaDiem.get(i) : null;
+        for (DiaDiem place : diaDiem) if (place.id == selectedPlaceId) return place;
+        return null;
     }
 
     private DiemThamQuan diemDangChon() {
-        int i = spDiem.getSelectedItemPosition() - 1;
-        return i >= 0 && i < diemThamQuan.size() ? diemThamQuan.get(i) : null;
+        for (DiemThamQuan point : diemThamQuan) if (point.id == selectedPointId) return point;
+        return null;
     }
 
     private void napDiem() {
@@ -267,38 +221,41 @@ public class QuanLyGpsAutoActivity extends BaseActivity {
             names.add("#" + item.id + " · " + item.ten);
         }
         dangNap = true;
-        ArrayAdapter<String> a = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, names);
-        a.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> a = AdminGiaoDien.adapter(this, names);
         spDiem.setAdapter(a);
-        spDiem.setSelection(0);
+        if (selectedPointId > 0 && diemDangChon() == null) selectedPointId = 0;
+        khoiPhucLuaChon();
+        spDiem.setEnabled(d != null);
         dangNap = false;
         hienCauHinh();
     }
 
     private static String so(double number) {
-        return Double.isFinite(number) ? String.format(Locale.US, "%.7f", number) : "";
+        return Double.isFinite(number) ? Double.toString(number) : "";
     }
 
     private void hienCauHinh() {
         DiaDiem d = diaDiemDangChon();
         DiemThamQuan diem = diemDangChon();
-        boolean main = diem == null;
-        boolean havePlace = d != null;
+        boolean main = selectedPointId == 0;
+        boolean havePlace = d != null && (main || diem != null);
+        loadingFields = true;
         swChoPhep.setVisibility(main ? View.GONE : View.VISIBLE);
         khungNguon.setVisibility(main ? View.GONE : View.VISIBLE);
-        swChoPhep.setChecked(!main && diem.choPhepAuto);
+        swChoPhep.setChecked(!main && diem != null && diem.choPhepAuto);
         edtLat.setText(!havePlace ? "" : so(main ? d.viDo : diem.viDo));
         edtLon.setText(!havePlace ? "" : so(main ? d.kinhDo : diem.kinhDo));
-        edtRadius.setText(!havePlace ? "" : so(main ? d.banKinhAuto : diem.banKinh));
-        edtNguon.setText(main ? "" : (diem.nguonGps == null ? "" : diem.nguonGps));
-
+        float radius = !havePlace ? Float.NaN : main ? d.banKinhAuto : diem.banKinh;
+        edtRadius.setText(Float.isFinite(radius) ? Float.toString(radius) : "");
+        edtNguon.setText(main || diem == null ? "" : diem.nguonGps);
+        for (EditText field : new EditText[]{edtLat, edtLon, edtRadius, edtNguon}) field.setError(null);
+        doiTuong.setText(!havePlace ? "Chưa có địa điểm" : main ? d.ten : diem.ten);
         moTaCheDo.setText(main
-                ? "AUTO MAIN: Khi người dùng bật GPS thật ở Trang chủ, hệ thống nhận diện địa điểm chính theo tọa độ và bán kính này."
-                : "AUTO SUB: Cấu hình tọa độ thật cho điểm thành phần. Không dùng tọa độ X/Y trên ảnh sơ đồ.");
-        trangThai.setText(!havePlace ? "Chưa có địa điểm để cấu hình"
-                : main ? "Phạm vi GPS MAIN: " + d.banKinhAuto + " m. Cần GPS đủ chính xác và người dùng xác nhận trước khi phát."
-                : diem.choPhepAuto ? "Điểm đã được đánh dấu cho phép AUTO trong SQLite. Chưa đồng nghĩa bộ theo dõi AUTO SUB đang chạy."
-                : "Điểm đang ở chế độ nghe thủ công (không cho phép AUTO SUB)." );
+                ? "Địa điểm chính · Nhận diện khi người dùng bật GPS thật."
+                : "Điểm thành phần · Bật AUTO cần tọa độ đã xác minh.");
+        initial = snapshot();
+        loadingFields = false;
+        capNhatTrangThai();
     }
 
     private double docSo(EditText e, String ten, double min, double max) {
@@ -321,7 +278,7 @@ public class QuanLyGpsAutoActivity extends BaseActivity {
         boolean enabled = !main && swChoPhep.isChecked();
 
         if (!main && !enabled) {
-            new AlertDialog.Builder(this)
+            new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Admin_Dialog)
                     .setTitle("Tắt GPS AUTO cho điểm thành phần?")
                     .setMessage("Chỉ cập nhật trạng thái cho phép AUTO thành TẮT. Tọa độ GPS đã lưu và Marker X/Y sẽ được giữ nguyên.")
                     .setNegativeButton("Hủy", null)
@@ -333,7 +290,7 @@ public class QuanLyGpsAutoActivity extends BaseActivity {
         if (!Double.isFinite(lat)) return;
         double lon = docSo(edtLon, "Kinh độ", -180, 180);
         if (!Double.isFinite(lon)) return;
-        if (lat == 0 && lon == 0) { bao("Không sử dụng tọa độ GPS 0,0"); return; }
+        if (lat == 0 && lon == 0) { edtLat.setError("Không sử dụng tọa độ GPS 0,0"); edtLat.requestFocus(); return; }
         double r = docSo(edtRadius, "Bán kính", 0.1, 10000);
         if (!Double.isFinite(r)) return;
         if (!main && text(edtNguon).isEmpty()) {
@@ -346,7 +303,7 @@ public class QuanLyGpsAutoActivity extends BaseActivity {
         String message = String.format(Locale.US,
                 "Mốc: %s\nVĩ độ: %.7f\nKinh độ: %.7f\nBán kính: %.1f m\n\nXác nhận lưu cấu hình GPS thực?",
                 name, lat, lon, r);
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Admin_Dialog)
                 .setTitle(main ? "Lưu GPS địa điểm chính?" : "Bật GPS AUTO cho điểm này?")
                 .setMessage(message)
                 .setNegativeButton("Hủy", null)
@@ -364,12 +321,8 @@ public class QuanLyGpsAutoActivity extends BaseActivity {
             boolean ok = KhoDuLieuThamQuan.luuDiem(this, db, placeId, pointId, v);
             if (ok) {
                 bao("Đã tắt cho phép AUTO; giữ nguyên tọa độ đã lưu");
-                int oldPosition = spDiem.getSelectedItemPosition();
-                napDiem();
-                if (oldPosition > 0 && oldPosition < spDiem.getCount()) {
-                    spDiem.setSelection(oldPosition);
-                    hienCauHinh();
-                }
+                AdminGiaoDien.anBanPhim(this);
+                napDiaDiem();
             } else bao("Không lưu được trạng thái AUTO");
         } catch (Exception e) {
             Log.e(TAG, "Khong luu duoc trang thai", e);
@@ -385,23 +338,8 @@ public class QuanLyGpsAutoActivity extends BaseActivity {
                     this, db, placeId, pointId, pointId > 0, lat, lon, radius, source);
             if (ok) {
                 bao(pointId == 0 ? "Đã cập nhật GPS địa điểm chính" : "Đã lưu cấu hình AUTO điểm thành phần");
-                // Reload both main point and subpoint values from SQLite without modifying Marker X/Y.
-                int diaDiemPosition = spDiaDiem.getSelectedItemPosition();
-                int diemPosition = spDiem.getSelectedItemPosition();
-                try (AppDatabase dbReload = new AppDatabase(this)) {
-                    diaDiem.clear();
-                    diaDiem.addAll(dbReload.danhSachDiaDiem());
-                }
-                if (diaDiemPosition >= 0 && diaDiemPosition < diaDiem.size()) {
-                    dangNap = true;
-                    spDiaDiem.setSelection(diaDiemPosition);
-                    dangNap = false;
-                    napDiem();
-                    if (diemPosition >= 0 && diemPosition < spDiem.getCount()) {
-                        spDiem.setSelection(diemPosition);
-                        hienCauHinh();
-                    }
-                }
+                AdminGiaoDien.anBanPhim(this);
+                napDiaDiem();
             } else bao("Không thể lưu cấu hình GPS AUTO");
         } catch (Exception e) {
             Log.e(TAG, "Loi luu GPS", e);
@@ -412,4 +350,19 @@ public class QuanLyGpsAutoActivity extends BaseActivity {
     private void bao(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
+    @Override protected void onResume() {
+        super.onResume();
+        if (!coQuyen()) finish();
+    }
+
+    @Override protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putInt("admin_place", selectedPlaceId);
+        state.putInt("admin_point", selectedPointId);
+        state.putStringArray("admin_values", new String[]{edtLat.getText().toString(), edtLon.getText().toString(),
+                edtRadius.getText().toString(), edtNguon.getText().toString()});
+        state.putBoolean("admin_auto", swChoPhep.isChecked());
+        state.putString("admin_initial", initial);
+    }
+
 }

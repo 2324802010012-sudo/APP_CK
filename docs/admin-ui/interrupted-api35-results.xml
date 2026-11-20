@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.example.app_ck.AdminCaptureTest" tests="19" failures="6" errors="0" skipped="0" time="583.887" timestamp="2026-11-20T16:20:39" hostname="localhost">
+  <properties>
+    <property name="device" value="HanhTrinhAdmin_API35(AVD) - 15" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="captureScreens" classname="com.example.app_ck.AdminCaptureTest" time="89.261">
+    <failure>androidx.test.espresso.NoMatchingRootException: Matcher 'cửa sổ hiển thị và đang nhận focus' did not match any of the following roots: [Root{application-window-token=android.view.ViewRootImpl$W&#64;176f398, window-token=android.view.ViewRootImpl$W&#64;176f398, has-window-focus=false, layout-params-type=1, layout-params-string={(0,0)(fillxfill) sim={adjust=resize forwardNavigation} ty=BASE_APPLICATION wanim=0x1030309
+fl=LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1080, height=2400, has-focus=false, has-focusable=true, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(fillxfill) sim={adjust=resize forwardNavigation} ty=BASE_APPLICATION wanim=0x1030309
+fl=LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}}]
+at dalvik.system.VMStack.getThreadStackTrace(Native Method)
+at java.lang.Thread.getStackTrace(Thread.java:1841)
+at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:34)
+at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:26)
+at androidx.test.espresso.base.DefaultFailureHandler$TypedFailureHandler.handle(DefaultFailureHandler.java:158)
+at androidx.test.espresso.base.DefaultFailureHandler.handle(DefaultFailureHandler.java:120)
+at androidx.test.espresso.ViewInteraction.waitForAndHandleInteractionResults(ViewInteraction.java:385)
+at androidx.test.espresso.ViewInteraction.check(ViewInteraction.java:366)
+at com.example.app_ck.AdminCaptureTest.capture(AdminCaptureTest.java:51)
+at com.example.app_ck.AdminCaptureTest.captureScreens(AdminCaptureTest.java:33)
+</failure>
+  </testcase>
+  <testcase name="kiemTraNangCapDatabase17Len18" classname="com.example.app_ck.AnhMacDinhTest" time="2.301" />
+  <testcase name="kiemTra83AnhDrawable" classname="com.example.app_ck.AnhMacDinhTest" time="0.03" />
+  <testcase name="kiemTraDuLieuAnhKhoiTao" classname="com.example.app_ck.AnhMacDinhTest" time="0.873" />
+  <testcase name="preexistingCommonEditsWinOverLegacyDuringMigration" classname="com.example.app_ck.ArchitectureDatabaseTest" time="1.06" />
+  <testcase name="upgrade14KeepsCredentialsHistoryCustomIdsMapsAndMarkerCoordinates" classname="com.example.app_ck.ArchitectureDatabaseTest" time="14.502" />
+  <testcase name="userCannotInvokeAdministrativeWritesOrViewOtherAccountDetails" classname="com.example.app_ck.ArchitectureDatabaseTest" time="8.701" />
+  <testcase name="freshInstallSeedsAllToursAndNoAdminAccount" classname="com.example.app_ck.ArchitectureDatabaseTest" time="0.292" />
+  <testcase name="lockInvalidatesExistingSessionAndUnlockRestoresPasswordLogin" classname="com.example.app_ck.ArchitectureDatabaseTest" time="18.671" />
+  <testcase name="failedUpgradeRollsBackVersionAndImportedRowsThenCanRetry" classname="com.example.app_ck.ArchitectureDatabaseTest" time="0.776" />
+  <testcase name="adminDynamicPointCanBeReadNarratedRenamedAndRecordedAfterReopen" classname="com.example.app_ck.ArchitectureDatabaseTest" time="4.667" />
+  <testcase name="roiManHinhVaXoayKhongTuBatLai" classname="com.example.app_ck.AutoConDaoFlowTest" time="71.056">
+    <failure>androidx.test.espresso.NoMatchingRootException: Matcher 'cửa sổ hiển thị và đang nhận focus' did not match any of the following roots: [Root{application-window-token=android.view.ViewRootImpl$W&#64;81d118c, window-token=android.view.ViewRootImpl$W&#64;81d118c, has-window-focus=false, layout-params-type=2, layout-params-string={(0,0)(fillxfill) gr=CENTER sim={adjust=resize} ty=APPLICATION fmt=TRANSPARENT wanim=0x7f100014
+fl=DIM_BEHIND LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1080, height=2400, has-focus=false, has-focusable=true, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(fillxfill) gr=CENTER sim={adjust=resize} ty=APPLICATION fmt=TRANSPARENT wanim=0x7f100014
+fl=DIM_BEHIND LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}}, Root{application-window-token=android.view.ViewRootImpl$W&#64;e0150d5, window-token=android.view.ViewRootImpl$W&#64;e0150d5, has-window-focus=false, layout-params-type=1, layout-params-string={(0,0)(fillxfill) sim={forwardNavigation} ty=BASE_APPLICATION wanim=0x1030309
+fl=KEEP_SCREEN_ON LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1080, height=2400, has-focus=false, has-focusable=true, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(fillxfill) sim={forwardNavigation} ty=BASE_APPLICATION wanim=0x1030309
+fl=KEEP_SCREEN_ON LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}}]
+at dalvik.system.VMStack.getThreadStackTrace(Native Method)
+at java.lang.Thread.getStackTrace(Thread.java:1841)
+at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:34)
+at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:26)
+at androidx.test.espresso.base.DefaultFailureHandler$TypedFailureHandler.handle(DefaultFailureHandler.java:158)
+at androidx.test.espresso.base.DefaultFailureHandler.handle(DefaultFailureHandler.java:120)
+at androidx.test.espresso.ViewInteraction.waitForAndHandleInteractionResults(ViewInteraction.java:385)
+at androidx.test.espresso.ViewInteraction.desugaredPerform(ViewInteraction.java:212)
+at androidx.test.espresso.ViewInteraction.perform(ViewInteraction.java:140)
+at com.example.app_ck.AutoConDaoFlowTest.batDemo(AutoConDaoFlowTest.java:40)
+at com.example.app_ck.AutoConDaoFlowTest.roiManHinhVaXoayKhongTuBatLai(AutoConDaoFlowTest.java:147)
+</failure>
+  </testcase>
+  <testcase name="menuChiCoDemoGpsVaVanChonDiemThuCongDuoc" classname="com.example.app_ck.AutoConDaoFlowTest" time="5.333" />
+  <testcase name="demoDiHetDanhMucChoDocXongVaHoiDiemThuCong" classname="com.example.app_ck.AutoConDaoFlowTest" time="143.969">
+    <failure>androidx.test.espresso.NoMatchingRootException: Matcher '(cửa sổ hiển thị và đang nhận focus and is dialog)' did not match any of the following roots: [Root{application-window-token=android.view.ViewRootImpl$W&#64;6ba0918, window-token=android.view.ViewRootImpl$W&#64;6ba0918, has-window-focus=false, layout-params-type=2, layout-params-string={(0,0)(wrapxwrap) gr=CENTER sim={adjust=pan} ty=APPLICATION fmt=TRANSLUCENT wanim=0x7f100140
+fl=DIM_BEHIND ALT_FOCUSABLE_IM SPLIT_TOUCH HARDWARE_ACCELERATED
+pfl=EDGE_TO_EDGE_ENFORCED
+bhv=DEFAULT
+fitTypes=STATUS_BARS NAVIGATION_BARS CAPTION_BAR
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1024, height=1057, has-focus=false, has-focusable=true, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(wrapxwrap) gr=CENTER sim={adjust=pan} ty=APPLICATION fmt=TRANSLUCENT wanim=0x7f100140
+fl=DIM_BEHIND ALT_FOCUSABLE_IM SPLIT_TOUCH HARDWARE_ACCELERATED
+pfl=EDGE_TO_EDGE_ENFORCED
+bhv=DEFAULT
+fitTypes=STATUS_BARS NAVIGATION_BARS CAPTION_BAR
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}}, Root{application-window-token=android.view.ViewRootImpl$W&#64;24a84ac, window-token=android.view.ViewRootImpl$W&#64;24a84ac, has-window-focus=false, layout-params-type=1, layout-params-string={(0,0)(fillxfill) ty=BASE_APPLICATION wanim=0x1030309
+fl=KEEP_SCREEN_ON LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1080, height=2400, has-focus=false, has-focusable=true, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(fillxfill) ty=BASE_APPLICATION wanim=0x1030309
+fl=KEEP_SCREEN_ON LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}}]
+at dalvik.system.VMStack.getThreadStackTrace(Native Method)
+at java.lang.Thread.getStackTrace(Thread.java:1841)
+at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:34)
+at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:26)
+at androidx.test.espresso.base.DefaultFailureHandler$TypedFailureHandler.handle(DefaultFailureHandler.java:158)
+at androidx.test.espresso.base.DefaultFailureHandler.handle(DefaultFailureHandler.java:120)
+at androidx.test.espresso.ViewInteraction.waitForAndHandleInteractionResults(ViewInteraction.java:385)
+at androidx.test.espresso.ViewInteraction.desugaredPerform(ViewInteraction.java:212)
+at androidx.test.espresso.ViewInteraction.perform(ViewInteraction.java:140)
+at com.example.app_ck.AutoConDaoFlowTest.demoDiHetDanhMucChoDocXongVaHoiDiemThuCong(AutoConDaoFlowTest.java:80)
+</failure>
+  </testcase>
+  <testcase name="chonThuCongHuyLuotDangChoTuDong" classname="com.example.app_ck.AutoConDaoFlowTest" time="9.447" />
+  <testcase name="haiTourDungKhiRoiManHinhVaXoay" classname="com.example.app_ck.AutoDiSanFlowTest" time="20.166" />
+  <testcase name="vanMieuGpsLocViTriCuSaiSoVaTourKhac" classname="com.example.app_ck.AutoDiSanFlowTest" time="78.782">
+    <failure>androidx.test.espresso.NoMatchingRootException: Matcher '(cửa sổ hiển thị và đang nhận focus and is dialog)' did not match any of the following roots: [Root{application-window-token=android.view.ViewRootImpl$W&#64;4bdca2b, window-token=android.view.ViewRootImpl$W&#64;4bdca2b, has-window-focus=false, layout-params-type=2, layout-params-string={(0,0)(wrapxwrap) gr=CENTER sim={adjust=pan} ty=APPLICATION fmt=TRANSLUCENT wanim=0x7f100140
+fl=DIM_BEHIND ALT_FOCUSABLE_IM SPLIT_TOUCH HARDWARE_ACCELERATED
+pfl=EDGE_TO_EDGE_ENFORCED
+bhv=DEFAULT
+fitTypes=STATUS_BARS NAVIGATION_BARS CAPTION_BAR
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1024, height=929, has-focus=false, has-focusable=true, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(wrapxwrap) gr=CENTER sim={adjust=pan} ty=APPLICATION fmt=TRANSLUCENT wanim=0x7f100140
+fl=DIM_BEHIND ALT_FOCUSABLE_IM SPLIT_TOUCH HARDWARE_ACCELERATED
+pfl=EDGE_TO_EDGE_ENFORCED
+bhv=DEFAULT
+fitTypes=STATUS_BARS NAVIGATION_BARS CAPTION_BAR
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}}, Root{application-window-token=android.view.ViewRootImpl$W&#64;c285467, window-token=android.view.ViewRootImpl$W&#64;c285467, has-window-focus=false, layout-params-type=1, layout-params-string={(0,0)(fillxfill) ty=BASE_APPLICATION wanim=0x1030309
+fl=KEEP_SCREEN_ON LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1080, height=2400, has-focus=false, has-focusable=true, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(fillxfill) ty=BASE_APPLICATION wanim=0x1030309
+fl=KEEP_SCREEN_ON LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}}]
+at dalvik.system.VMStack.getThreadStackTrace(Native Method)
+at java.lang.Thread.getStackTrace(Thread.java:1841)
+at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:34)
+at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:26)
+at androidx.test.espresso.base.DefaultFailureHandler$TypedFailureHandler.handle(DefaultFailureHandler.java:158)
+at androidx.test.espresso.base.DefaultFailureHandler.handle(DefaultFailureHandler.java:120)
+at androidx.test.espresso.ViewInteraction.waitForAndHandleInteractionResults(ViewInteraction.java:385)
+at androidx.test.espresso.ViewInteraction.desugaredPerform(ViewInteraction.java:212)
+at androidx.test.espresso.ViewInteraction.perform(ViewInteraction.java:140)
+at com.example.app_ck.AutoDiSanFlowTest.gps(AutoDiSanFlowTest.java:175)
+at com.example.app_ck.AutoDiSanFlowTest.vanMieuGpsLocViTriCuSaiSoVaTourKhac(AutoDiSanFlowTest.java:193)
+</failure>
+  </testcase>
+  <testcase name="hienThiRoDiemAutoVaThuCongTrenCaHaiTour" classname="com.example.app_ck.AutoDiSanFlowTest" time="69.381">
+    <failure>androidx.test.espresso.NoMatchingRootException: Matcher 'cửa sổ hiển thị và đang nhận focus' did not match any of the following roots: [Root{application-window-token=android.view.ViewRootImpl$W&#64;d95fe82, window-token=android.view.ViewRootImpl$W&#64;d95fe82, has-window-focus=false, layout-params-type=1, layout-params-string={(0,0)(fillxfill) ty=BASE_APPLICATION wanim=0x1030309
+fl=LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, decor-view-string=DecorView{id=-1, visibility=VISIBLE, width=1080, height=2400, has-focus=false, has-focusable=true, has-window-focus=false, is-clickable=false, is-enabled=true, is-focused=false, is-focusable=false, is-layout-requested=false, is-selected=false, layout-params={(0,0)(fillxfill) ty=BASE_APPLICATION wanim=0x1030309
+fl=LAYOUT_IN_SCREEN LAYOUT_INSET_DECOR SPLIT_TOUCH HARDWARE_ACCELERATED DRAWS_SYSTEM_BAR_BACKGROUNDS
+pfl=NO_MOVE_ANIMATION EDGE_TO_EDGE_ENFORCED FORCE_DRAW_STATUS_BAR_BACKGROUND FIT_INSETS_CONTROLLED
+bhv=DEFAULT
+fitSides=
+frameRateBoostOnTouch=true
+dvrrWindowFrameRateHint=true}, tag=null, root-is-layout-requested=false, has-input-connection=false, x=0.0, y=0.0, child-count=1}}]
+at dalvik.system.VMStack.getThreadStackTrace(Native Method)
+at java.lang.Thread.getStackTrace(Thread.java:1841)
+at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:34)
+at androidx.test.espresso.base.EspressoExceptionHandler.handleSafely(EspressoExceptionHandler.java:26)
+at androidx.test.espresso.base.DefaultFailureHandler$TypedFailureHandler.handle(DefaultFailureHandler.java:158)
+at androidx.test.espresso.base.DefaultFailureHandler.handle(DefaultFailureHandler.java:120)
+at androidx.test.espresso.ViewInteraction.waitForAndHandleInteractionResults(ViewInteraction.java:385)
+at androidx.test.espresso.ViewInteraction.check(ViewInteraction.java:366)
+at com.example.app_ck.AutoDiSanFlowTest.kiemTraNhanCheDo(AutoDiSanFlowTest.java:133)
+at com.example.app_ck.AutoDiSanFlowTest.hienThiRoDiemAutoVaThuCongTrenCaHaiTour(AutoDiSanFlowTest.java:120)
+</failure>
+  </testcase>
+  <testcase name="hueDemoDu10DiemChoDocXongVaHoiThuCong" classname="com.example.app_ck.AutoDiSanFlowTest" time="33.842">
+    <failure></failure>
+  </testcase>
+  <system-err>Exception thrown during onAfterAll invocation of plugin AndroidTestApkInstallerPlugin: device 'emulator-5554' not found
+device 'emulator-5554' not found
+com.android.ddmlib.AdbCommandRejectedException: device 'emulator-5554' not found
+	at com.android.ddmlib.AdbHelper.setDevice(AdbHelper.java:967)
+	at com.android.ddmlib.AdbHelper.setDevice(AdbHelper.java:986)
+	at com.android.ddmlib.internal.DeviceImpl.lambda$executeRemoteCommand$18(DeviceImpl.java:785)
+	at com.android.ddmlib.internal.DeviceImpl.logRun1(DeviceImpl.java:1801)
+	at com.android.ddmlib.internal.DeviceImpl.executeRemoteCommand(DeviceImpl.java:755)
+	at com.android.ddmlib.internal.DeviceImpl.lambda$executeRemoteCommand$15(DeviceImpl.java:618)
+	at com.android.ddmlib.internal.DeviceImpl.logRun1(DeviceImpl.java:1801)
+	at com.android.ddmlib.internal.DeviceImpl.executeRemoteCommand(DeviceImpl.java:615)
+	at com.android.ddmlib.internal.DeviceImpl.lambda$executeShellCommand$14(DeviceImpl.java:573)
+	at com.android.ddmlib.internal.DeviceImpl.logRun1(DeviceImpl.java:1801)
+	at com.android.ddmlib.internal.DeviceImpl.executeShellCommand(DeviceImpl.java:570)
+	at com.android.tools.utp.plugins.deviceprovider.ddmlib.DdmlibAndroidDevice.executeShellCommand(DdmlibAndroidDevice.kt)
+	at com.android.tools.utp.plugins.deviceprovider.ddmlib.DdmlibAndroidDeviceController$executeAsync$deferred$1.invokeSuspend(DdmlibAndroidDeviceController.kt:171)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:108)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:584)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:793)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:697)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:684)
+
+Test run failed to complete. Expected 114 tests, received 18
+</system-err>
+</testsuite>

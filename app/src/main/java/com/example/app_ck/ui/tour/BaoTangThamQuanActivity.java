@@ -1,17 +1,6 @@
-
 package com.example.app_ck.ui.tour;
 
+/** Giữ component Intent cũ; toàn bộ hành vi được xử lý trong ThamQuanActivity. */
 public class BaoTangThamQuanActivity extends ThamQuanActivity {
-
-    @Override
-    protected int diaDiemMacDinh() {
-
-        return 1;
-    }
-
-    @Override
-    protected int diemMacDinh() {
-
-        return 10;
-    }
+    @Override protected int diaDiemMacDinh() { return 1; }
 }

@@ -131,7 +131,7 @@ public class BaseActivity extends AppCompatActivity {
                         + tenDiem + "” để nghe thủ công không?")
                 .setNegativeButton("Tiếp tục nghe", null)
                 .setPositiveButton("Chuyển điểm", (dialog, which) -> {
-                    if (!isFinishing() && !isDestroyed()
+                    if (hoiChuyenDiem == dialog && !isFinishing() && !isDestroyed()
                             && getLifecycle().getCurrentState().isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED))
                         chuyenDiem.run();
                 }).create();
@@ -183,7 +183,11 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     @Override protected void onStop() {
-        if (hoiChuyenDiem != null) hoiChuyenDiem.dismiss();
+        if (hoiChuyenDiem != null) {
+            androidx.appcompat.app.AlertDialog cu = hoiChuyenDiem;
+            hoiChuyenDiem = null;
+            cu.dismiss();
+        }
         huyLuotLichSu();
         dongKhungThuyetMinh();
         if (thamQuanTuDong != null) thamQuanTuDong.dung("Đã dừng theo dõi và giọng đọc khi rời màn hình. Bấm Demo hoặc GPS thật để bắt đầu lượt mới.");

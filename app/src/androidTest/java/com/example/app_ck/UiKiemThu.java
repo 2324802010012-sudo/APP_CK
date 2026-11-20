@@ -13,6 +13,33 @@ import org.hamcrest.TypeSafeMatcher;
 
 /** Chờ đúng cửa sổ có focus và không mời lưu thông tin tài khoản thử vào dịch vụ autofill. */
 public final class UiKiemThu {
+    static Object truong(Object target, String ten) {
+        for (Class<?> lop = target.getClass(); lop != null; lop = lop.getSuperclass()) {
+            try {
+                java.lang.reflect.Field field = lop.getDeclaredField(ten);
+                field.setAccessible(true);
+                return field.get(target);
+            } catch (NoSuchFieldException ex) {
+                // Trạng thái có thể thuộc Activity/controller cha sau refactor.
+            } catch (IllegalAccessException ex) {
+                throw new AssertionError(ex);
+            }
+        }
+        throw new AssertionError("Không có field " + ten);
+    }
+
+    static android.view.View timTheoMoTa(android.view.View view, String moTa) {
+        if (view.getContentDescription() != null
+                && view.getContentDescription().toString().startsWith(moTa)) return view;
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                android.view.View tim = timTheoMoTa(group.getChildAt(i), moTa);
+                if (tim != null) return tim;
+            }
+        }
+        return null;
+    }
     private static final Matcher<Root> CO_FOCUS = new TypeSafeMatcher<Root>() {
         @Override public void describeTo(Description d) { d.appendText("cửa sổ hiển thị và đang nhận focus"); }
         @Override protected boolean matchesSafely(Root r) { return r.getDecorView().isShown() && r.getDecorView().hasWindowFocus(); }

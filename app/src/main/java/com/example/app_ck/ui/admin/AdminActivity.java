@@ -1,29 +1,27 @@
 package com.example.app_ck.ui.admin;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AlertDialog;
 
 import com.example.app_ck.R;
 import com.example.app_ck.data.local.AppDatabase;
 import com.example.app_ck.session.PhienDangNhap;
 import com.example.app_ck.ui.common.BaseActivity;
 import com.example.app_ck.ui.home.MainActivity;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class AdminActivity extends BaseActivity {
 
-    private static final String TAG = "APP_CK_ADMIN";
-
-    // =====================================================
-    // KHOI TAO
-    // =====================================================
+    private static final String TAG = "AdminDashboard";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle state) {
+        super.onCreate(state);
 
         if (!kiemTraQuyen()) {
             finish();
@@ -32,8 +30,8 @@ public class AdminActivity extends BaseActivity {
 
         setContentView(R.layout.activity_admin);
         apDungKhoangTrongHeThong();
-
         ganSuKien();
+        capNhatThongKe();
     }
 
     @Override
@@ -42,181 +40,141 @@ public class AdminActivity extends BaseActivity {
 
         if (!kiemTraQuyen()) {
             finish();
+            return;
+        }
+
+        // Du lieu co the da thay doi tai cac trang quan ly.
+        if (findViewById(R.id.adminSoDiaDiem) != null) {
+            capNhatThongKe();
         }
     }
-
-    // =====================================================
-    // KIEM TRA QUYEN ADMIN
-    // =====================================================
 
     private boolean kiemTraQuyen() {
-
         try (AppDatabase helper = new AppDatabase(this)) {
-
             PhienDangNhap.yeuCauQuanTri(
-                    this,
-                    helper.getReadableDatabase()
-            );
-
+                    this, helper.getReadableDatabase());
             return true;
-
         } catch (SecurityException e) {
-
-            Toast.makeText(
-                    this,
+            Toast.makeText(this,
                     "Tài khoản không có quyền quản trị",
-                    Toast.LENGTH_SHORT
-            ).show();
-
+                    Toast.LENGTH_SHORT).show();
             return false;
-
         } catch (Exception e) {
-
-            Log.e(TAG, "Lỗi kiểm tra quyền Admin", e);
-
-            Toast.makeText(
-                    this,
+            Log.e(TAG, "Không xác minh được quyền Admin", e);
+            Toast.makeText(this,
                     "Không thể xác minh quyền quản trị",
-                    Toast.LENGTH_LONG
-            ).show();
-
+                    Toast.LENGTH_LONG).show();
             return false;
         }
     }
 
-    // =====================================================
-    // GAN SU KIEN CAC CHUC NANG
-    // =====================================================
-
     private void ganSuKien() {
-
-        // UC08.1 - UC08.4
-        // QUAN LY DIA DIEM DU LICH
         findViewById(R.id.adminDiaDiem)
-                .setOnClickListener(v -> {
-                    startActivity(
-                            new Intent(
-                                    AdminActivity.this,
-                                    QuanLyDiaDiemActivity.class
-                            )
-                    );
-                });
+                .setOnClickListener(v -> moManHinh(
+                        QuanLyDiaDiemActivity.class));
 
-        // UC08.5 - UC08.7
-        // QUAN LY DIEM THAM QUAN
         findViewById(R.id.adminDiemThamQuan)
-                .setOnClickListener(v -> {
-                    startActivity(
-                            new Intent(
-                                    AdminActivity.this,
-                                    QuanLyDiemThamQuanActivity.class
-                            )
-                    );
-                });
+                .setOnClickListener(v -> moManHinh(
+                        QuanLyDiemThamQuanActivity.class));
 
-        // UC08.8
-        // QUAN LY NOI DUNG THUYET MINH
         findViewById(R.id.adminThuyetMinh)
-                .setOnClickListener(v -> {
-                    startActivity(
-                            new Intent(
-                                    AdminActivity.this,
-                                    QuanLyThuyetMinhActivity.class
-                            )
-                    );
-                });
-        // UC08 - CAU HINH GPS AUTO
+                .setOnClickListener(v -> moManHinh(
+                        QuanLyThuyetMinhActivity.class));
+
         findViewById(R.id.adminGpsAuto)
-                .setOnClickListener(v -> {
-                    Intent intent = new Intent(
-                            AdminActivity.this,
-                            QuanLyGpsAutoActivity.class
-                    );
+                .setOnClickListener(v -> moManHinh(
+                        QuanLyGpsAutoActivity.class));
 
-                    startActivity(intent);
-                });
-
-        // UC08.9 - UC08.12
-        // QUAN LY TAI KHOAN
         findViewById(R.id.adminTaiKhoan)
-                .setOnClickListener(v -> {
-                    startActivity(
-                            new Intent(
-                                    AdminActivity.this,
-                                    QuanLyTaiKhoanActivity.class
-                            )
-                    );
-                });
+                .setOnClickListener(v -> moManHinh(
+                        QuanLyTaiKhoanActivity.class));
 
-        // VE TRANG CHU - GIU PHIEN ADMIN
         findViewById(R.id.adminTrangChu)
                 .setOnClickListener(v -> veTrangChu());
 
-        // DANG XUAT
         findViewById(R.id.adminDangXuat)
                 .setOnClickListener(v -> xacNhanDangXuat());
     }
 
-    // =====================================================
-    // THONG BAO CHUA TRIEN KHAI
-    // =====================================================
-
-    private void thongBaoChuaTrienKhai(String chucNang) {
-
-        Toast.makeText(
-                this,
-                chucNang + " sẽ được triển khai ở bước tiếp theo",
-                Toast.LENGTH_SHORT
-        ).show();
+    private void moManHinh(Class<?> manHinh) {
+        if (!kiemTraQuyen()) {
+            finish();
+            return;
+        }
+        startActivity(new Intent(this, manHinh));
     }
 
-    // =====================================================
-    // VE TRANG CHU - GIU PHIEN ADMIN
-    // =====================================================
+    private void capNhatThongKe() {
+        try (AppDatabase helper = new AppDatabase(this)) {
+            SQLiteDatabase db = helper.getReadableDatabase();
+
+            // Luon kiem tra quyen truoc khi doc thong ke.
+            PhienDangNhap.yeuCauQuanTri(this, db);
+
+            int soDiaDiem = demBanGhi(db, "dia_diem");
+            int soDiem = demBanGhi(
+                    db, "diem_tham_quan_chung");
+            int soTaiKhoan = demBanGhi(db, "tai_khoan");
+
+            hienSo(R.id.adminSoDiaDiem, soDiaDiem);
+            hienSo(R.id.adminSoDiem, soDiem);
+            hienSo(R.id.adminSoTaiKhoan, soTaiKhoan);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Không tải được thống kê", e);
+            hienChu(R.id.adminSoDiaDiem, "—");
+            hienChu(R.id.adminSoDiem, "—");
+            hienChu(R.id.adminSoTaiKhoan, "—");
+        }
+    }
+
+    private int demBanGhi(
+            SQLiteDatabase db, String tenBang) {
+        // Chi su dung ba ten bang co dinh cua ung dung.
+        try (Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM " + tenBang, null)) {
+            return cursor.moveToFirst()
+                    ? cursor.getInt(0) : 0;
+        }
+    }
+
+    private void hienSo(int id, int soLuong) {
+        hienChu(id, String.valueOf(soLuong));
+    }
+
+    private void hienChu(int id, String noiDung) {
+        TextView view = findViewById(id);
+        if (view != null) {
+            view.setText(noiDung);
+        }
+    }
 
     private void veTrangChu() {
-
-        Intent intent = new Intent(
-                AdminActivity.this,
-                MainActivity.class
-        );
-
-        startActivity(intent);
+        startActivity(new Intent(
+                this, MainActivity.class));
         finish();
     }
 
-    // =====================================================
-    // DANG XUAT
-    // =====================================================
-
     private void xacNhanDangXuat() {
-
-        new AlertDialog.Builder(this)
-                .setTitle("Đăng xuất tài khoản Admin?")
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Đăng xuất tài khoản?")
                 .setMessage(
-                        "Bạn có chắc muốn kết thúc phiên quản trị?"
-                )
+                        "Bạn có muốn kết thúc phiên quản trị?")
                 .setNegativeButton("Hủy", null)
                 .setPositiveButton(
                         "Đăng xuất",
                         (dialog, which) -> {
-
                             PhienDangNhap.dangXuat(this);
 
                             Intent intent = new Intent(
-                                    AdminActivity.this,
-                                    MainActivity.class
-                            );
-
+                                    this, MainActivity.class);
                             intent.addFlags(
                                     Intent.FLAG_ACTIVITY_NEW_TASK
-                                            | Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            );
+                                            | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                             startActivity(intent);
                             finish();
-                        }
-                )
+                        })
                 .show();
     }
 }

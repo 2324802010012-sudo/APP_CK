@@ -86,10 +86,12 @@ public class LichSuFlowTest {
     @Test public void khachMoTuTrangChuDangNhapVaXemTrangThaiRong() {
         PhienDangNhap.dangXuat(context);
         try(ActivityScenario<MainActivity> s=ActivityScenario.launch(MainActivity.class)) {
-            onView(withId(R.id.nutLichSu)).perform(scrollTo(),click());
+            onView(withId(R.id.navCaNhan)).perform(click());
+            onView(withId(R.id.cnDangNhap)).perform(scrollTo(),click());
             onView(withId(R.id.edtTenDangNhap)).perform(replaceText(tenA));
             onView(withId(R.id.edtMatKhau)).perform(replaceText(MAT_KHAU),closeSoftKeyboard());
             onView(withId(R.id.btnDangNhap)).perform(click());
+            onView(withId(R.id.cnLichSu)).perform(scrollTo(),click());
             onView(withText("Chưa có lịch sử nghe")).check(matches(isDisplayed()));
             assertEquals(a,PhienDangNhap.id(context)); assertTrue(doc(a).isEmpty());
         }
@@ -100,7 +102,7 @@ public class LichSuFlowTest {
             onView(withId(R.id.cnLichSu)).perform(scrollTo(),click());
             onView(withText("Chưa có lịch sử nghe")).check(matches(isDisplayed()));
             onView(withId(R.id.lsNutTrangThai)).perform(scrollTo(),click());
-            onView(withId(R.id.oTimKiem)).check(matches(isDisplayed()));
+            onView(withId(R.id.kpTimKiem)).check(matches(isDisplayed()));
         }
     }
 
@@ -116,9 +118,11 @@ public class LichSuFlowTest {
                 assertEquals("Tự động · Địa điểm chính",((TextView)ds.getChildAt(1).findViewById(R.id.lsCheDo)).getText().toString());
                 ds.getChildAt(0).findViewById(R.id.lsXoaLuot).performClick();
             });
+            onView(withText("Xóa lượt nghe")).perform(click());
             onView(withText("Hủy")).inRoot(UiKiemThu.hoiThoai()).perform(click());
             assertEquals(2,doc(a).size());
             s.onActivity(x -> ((LinearLayout)x.findViewById(R.id.lsDanhSach)).getChildAt(0).findViewById(R.id.lsXoaLuot).performClick());
+            onView(withText("Xóa lượt nghe")).perform(click());
             onView(withText("Xóa")).inRoot(UiKiemThu.hoiThoai()).perform(click());
             assertEquals(1,doc(a).size()); assertEquals(KhoLichSu.AUTO_MAIN,doc(a).get(0).cheDo);
         }
@@ -183,7 +187,6 @@ public class LichSuFlowTest {
     }
 
     @Test public void intentMoLaiDuNamNoiVaDiemThanhPhanKhongTuPhat() {
-        String[] lop={"ThamQuanActivity","BaoTangThamQuanActivity","DaiNoiHueThamQuanActivity","ConDaoThamQuanActivity","VanMieuThamQuanActivity"};
         int[] cuoi={25,13,10,19,16};
         try(AppDatabase db=new AppDatabase(context)) {
             for(int i=0;i<5;i++) {
@@ -197,7 +200,8 @@ public class LichSuFlowTest {
                 assertFalse(moTong.getBooleanExtra(ChiTietDiaDiemActivity.PHAT_TU_VI_TRI,false));
                 KhoLichSu.ghi(db.getWritableDatabase(),a,i,cuoi[i],KhoLichSu.THU_CONG,100+i,"diem"+i);
                 Intent moDiem=LichSuActivity.taoIntentMoLai(context,doc(a).get(0));
-                assertEquals("com.example.app_ck.ui.tour."+lop[i],moDiem.getComponent().getClassName());
+                assertEquals(ThamQuanActivity.class.getName(),moDiem.getComponent().getClassName());
+                assertEquals(i,moDiem.getIntExtra("viTriDiaDiem",-1));
                 assertEquals(cuoi[i],moDiem.getIntExtra("idMarker",-1));
             }
         }

@@ -6,6 +6,8 @@
 
 Cập nhật theo mã nguồn và kết quả kiểm chứng đến **10/11/2026**.
 
+Kiến trúc tham quan được refactor ngày **19/11/2026**: [kiểm kê, đối chiếu file và kết quả kiểm thử](docs/refactor-tour-architecture.md).
+
 README này giải thích cấu trúc và cách vận hành project để cài đặt, sử dụng, bảo trì và chuẩn bị bảo vệ. Những giới hạn hoặc phần chưa kiểm chứng được nêu riêng, không xem việc build thành công là bằng chứng mọi chức năng đã được nghiệm thu.
 
 ## Mục lục
@@ -37,7 +39,7 @@ README này giải thích cấu trúc và cách vận hành project để cài �
 | Build | Gradle 9.6.0, AGP 8.9.2, Gradle Daemon dùng JDK 21 |
 | Bản đồ | osmdroid 6.1.20, OpenStreetMap |
 | Âm thanh | TextToSpeech, WAV tạm và MediaPlayer |
-| Lưu trữ | SQLite v17, SharedPreferences cho phiên |
+| Lưu trữ | SQLite v18, SharedPreferences cho phiên và tiến độ nghe |
 
 Chi tiết phiên bản: [app/build.gradle.kts](app/build.gradle.kts), [libs.versions.toml](gradle/libs.versions.toml).
 
@@ -79,7 +81,7 @@ $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
 .\gradlew.bat assembleDebug
 ```
 
-APK của cấu hình hiện tại: `app/build/intermediates/apk/debug/app-debug.apk`.
+APK từ lệnh Gradle trên: `app/build/outputs/apk/debug/app-debug.apk`.
 
 Tra cứu và nghe thủ công không cần GPS. Bản đồ nền cần mạng/cache; nghe ngoại tuyến phụ thuộc giọng tiếng Việt đã cài trên thiết bị.
 
@@ -93,7 +95,7 @@ Tra cứu và nghe thủ công không cần GPS. Bản đồ nền cần mạng/
 
 ## SQLite và nguyên tắc dữ liệu
 
-Database: **`du_lich_tai_khoan.db`, phiên bản 17**.
+Database: **`du_lich_tai_khoan.db`, phiên bản 18**. Refactor Java không thay đổi schema hoặc tăng version.
 
 - [AppDatabase.java](app/src/main/java/com/example/app_ck/data/local/AppDatabase.java): helper và vòng đời kết nối.
 - [NangCapDatabase.java](app/src/main/java/com/example/app_ck/data/local/NangCapDatabase.java): tạo/nâng cấp schema, chuyển dữ liệu cũ, kiểm tra toàn vẹn.
@@ -235,9 +237,9 @@ flowchart TD
 | --- | --- | --- |
 | Khởi động | `WelcomeActivity` | Vào ứng dụng và tiếp cận luồng trang chủ |
 | Trang chủ | `MainActivity`, `KhamPhaActivity`, `GoiYDiaDiem` | Tìm/lọc địa điểm, xem gợi ý, sắp xếp gần tôi và mở chi tiết |
-| Chi tiết | `ChiTietDiaDiemActivity` | Xem nội dung, ảnh, điểm thành phần, nguồn; mở bản đồ/tour và thao tác yêu thích |
+| Chi tiết | `ChiTietDiaDiemActivity`, `BoAnhDiaDiem` | Xem nội dung, ảnh, điểm thành phần, nguồn; mở bản đồ/tour và thao tác yêu thích |
 | Bản đồ | `BanDoActivity`, `BanDoChaoMungView` | Xem vị trí, chọn địa điểm; bản đồ osmdroid khác với sơ đồ ảnh trong tour |
-| Tham quan | `ThamQuanActivity`, các Activity tour riêng | Chọn tầng, marker hoặc điểm danh sách; xem/nghe nội dung; sử dụng AUTO/Demo theo cấu hình |
+| Tham quan | `ThamQuanActivity`, `CauHinhTour`, `KhungSoDoTour` | Một luồng chung cho mọi địa điểm; sơ đồ Huế giữ bộ vẽ riêng và Côn Đảo giữ ID điều khiển tương thích |
 | Xác thực | `DangNhapActivity`, `DangKyActivity`, `QuenMatKhauActivity` | Tạo tài khoản, đăng nhập, dùng mã khôi phục khi quên mật khẩu |
 | Cá nhân | `CaNhanActivity`, `SuaHoSoActivity`, `DoiMatKhauActivity` | Quản lý hồ sơ, mật khẩu và phiên |
 | Dữ liệu cá nhân | `YeuThichActivity`, `LichSuActivity` | Xem yêu thích/lượt nghe của tài khoản hiện tại, mở lại nội dung hoặc xóa lịch sử |
@@ -258,7 +260,7 @@ Mật khẩu dùng PBKDF2-HMAC-SHA1, 120.000 vòng, đầu ra 256 bit và salt n
 
 ### Điều hướng tour
 
-`DieuHuongThamQuan` chọn Activity theo ID địa điểm: 1 → Bảo tàng, 2 → Đại Nội Huế, 3 → Côn Đảo, 4 → Văn Miếu; các ID còn lại dùng `ThamQuanActivity`. Intent truyền `viTriDiaDiem` và `idMarker`. Địa điểm ADMIN thêm dùng giao diện chung, không phải viết thêm Activity riêng.
+`DieuHuongThamQuan` mở `ThamQuanActivity` cho mọi ID địa điểm, truyền nguyên `viTriDiaDiem` và `idMarker`. Dữ liệu điểm, tầng, ảnh và cấu hình AUTO đọc từ SQLite; `CauHinhTour` chỉ chọn cách hiển thị. `SoDoHueView` giữ công thức zoom/pan và tọa độ riêng của Huế. Các Activity cũ còn khai báo trong Manifest dưới dạng lớp mỏng kế thừa màn hình chung để Intent cũ tiếp tục hoạt động. Địa điểm ADMIN thêm không cần Activity mới.
 
 ## Giải thích database
 
@@ -376,7 +378,7 @@ Truy vấn thứ hai xem các điểm Đại Nội Huế, gồm ảnh riêng và
 | Thành phần | Vai trò |
 | --- | --- |
 | `ThamQuanTuDong` | Điều phối hướng dẫn nhận diện địa điểm từ trang chủ |
-| `HuongDanTour`, `HuongDanConDao` | Điều phối hướng dẫn trong tour và phần chuyên biệt Côn Đảo |
+| `HuongDanTour` | Điều phối hướng dẫn chung trong tour; nhận cấu hình ID điều khiển Côn Đảo |
 | `BoNhanDienDiaDiem` | Nhận diện địa điểm lớn |
 | `BoNhanDienDiemThanhPhan` | Chỉ xét các điểm AUTO của tour đang mở, loại tình huống vùng sai số chạm nhiều mốc |
 | `BoChonDiemTuDong` | Khoảng cách, vùng phát, chờ ổn định và chống lặp trong lượt |

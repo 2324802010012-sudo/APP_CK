@@ -4,14 +4,10 @@ package com.example.app_ck.ui.tour;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.RippleDrawable;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
@@ -27,15 +23,13 @@ import androidx.activity.ComponentActivity;
 import androidx.activity.OnBackPressedCallback;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.NestedScrollView;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.example.app_ck.R;
 import com.example.app_ck.data.model.DiemThamQuan;
 import com.google.android.material.appbar.AppBarLayout;
 
-import java.text.Normalizer;
+import static com.example.app_ck.util.VanBanTimKiem.chuanHoa;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
@@ -49,17 +43,7 @@ public final class GiaoDienTour {
     private static final int XANH =
             Color.parseColor("#2C7351");
 
-    private static final int TIEU_DE =
-            Color.parseColor("#182D22");
-
-    private static final int CHU_PHU =
-            Color.parseColor("#687B6E");
-
-    private static final int NEN_NUT_SANG =
-            Color.parseColor("#EDF5EC");
-
-    private static final int NEN_NUT_TOI =
-            Color.parseColor("#88203329");
+    private static final int CHU_PHU = Color.parseColor("#687B6E");
 
     private final Activity activity;
 
@@ -69,19 +53,8 @@ public final class GiaoDienTour {
 
     private final AppBarLayout appBar;
 
-    private final View hero;
-    private final View nenThuGon;
-
-    private final TextView tenDiaDiem;
-    private final TextView tenThuGon;
+    private final BannerTour banner;
     private final TextView heroThongTin;
-    private final TextView nutQuayLai;
-
-    private final ImageButton nutThuGon;
-
-    private int doLechHeader = 0;
-
-    private Boolean giaoDienHeaderGon = null;
 
     // =====================================================
     // TAB VA TIM KIEM
@@ -166,35 +139,9 @@ public final class GiaoDienTour {
 
         this.activity = activity;
 
-        // Header
-
         appBar = activity.findViewById(R.id.tqAppBar);
-
-        hero = activity.findViewById(R.id.tqHero);
-
-        nenThuGon = activity.findViewById(
-                R.id.tqNenThuGon
-        );
-
-        tenDiaDiem = activity.findViewById(
-                R.id.tqTenDiaDiem
-        );
-
-        tenThuGon = activity.findViewById(
-                R.id.tqTenThuGon
-        );
-
-        heroThongTin = activity.findViewById(
-                R.id.tqHeroThongTin
-        );
-
-        nutQuayLai = activity.findViewById(
-                R.id.tqNutQuayLai
-        );
-
-        nutThuGon = activity.findViewById(
-                R.id.tqNutThuGon
-        );
+        heroThongTin = activity.findViewById(R.id.tqHeroThongTin);
+        banner = new BannerTour(activity, () -> dangToanManHinh, this::anBanPhim);
 
         // Tab
 
@@ -267,7 +214,6 @@ public final class GiaoDienTour {
         vungCuon.setTag(this);
 
         ganSuKien();
-        khoiTaoHeader();
         khoiTaoToanManHinh();
         capNhatIconNguon();
 
@@ -328,187 +274,8 @@ public final class GiaoDienTour {
                 "tourHeaderGon",
                 dangToanManHinh
                         ? headerGonTruocToanManHinh
-                        : headerDangGon()
+                        : banner.dangGon()
         );
-    }
-
-    // =====================================================
-    // HEADER THU GON
-    // =====================================================
-
-    private void khoiTaoHeader() {
-        CollapsingToolbarLayout collapsingHeader =
-                activity.findViewById(R.id.tqCollapsingHeader);
-
-        collapsingHeader.setContentScrim(null);
-        collapsingHeader.setStatusBarScrim(null);
-        collapsingHeader.setScrimsShown(false, false);
-        // Dong bo ten tu Activity sang header nho
-
-        tenThuGon.setText(
-                tenDiaDiem.getText()
-        );
-
-        tenDiaDiem.addTextChangedListener(
-                new TextWatcher() {
-
-                    @Override
-                    public void beforeTextChanged(
-                            CharSequence s,
-                            int start,
-                            int count,
-                            int after) {
-                    }
-
-                    @Override
-                    public void onTextChanged(
-                            CharSequence s,
-                            int start,
-                            int before,
-                            int count) {
-
-                        tenThuGon.setText(s);
-                    }
-
-                    @Override
-                    public void afterTextChanged(
-                            Editable s) {
-                    }
-                }
-        );
-
-        // Tu dong thu gon khi cuon
-
-        appBar.addOnOffsetChangedListener(
-                (AppBarLayout.OnOffsetChangedListener)
-                        (bar, offset) -> {
-
-                            if (dangToanManHinh) return;
-
-                            doLechHeader = offset;
-
-                            capNhatHeader(
-                                    bar.getTotalScrollRange(),
-                                    offset
-                            );
-                        }
-        );
-
-        // Cho phep nguoi dung tu thu gon / mo rong
-
-        nutThuGon.setOnClickListener(v -> {
-
-            anBanPhim();
-
-            appBar.setExpanded(
-                    headerDangGon(),
-                    true
-            );
-        });
-
-        capNhatHeader(1, 0);
-    }
-
-    private boolean headerDangGon() {
-
-        int range = appBar.getTotalScrollRange();
-
-        return range > 0
-                && Math.abs(doLechHeader) >= range / 2f;
-    }
-
-    private void capNhatHeader(
-            int range,
-            int offset) {
-
-        float tiLe = range <= 0
-                ? 0f
-                : Math.min(
-                1f,
-                Math.abs(offset) / (float) range
-        );
-
-        // Chuyen doi mem giua banner va header nho
-
-        float alphaThuGon = Math.max(
-                0f,
-                Math.min(
-                        1f,
-                        (tiLe - 0.35f) / 0.45f
-                )
-        );
-
-        hero.setAlpha(
-                1f - alphaThuGon
-        );
-
-        nenThuGon.setAlpha(alphaThuGon);
-
-        tenThuGon.setAlpha(alphaThuGon);
-
-        tenThuGon.setVisibility(
-                alphaThuGon > 0.01f
-                        ? View.VISIBLE
-                        : View.INVISIBLE
-        );
-
-        // Tranh doc trung lap ten bang TalkBack
-
-        hero.setImportantForAccessibility(
-                alphaThuGon >= 0.5f
-                        ? View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
-                        : View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
-        );
-
-        tenThuGon.setImportantForAccessibility(
-                alphaThuGon >= 0.5f
-                        ? View.IMPORTANT_FOR_ACCESSIBILITY_YES
-                        : View.IMPORTANT_FOR_ACCESSIBILITY_NO
-        );
-
-        boolean gon = tiLe >= 0.5f;
-
-        // Chi doi mau nut khi trang thai thay doi
-
-        if (giaoDienHeaderGon == null
-                || giaoDienHeaderGon != gon) {
-
-            giaoDienHeaderGon = gon;
-
-            int mauIcon = gon
-                    ? XANH
-                    : Color.WHITE;
-
-            int mauNen = gon
-                    ? NEN_NUT_SANG
-                    : NEN_NUT_TOI;
-
-            nutQuayLai.setBackgroundTintList(
-                    ColorStateList.valueOf(mauNen)
-            );
-
-            nutQuayLai.setCompoundDrawableTintList(
-                    ColorStateList.valueOf(mauIcon)
-            );
-
-            nutThuGon.setBackgroundTintList(
-                    ColorStateList.valueOf(mauNen)
-            );
-
-            nutThuGon.setImageTintList(
-                    ColorStateList.valueOf(mauIcon)
-            );
-
-            nutThuGon.setRotation(
-                    gon ? 180f : 0f
-            );
-
-            nutThuGon.setContentDescription(
-                    gon
-                            ? "Mở rộng ảnh bìa"
-                            : "Thu gọn ảnh bìa"
-            );
-        }
     }
 
     // =====================================================
@@ -726,10 +493,6 @@ public final class GiaoDienTour {
                         + " điểm tham quan · Thuyết minh di sản"
         );
 
-        tenThuGon.setText(
-                tenDiaDiem.getText()
-        );
-
         hienThiDanhSach();
         capNhatIconNguon();
         capNhatTenToanManHinh();
@@ -781,7 +544,10 @@ public final class GiaoDienTour {
             }
 
             danhSach.addView(
-                    taoTheDiem(diem, khuVuc)
+                    GiaoDienTheThamQuan.tao(activity, diem, khuVuc, idDangChon,
+                            hoTroAuto != null && hoTroAuto.test(diem.id),
+                            () -> { anBanPhim(); if (suKienChon != null) suKienChon.accept(diem.id); },
+                            () -> ngheNhanh(diem.id))
             );
 
             dem++;
@@ -797,7 +563,7 @@ public final class GiaoDienTour {
 
         if (dem == 0) {
 
-            TextView rong = taoChu(
+            TextView rong = GiaoDienTheThamQuan.taoChu(activity,
                     cacDiem.isEmpty()
                             ? "Chưa có điểm tham quan"
                             : "Không tìm thấy điểm phù hợp",
@@ -814,280 +580,6 @@ public final class GiaoDienTour {
 
             danhSach.addView(rong);
         }
-    }
-
-    // =====================================================
-    // THE DIEM THAM QUAN
-    // =====================================================
-
-    private View taoTheDiem(
-            DiemThamQuan diem,
-            String khuVuc) {
-
-        boolean dangChon =
-                diem.id == idDangChon;
-
-        boolean coAuto =
-                hoTroAuto != null
-                        && hoTroAuto.test(diem.id);
-
-        boolean coBai =
-                coNoiDung(diem.noiDung)
-                        || coNoiDung(diem.moTa);
-
-        // The ngoai
-
-        LinearLayout the = new LinearLayout(activity);
-
-        the.setOrientation(
-                LinearLayout.HORIZONTAL
-        );
-
-        the.setGravity(
-                Gravity.CENTER_VERTICAL
-        );
-
-        the.setPadding(
-                dp(8), dp(6), dp(8), dp(6)
-        );
-
-        the.setMinimumHeight(dp(70));
-
-        the.setBackground(
-                nen(
-                        dangChon
-                                ? "#E8F2E6"
-                                : "#FFFFFF",
-                        dangChon
-                                ? "#88B18B"
-                                : "#E0E9E0",
-                        16
-                )
-        );
-
-        LinearLayout.LayoutParams lpThe =
-                new LinearLayout.LayoutParams(
-                        -1, -2
-                );
-
-        lpThe.bottomMargin = dp(8);
-
-        the.setLayoutParams(lpThe);
-
-        // Vung bam chon diem
-
-        LinearLayout vungChon =
-                new LinearLayout(activity);
-
-        vungChon.setOrientation(
-                LinearLayout.HORIZONTAL
-        );
-
-        vungChon.setGravity(
-                Gravity.CENTER_VERTICAL
-        );
-
-        vungChon.setMinimumHeight(dp(54));
-
-        vungChon.setPadding(
-                dp(4), dp(6), dp(8), dp(6)
-        );
-
-        vungChon.setBackground(
-                nenCham(
-                        dangChon
-                                ? "#E8F2E6"
-                                : "#FFFFFF",
-                        dangChon
-                                ? "#E8F2E6"
-                                : "#FFFFFF",
-                        12
-                )
-        );
-
-        the.addView(
-                vungChon,
-                new LinearLayout.LayoutParams(
-                        0, -2, 1f
-                )
-        );
-
-        // So marker
-
-        String soMarker = diem.coMarker()
-                ? String.format(
-                Locale.ROOT,
-                "%02d",
-                diem.soHienThi > 0
-                        ? diem.soHienThi
-                        : diem.id
-        )
-                : "–";
-
-        TextView so = taoChu(
-                soMarker,
-                15,
-                dangChon ? Color.WHITE : XANH,
-                true
-        );
-
-        so.setGravity(Gravity.CENTER);
-
-        so.setBackground(
-                nen(
-                        dangChon
-                                ? "#2C7351"
-                                : "#EDF5EC",
-                        dangChon
-                                ? "#2C7351"
-                                : "#EDF5EC",
-                        12
-                )
-        );
-
-        vungChon.addView(
-                so,
-                new LinearLayout.LayoutParams(
-                        dp(40), dp(40)
-                )
-        );
-
-        // Khu vuc noi dung
-
-        LinearLayout noiDung =
-                new LinearLayout(activity);
-
-        noiDung.setOrientation(
-                LinearLayout.VERTICAL
-        );
-
-        LinearLayout.LayoutParams lpNoiDung =
-                new LinearLayout.LayoutParams(
-                        0, -2, 1f
-                );
-
-        lpNoiDung.leftMargin = dp(10);
-
-        vungChon.addView(
-                noiDung,
-                lpNoiDung
-        );
-
-        TextView ten = taoChu(
-                diem.ten,
-                14,
-                TIEU_DE,
-                true
-        );
-
-        noiDung.addView(ten);
-
-        // Trang thai diem
-
-        List<String> nhan = new ArrayList<>();
-
-        if (khuVuc != null
-                && !khuVuc.trim().isEmpty()) {
-
-            nhan.add(khuVuc);
-        }
-
-        if (coAuto) {
-
-            nhan.add("AUTO");
-        }
-
-        if (dangChon) {
-
-            nhan.add("Đang chọn");
-        }
-
-        if (!diem.coMarker()) {
-
-            nhan.add("Chọn từ danh sách");
-        }
-
-        if (!coBai) {
-
-            nhan.add("Chưa có bài nghe");
-        }
-
-        if (!nhan.isEmpty()) {
-
-            TextView trangThai = taoChu(
-                    TextUtils.join(" · ", nhan),
-                    12,
-                    dangChon || coAuto
-                            ? XANH
-                            : CHU_PHU,
-                    false
-            );
-
-            trangThai.setPadding(
-                    0, dp(4), 0, 0
-            );
-
-            noiDung.addView(trangThai);
-        }
-
-        // Bam ten chi chon diem
-
-        vungChon.setClickable(true);
-        vungChon.setFocusable(true);
-        vungChon.setSelected(dangChon);
-
-        vungChon.setContentDescription(
-                "Chọn " + diem.ten
-                        + (nhan.isEmpty()
-                        ? ""
-                        : ", " + TextUtils.join(", ", nhan))
-        );
-
-        vungChon.setOnClickListener(v -> {
-
-            anBanPhim();
-
-            if (suKienChon != null) {
-
-                suKienChon.accept(diem.id);
-            }
-        });
-
-        // Nut nghe nhanh doc lap
-
-        ImageButton nutNghe =
-                GiaoDienSoDo.taoNut(
-                        activity,
-                        R.drawable.ui_tour_headphones,
-                        "Nghe " + diem.ten,
-                        () -> ngheNhanh(diem.id)
-                );
-
-        nutNghe.setEnabled(coBai);
-
-        nutNghe.setAlpha(
-                coBai ? 1f : 0.35f
-        );
-
-        LinearLayout.LayoutParams lpNghe =
-                new LinearLayout.LayoutParams(
-                        dp(48), dp(48)
-                );
-
-        lpNghe.leftMargin = dp(4);
-
-        the.addView(
-                nutNghe,
-                lpNghe
-        );
-
-        return the;
-    }
-
-    private boolean coNoiDung(String text) {
-
-        return text != null
-                && !text.trim().isEmpty();
     }
 
     // =====================================================
@@ -1283,7 +775,7 @@ public final class GiaoDienTour {
                 vungCuon.getScrollY();
 
         headerGonTruocToanManHinh =
-                headerDangGon();
+                banner.dangGon();
 
         hienThiAutoCu =
                 khungHuongDan.getVisibility();
@@ -1484,21 +976,7 @@ public final class GiaoDienTour {
     // TIEN ICH
     // =====================================================
 
-    private String chuanHoa(String text) {
 
-        if (text == null) return "";
-
-        return Normalizer.normalize(
-                        text,
-                        Normalizer.Form.NFD
-                )
-                .replaceAll("\\p{M}+", "")
-                .replace('đ', 'd')
-                .replace('Đ', 'D')
-                .toLowerCase(Locale.ROOT)
-                .trim()
-                .replaceAll("\\s+", " ");
-    }
 
     private void anBanPhim() {
 
@@ -1520,77 +998,7 @@ public final class GiaoDienTour {
         oTimKiem.clearFocus();
     }
 
-    private TextView taoChu(
-            String text,
-            int size,
-            int color,
-            boolean dam) {
-
-        TextView tv = new TextView(activity);
-
-        tv.setText(text);
-        tv.setTextSize(size);
-        tv.setTextColor(color);
-
-        tv.setLineSpacing(
-                dp(3), 1f
-        );
-
-        tv.setTypeface(
-                Typeface.create(
-                        dam
-                                ? "sans-serif-medium"
-                                : "sans-serif",
-                        Typeface.NORMAL
-                )
-        );
-
-        return tv;
-    }
-
-    private GradientDrawable nen(
-            String mau,
-            String vien,
-            int boGoc) {
-
-        GradientDrawable d =
-                new GradientDrawable();
-
-        d.setColor(
-                Color.parseColor(mau)
-        );
-
-        d.setCornerRadius(
-                dp(boGoc)
-        );
-
-        d.setStroke(
-                dp(1),
-                Color.parseColor(vien)
-        );
-
-        return d;
-    }
-
-    private RippleDrawable nenCham(
-            String mau,
-            String vien,
-            int boGoc) {
-
-        return new RippleDrawable(
-                ColorStateList.valueOf(
-                        Color.parseColor("#192C7351")
-                ),
-                nen(mau, vien, boGoc),
-                null
-        );
-    }
-
     private int dp(float value) {
-
-        return Math.round(
-                value * activity.getResources()
-                        .getDisplayMetrics().density
-        );
+        return Math.round(value * activity.getResources().getDisplayMetrics().density);
     }
 }

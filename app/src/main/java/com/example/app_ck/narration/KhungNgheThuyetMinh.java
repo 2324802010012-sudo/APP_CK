@@ -1,12 +1,10 @@
 
 package com.example.app_ck.narration;
 
-import android.animation.ValueAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -25,16 +23,12 @@ import android.speech.tts.UtteranceProgressListener;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.core.content.ContextCompat;
 
 import com.example.app_ck.R;
@@ -42,15 +36,11 @@ import com.example.app_ck.data.local.AppDatabase;
 import com.example.app_ck.data.model.DiemThamQuan;
 import com.example.app_ck.data.repository.KhoDuLieuThamQuan;
 import com.example.app_ck.data.repository.KhoLichSu;
-import com.example.app_ck.session.PhienDangNhap;
 import com.example.app_ck.ui.common.AnhDiaDiem;
 import com.example.app_ck.ui.common.BaseActivity;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,9 +77,8 @@ public final class KhungNgheThuyetMinh {
     private final TextView nutTocDo;
     private final TextView nutNgheTiep;
 
-    private final LinearLayout songAm;
+    private final GiaoDienKhungNghe giaoDien;
 
-    private AlertDialog dialogNoiDung;
     // Xử lý bất đồng bộ
 
     private final Handler main =
@@ -187,11 +176,9 @@ public final class KhungNgheThuyetMinh {
 
     // Ghi nhớ tiến độ nghe
 
-    private final SharedPreferences tienDo;
+    private final TienDoNghe tienDo;
 
-    private String maTienDo;
 
-    private long taiKhoanTienDo;
 
     private int tienDoCu;
 
@@ -199,7 +186,6 @@ public final class KhungNgheThuyetMinh {
 
     // Hiệu ứng sóng âm
 
-    private ValueAnimator hoatAnhSong;
 
     // Tác vụ định kỳ
 
@@ -256,10 +242,7 @@ public final class KhungNgheThuyetMinh {
                 Context.AUDIO_SERVICE
         );
 
-        tienDo = activity.getSharedPreferences(
-                "tien_do_thuyet_minh",
-                Context.MODE_PRIVATE
-        );
+        tienDo = new TienDoNghe(activity);
 
         if (Build.VERSION.SDK_INT >= 26) {
 
@@ -311,90 +294,13 @@ public final class KhungNgheThuyetMinh {
 
         nutNgheTiep = view.findViewById(R.id.ngheTiep);
 
-        songAm = view.findViewById(R.id.ngheSongAm);
+        giaoDien = new GiaoDienKhungNghe(activity, dialog, view);
 
-        cauHinhDialog();
+        giaoDien.cauHinhDialog(() -> { luuTienDo(); donLuot(); });
 
         ganSuKien();
 
         resetDongHo();
-    }
-
-    // =====================================================
-    // 4. CẤU HÌNH BOTTOM SHEET
-    // =====================================================
-
-    private void cauHinhDialog() {
-
-        dialog.setCancelable(true);
-
-        dialog.setOnShowListener(d -> {
-
-            float density = activity.getResources()
-                    .getDisplayMetrics().density;
-
-            int chieuCaoManHinh = activity.getResources()
-                    .getDisplayMetrics().heightPixels;
-
-            View noiDungActivity = activity.findViewById(
-                    android.R.id.content
-            );
-
-            if (noiDungActivity != null
-                    && noiDungActivity.getHeight() > 0) {
-
-                chieuCaoManHinh = Math.min(
-                        chieuCaoManHinh,
-                        noiDungActivity.getHeight()
-                );
-            }
-
-            // Chiều cao tự thích ứng theo thiết bị
-
-            int height = Math.min(
-                    Math.round(chieuCaoManHinh * 0.94f),
-                    Math.round(680 * density)
-            );
-
-            if (view.getLayoutParams() != null) {
-
-                view.getLayoutParams().height = height;
-                view.requestLayout();
-            }
-
-            BottomSheetBehavior<?> behavior =
-                    dialog.getBehavior();
-
-            behavior.setFitToContents(true);
-
-            behavior.setSkipCollapsed(true);
-
-            // Không cho kéo Bottom Sheet lên xuống
-
-            behavior.setDraggable(false);
-
-            behavior.setMaxWidth(
-                    Math.round(600 * density)
-            );
-
-            behavior.setShouldRemoveExpandedCorners(false);
-
-            behavior.setState(
-                    BottomSheetBehavior.STATE_EXPANDED
-            );
-        });
-
-        dialog.setOnDismissListener(d -> {
-
-            if (!dialog.isShowing()) {
-
-                dongNoiDungThuyetMinh();
-
-                luuTienDo();
-
-                donLuot();
-            }
-        });
     }
 
     // =====================================================
@@ -404,7 +310,7 @@ public final class KhungNgheThuyetMinh {
     private void ganSuKien() {
         // Mở nội dung thuyết minh
         view.findViewById(R.id.ngheDocNoiDung)
-                .setOnClickListener(v -> moNoiDungThuyetMinh());
+                .setOnClickListener(v -> { if (!daHuy) giaoDien.moNoiDungThuyetMinh(); });
         // Đóng trình nghe
 
         view.findViewById(R.id.ngheDong)
@@ -535,7 +441,7 @@ public final class KhungNgheThuyetMinh {
 
                         main.removeCallbacks(nhip);
 
-                        dungSongAm();
+                        giaoDien.dungSongAm();
 
                         nutPhat.setEnabled(false);
                         nutLui.setEnabled(false);
@@ -1619,7 +1525,7 @@ public final class KhungNgheThuyetMinh {
 
             trangThai("Đang phát thuyết minh");
 
-            batSongAm();
+            giaoDien.batSongAm();
 
             main.removeCallbacks(nhip);
 
@@ -1673,7 +1579,7 @@ public final class KhungNgheThuyetMinh {
 
         boFocus();
 
-        dungSongAm();
+        giaoDien.dungSongAm();
 
         capNhatTienTrinh();
 
@@ -1707,7 +1613,7 @@ public final class KhungNgheThuyetMinh {
 
             boFocus();
 
-            dungSongAm();
+            giaoDien.dungSongAm();
         }
     }
 
@@ -1982,126 +1888,19 @@ public final class KhungNgheThuyetMinh {
     // =====================================================
 
     private void docTienDoDaLuu() {
-
-        maTienDo = null;
-
-        tienDoCu = 0;
-
-        taiKhoanTienDo =
-                PhienDangNhap.id(activity);
-
-        // Chỉ áp dụng cho người dùng đã đăng nhập
-        // và chế độ nghe thủ công.
-        // Không ảnh hưởng đến AUTO và DEMO.
-
-        if (taiKhoanTienDo > 0
-                && idDiaDiem >= 0
-                && idDiem >= 0
-                && KhoLichSu.THU_CONG.equals(
-                cheDoLichSu
-        )) {
-
-            maTienDo =
-                    taiKhoanTienDo
-                            + "_"
-                            + idDiaDiem
-                            + "_"
-                            + idDiem
-                            + "_"
-                            + maHoaNoiDung(noiDung);
-
-            tienDoCu = tienDo.getInt(
-                    maTienDo,
-                    0
-            );
-        }
-
+        tienDoCu = tienDo.mo(idDiaDiem, idDiem, cheDoLichSu, noiDung);
         capNhatNutNgheTiep();
     }
 
-    // Phân biệt các phiên bản nội dung
-
-    private String maHoaNoiDung(String text) {
-
-        try {
-
-            MessageDigest digest =
-                    MessageDigest.getInstance("SHA-256");
-
-            byte[] data = digest.digest(
-                    text.getBytes(StandardCharsets.UTF_8)
-            );
-
-            StringBuilder result =
-                    new StringBuilder();
-
-            for (byte b : data) {
-
-                result.append(
-                        String.format(
-                                Locale.ROOT,
-                                "%02x",
-                                b & 0xff
-                        )
-                );
-            }
-
-            return result.toString();
-
-        } catch (Exception e) {
-
-            return Integer.toHexString(
-                    text.hashCode()
-            ) + "_" + text.length();
-        }
-    }
-
-    // =====================================================
-    // 21. GHI TIẾN ĐỘ NGHE
-    // =====================================================
-
     private void luuTienDo() {
-
-        if (maTienDo == null
-                || !coLuotDaPhat
-                || daNgheHet
-                || taiKhoanTienDo
-                != PhienDangNhap.id(activity)) {
-
-            return;
-        }
-
+        if (!tienDo.dungPhien() || !coLuotDaPhat || daNgheHet) return;
         capNhatTienTrinh();
-
-        if (viTriDung >= 3000) {
-
-            tienDo.edit()
-                    .putInt(maTienDo, viTriDung)
-                    .apply();
-
-        } else {
-
-            // Xóa tiến độ cũ nếu đã nghe lại từ đầu
-
-            tienDo.edit()
-                    .remove(maTienDo)
-                    .apply();
-        }
+        tienDo.luu(viTriDung);
     }
 
     private void xoaTienDo() {
-
-        if (maTienDo != null
-                && taiKhoanTienDo
-                == PhienDangNhap.id(activity)) {
-
-            tienDo.edit()
-                    .remove(maTienDo)
-                    .apply();
-        }
-
+        tienDo.xoa();
         tienDoCu = 0;
-
         capNhatNutNgheTiep();
     }
 
@@ -2132,10 +1931,7 @@ public final class KhungNgheThuyetMinh {
 
     private void ngheTuViTriDaLuu() {
 
-        if (maTienDo == null
-                || tienDoCu <= 0
-                || taiKhoanTienDo
-                != PhienDangNhap.id(activity)) {
+        if (!tienDo.dungPhien() || tienDoCu <= 0) {
 
             return;
         }
@@ -2179,82 +1975,6 @@ public final class KhungNgheThuyetMinh {
                 phat();
             }
         }
-    }
-
-    // =====================================================
-    // 23. HIỆU ỨNG SÓNG ÂM
-    // =====================================================
-
-    private void batSongAm() {
-
-        dungSongAm();
-
-        songAm.setAlpha(1f);
-
-        hoatAnhSong = ValueAnimator.ofFloat(
-                0f,
-                1f
-        );
-
-        hoatAnhSong.setDuration(900);
-
-        hoatAnhSong.setRepeatCount(
-                ValueAnimator.INFINITE
-        );
-
-        hoatAnhSong.setInterpolator(
-                new LinearInterpolator()
-        );
-
-        hoatAnhSong.addUpdateListener(animation -> {
-
-            float phase =
-                    (float) animation.getAnimatedValue();
-
-            for (int i = 0;
-                 i < songAm.getChildCount();
-                 i++) {
-
-                float scale = (float) (
-                        0.45
-                                + 0.55 * Math.abs(
-                                Math.sin(
-                                        phase
-                                                * Math.PI
-                                                * 2
-                                                + i * 0.8
-                                )
-                        )
-                );
-
-                songAm.getChildAt(i)
-                        .setScaleY(scale);
-            }
-        });
-
-        hoatAnhSong.start();
-    }
-
-    private void dungSongAm() {
-
-        if (hoatAnhSong != null) {
-
-            hoatAnhSong.cancel();
-
-            hoatAnhSong.removeAllUpdateListeners();
-
-            hoatAnhSong = null;
-        }
-
-        for (int i = 0;
-             i < songAm.getChildCount();
-             i++) {
-
-            songAm.getChildAt(i)
-                    .setScaleY(1f);
-        }
-
-        songAm.setAlpha(0.45f);
     }
 
     // =====================================================
@@ -2386,7 +2106,7 @@ public final class KhungNgheThuyetMinh {
         view.findViewById(R.id.ngheChuanBi)
                 .setVisibility(View.GONE);
 
-        dungSongAm();
+        giaoDien.dungSongAm();
     }
 
     // =====================================================
@@ -2492,7 +2212,7 @@ public final class KhungNgheThuyetMinh {
 
         main.removeCallbacks(nhip);
 
-        dungSongAm();
+        giaoDien.dungSongAm();
 
         daChuanBi = false;
 
@@ -2575,7 +2295,7 @@ public final class KhungNgheThuyetMinh {
 
         if (daHuy) return;
 
-        dongNoiDungThuyetMinh();
+        giaoDien.dongNoiDungThuyetMinh();
 
         luuTienDo();
 
@@ -2672,107 +2392,4 @@ public final class KhungNgheThuyetMinh {
         );
     }
 
-    private void moNoiDungThuyetMinh() {
-
-        if (daHuy
-                || !dialog.isShowing()
-                || activity.isFinishing()
-                || activity.isDestroyed()) {
-
-            return;
-        }
-
-        // Không mở trùng nhiều hộp thoại
-        if (dialogNoiDung != null
-                && dialogNoiDung.isShowing()) {
-
-            return;
-        }
-
-        TextView vanBan =
-                view.findViewById(R.id.ngheNoiDung);
-
-        TextView tenDiem =
-                view.findViewById(R.id.ngheTenDiem);
-
-        String baiThuyetMinh =
-                vanBan.getText().toString().trim();
-
-        String tieuDe =
-                tenDiem.getText().toString().trim();
-
-        if (TextUtils.isEmpty(baiThuyetMinh)) {
-
-            Toast.makeText(
-                    activity,
-                    "Chưa có nội dung thuyết minh.",
-                    Toast.LENGTH_SHORT
-            ).show();
-
-            return;
-        }
-
-        // Sử dụng nội dung thật của bài đang nghe
-        // Không thêm dữ liệu cố định.
-
-        AlertDialog moi =
-                new MaterialAlertDialogBuilder(activity)
-
-                        .setTitle(
-                                TextUtils.isEmpty(tieuDe)
-                                        ? "Nội dung thuyết minh"
-                                        : tieuDe
-                        )
-
-                        .setIcon(R.drawable.ui_nghe_noi_dung)
-
-                        .setMessage(baiThuyetMinh)
-
-                        .setPositiveButton("Đóng", null)
-
-                        .create();
-
-        dialogNoiDung = moi;
-
-        moi.setOnDismissListener(d -> {
-
-            if (dialogNoiDung == moi) {
-
-                dialogNoiDung = null;
-            }
-        });
-
-        moi.show();
-
-        // Cải thiện khả năng đọc văn bản
-
-        TextView noiDungHienThi =
-                moi.findViewById(android.R.id.message);
-
-        if (noiDungHienThi != null) {
-
-            noiDungHienThi.setTextSize(15);
-
-            float density = activity.getResources()
-                    .getDisplayMetrics().density;
-
-            noiDungHienThi.setLineSpacing(
-                    5 * density,
-                    1.15f
-            );
-
-            noiDungHienThi.setTextIsSelectable(true);
-        }
-    }
-    private void dongNoiDungThuyetMinh() {
-
-        if (dialogNoiDung != null) {
-
-            AlertDialog cu = dialogNoiDung;
-
-            dialogNoiDung = null;
-
-            cu.dismiss();
-        }
-    }
 }

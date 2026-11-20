@@ -1,6 +1,9 @@
 package com.example.app_ck;
 
 import com.example.app_ck.data.seed.CauHinhAutoConDao;
+import com.example.app_ck.data.local.AppDatabase;
+import com.example.app_ck.data.model.DiemThamQuan;
+import com.example.app_ck.data.repository.KhoDuLieuThamQuan;
 import com.example.app_ck.ui.tour.ConDaoThamQuanActivity;
 
 import android.graphics.Bitmap;
@@ -20,7 +23,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class MarkerConDaoTest {
     private View timSoDo(View view) {
-        if ("Sơ đồ tham quan có Marker tương tác".contentEquals(
+        if ("Sơ đồ tham quan có marker tương tác".contentEquals(
                 view.getContentDescription()==null ? "" : view.getContentDescription())) return view;
         if (view instanceof ViewGroup) for (int i=0;i<((ViewGroup)view).getChildCount();i++) {
             View tim=timSoDo(((ViewGroup)view).getChildAt(i));
@@ -33,9 +36,14 @@ public class MarkerConDaoTest {
         try (ActivityScenario<ConDaoThamQuanActivity> s=ActivityScenario.launch(ConDaoThamQuanActivity.class)) {
             for (CauHinhAutoConDao.Diem d:CauHinhAutoConDao.CAC_DIEM) {
                 if(!d.coMarker()) continue;
+                final DiemThamQuan mongDoi;
+                try (AppDatabase helper = new AppDatabase(InstrumentationRegistry.getInstrumentation().getTargetContext())) {
+                    mongDoi = KhoDuLieuThamQuan.lay(helper.getReadableDatabase(),3,d.id);
+                }
+                assertNotNull(mongDoi);
                 InstrumentationRegistry.getInstrumentation().waitForIdleSync();
                 s.onActivity(a -> {
-                    View soDo=timSoDo(a.findViewById(R.id.tqDanhSachKhuVuc));
+                    View soDo=timSoDo(a.findViewById(R.id.tqKhungSoDo));
                     assertNotNull(soDo);
                     int w=soDo.getWidth(),h=soDo.getHeight();
                     assertTrue(w>0 && h>0);
@@ -51,8 +59,8 @@ public class MarkerConDaoTest {
                     soDo.dispatchTouchEvent(down);
                     soDo.dispatchTouchEvent(up);
                     down.recycle();up.recycle();
-                    assertEquals("Số sơ đồ "+d.soSoDo,d.ten,((TextView)a.findViewById(R.id.tqTenKhuVuc)).getText().toString());
-                    assertEquals(d.noiDung,((TextView)a.findViewById(R.id.tqMoTaKhuVuc)).getText().toString());
+                    assertEquals("Số sơ đồ "+d.soSoDo,mongDoi.ten,((TextView)a.findViewById(R.id.tqTenKhuVuc)).getText().toString());
+                    assertEquals(mongDoi.baiThuyetMinh(),((TextView)a.findViewById(R.id.tqMoTaKhuVuc)).getText().toString());
                 });
             }
         }

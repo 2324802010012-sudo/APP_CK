@@ -2,19 +2,16 @@ package com.example.app_ck.ui.home;
 
 import com.example.app_ck.data.model.DiaDiem;
 
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 public final class GoiYDiaDiem {
     private GoiYDiaDiem() {}
     public static String chuanHoa(String text) {
-        return Normalizer.normalize(text == null ? "" : text.toLowerCase(Locale.ROOT), Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "").replace('đ', 'd').trim();
+        return com.example.app_ck.util.VanBanTimKiem.boDau(text);
     }
     private static Set<String> chuDe(String text) {
         Set<String> ds = new HashSet<>();

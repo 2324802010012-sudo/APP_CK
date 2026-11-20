@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:theme="@style/ThemeOverlay.Admin.Screen" xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/admin_background"
+    android:focusableInTouchMode="true">
+    <include layout="@layout/view_admin_header" />
+    <ScrollView android:id="@+id/gpsScroll" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:paddingStart="16dp" android:paddingEnd="16dp"
+            android:paddingBottom="16dp">
+            <LinearLayout style="@style/AdminCard">
+                <TextView style="@style/AdminSection" android:text="Chọn vị trí cấu hình" />
+                <TextView style="@style/AdminLabel" android:text="Địa điểm du lịch" android:labelFor="@id/gpsDiaDiem" />
+                <Spinner android:id="@+id/gpsDiaDiem" style="@style/AdminSpinner"
+                    android:contentDescription="Chọn địa điểm du lịch" />
+                <TextView style="@style/AdminLabel" android:text="Địa điểm chính / điểm thành phần" android:labelFor="@id/gpsDiem" />
+                <Spinner android:id="@+id/gpsDiem" style="@style/AdminSpinner"
+                    android:contentDescription="Chọn mốc GPS cần cấu hình" />
+            </LinearLayout>
+            <LinearLayout style="@style/AdminCard">
+                <TextView android:id="@+id/gpsDoiTuong" style="@style/AdminSection" />
+                <TextView android:id="@+id/gpsTrangThai" style="@style/AdminCaption"
+                    android:layout_marginTop="6dp" android:textColor="@color/admin_primary" />
+                <TextView android:id="@+id/gpsMoTa" style="@style/AdminCaption"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+            <LinearLayout style="@style/AdminCard">
+                <TextView style="@style/AdminSection" android:text="Tọa độ GPS" />
+                <TextView style="@style/AdminCaption" android:layout_marginTop="6dp"
+                    android:text="Vị trí thực tế, độc lập với X/Y trên sơ đồ." />
+                <TextView style="@style/AdminLabel" android:text="Vĩ độ (−90 đến 90)" android:labelFor="@id/gpsViDo" />
+                <EditText android:id="@+id/gpsViDo" style="@style/AdminInput"
+                    android:inputType="numberDecimal|numberSigned" android:hint="Ví dụ: 10.777000" />
+                <TextView style="@style/AdminLabel" android:text="Kinh độ (−180 đến 180)" android:labelFor="@id/gpsKinhDo" />
+                <EditText android:id="@+id/gpsKinhDo" style="@style/AdminInput"
+                    android:inputType="numberDecimal|numberSigned" android:hint="Ví dụ: 106.695300" />
+            </LinearLayout>
+            <LinearLayout style="@style/AdminCard">
+                <TextView style="@style/AdminSection" android:text="Vùng kích hoạt" />
+                <TextView style="@style/AdminLabel" android:text="Bán kính nhận diện (mét)" android:labelFor="@id/gpsBanKinh" />
+                <EditText android:id="@+id/gpsBanKinh" style="@style/AdminInput"
+                    android:inputType="numberDecimal" android:hint="Ví dụ: 35" />
+                <androidx.appcompat.widget.SwitchCompat android:id="@+id/gpsChoPhep"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:minHeight="52dp" android:layout_marginTop="12dp"
+                    android:text="Cho phép GPS AUTO" android:textSize="14sp"
+                    android:textColor="@color/admin_heading" />
+                <TextView style="@style/AdminCaption" android:layout_marginTop="8dp"
+                    android:text="Cấu hình được dùng khi người dùng bật GPS thật. Tắt AUTO vẫn giữ vị trí đã lưu." />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/gpsKhungNguon" style="@style/AdminCard">
+                <TextView style="@style/AdminSection" android:text="Nguồn xác minh" android:labelFor="@id/gpsNguon" />
+                <TextView style="@style/AdminCaption" android:layout_marginTop="6dp"
+                    android:text="Bắt buộc khi bật AUTO cho điểm thành phần." />
+                <EditText android:id="@+id/gpsNguon" style="@style/AdminInput"
+                    android:layout_marginTop="12dp" android:singleLine="false" android:minLines="3"
+                    android:gravity="top|start" android:inputType="textMultiLine|textCapSentences"
+                    android:hint="Tài liệu hoặc cách xác minh tọa độ" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="16dp" android:background="@android:color/white"
+        android:elevation="4dp">
+        <TextView android:id="@+id/gpsTrangThaiLuu" style="@style/AdminCaption"
+            android:layout_marginBottom="8dp" android:accessibilityLiveRegion="polite" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/gpsLuu"
+            style="@style/AdminButton" android:text="Lưu cấu hình" />
+    </LinearLayout>
+</LinearLayout>

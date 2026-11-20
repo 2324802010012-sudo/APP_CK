@@ -38,8 +38,7 @@ public class AutoDiSanFlowTest {
     }
 
     private Object truong(Object a,String ten) {
-        try { Field f=a.getClass().getDeclaredField(ten); f.setAccessible(true); return f.get(a); }
-        catch (ReflectiveOperationException e) { throw new AssertionError(e); }
+        return UiKiemThu.truong(a, ten);
     }
     private <T extends BaseActivity> String chu(ActivityScenario<T> s,int id) {
         AtomicReference<String> value=new AtomicReference<>();
@@ -127,9 +126,13 @@ public class AutoDiSanFlowTest {
             assertTrue(chu(s, R.id.tourPhamVi).contains(
                     tour.cacMocTuDong().size() + "/" + tour.cacDiem.size()));
             for (CauHinhAutoDiSan.Diem d : tour.cacDiem) {
-                onView(withText(d.id + ".  " + d.ten + "\n" + tour.nhanCheDo(d.id)))
-                        .check(androidx.test.espresso.assertion.ViewAssertions.matches(
-                                isDescendantOfA(withId(R.id.tqDanhSachKhuVuc))));
+                org.hamcrest.Matcher<android.view.View> the = withContentDescription(
+                        org.hamcrest.Matchers.startsWith("Chọn " + d.ten));
+                onView(the).check(androidx.test.espresso.assertion.ViewAssertions.matches(
+                        isDescendantOfA(withId(R.id.tqDanhSachDiem))));
+                onView(the).check(androidx.test.espresso.assertion.ViewAssertions.matches(
+                        d.choPhepAuto ? withContentDescription(org.hamcrest.Matchers.containsString("AUTO"))
+                                : org.hamcrest.Matchers.not(withContentDescription(org.hamcrest.Matchers.containsString("AUTO")))));
             }
             s.onActivity(a -> {
                 a.findViewById(R.id.tourBatAuto).performClick();
@@ -151,6 +154,9 @@ public class AutoDiSanFlowTest {
             sanSang(s);
             bat(s,R.id.tourGps);
             assertTrue(chu(s,R.id.tourCheDo).startsWith("GPS thật"));
+            // Chỉ kiểm tra mẫu được bơm bên dưới; GPS hệ điều hành có thể gửi vị trí AVD xen giữa.
+            s.onActivity(a -> ((android.location.LocationManager)a.getSystemService(android.content.Context.LOCATION_SERVICE))
+                    .removeUpdates((HuongDanTour)truong(a,"huongDan")));
             // Bơm các mẫu vào callback để kiểm thử bộ lọc, không đổi GPS của thiết bị.
             for(int i=0;i<4;i++) { gui(s,latNgoaiTour,lonNgoaiTour,3,0); SystemClock.sleep(1000); }
             assertFalse(chu(s,R.id.tourTrangThai).startsWith("Đang tự động phát:"));

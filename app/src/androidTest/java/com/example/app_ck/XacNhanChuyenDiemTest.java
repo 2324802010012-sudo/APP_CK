@@ -18,7 +18,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
 import org.junit.After;
@@ -59,10 +58,14 @@ public class XacNhanChuyenDiemTest {
         catch (Exception e) { throw new AssertionError(e); }
     }
     private void chon(BaseActivity a, int chiSo) {
-        String ten=a instanceof DaiNoiHueThamQuanActivity ? "chonChiSo" : "chuyenDiem";
-        try { Method m=a.getClass().getDeclaredMethod(ten,int.class); m.setAccessible(true); m.invoke(a,chiSo); }
-        catch (Exception e) { throw new AssertionError(e); }
+        com.example.app_ck.data.model.DuLieuTour duLieu =
+                (com.example.app_ck.data.model.DuLieuTour)doc(a,"duLieu");
+        String ten = "Chọn " + duLieu.cacDiem.get(chiSo).ten;
+        android.view.View view = UiKiemThu.timTheoMoTa(a.findViewById(R.id.tqDanhSachDiem),ten);
+        assertNotNull(view);
+        view.performClick();
     }
+
     private void phat(BaseActivity a) {
         Object hd=doc(a,"huongDan");
         // Kiểm tra cả nhánh GPS và Demo mà không sửa vị trí/quyền của thiết bị.
@@ -131,6 +134,8 @@ public class XacNhanChuyenDiemTest {
                     assertEquals(0,doc(doc(a,"huongDan"),"cheDo"));
                     assertNull(doc(a,"luotDoc"));
                     assertFalse(((TextToSpeech)doc(a,"tts")).isSpeaking());
+                    assertNull("Chọn điểm không tự mở/phát trình nghe",doc(a,"khungNghe"));
+                    a.moKhungThuyetMinh(false);
                     Object khung=doc(a,"khungNghe");
                     BottomSheetDialog nghe=(BottomSheetDialog)doc(khung,"dialog");
                     assertTrue(nghe.isShowing());
@@ -151,6 +156,8 @@ public class XacNhanChuyenDiemTest {
                 s.onActivity(a -> {
                     chon(a,1);
                     assertNull(doc(a,"hoiChuyenDiem"));
+                    assertNull("Chọn thủ công chưa phát âm thanh",doc(a,"khungNghe"));
+                    a.moKhungThuyetMinh(false);
                     assertTrue(((BottomSheetDialog)doc(doc(a,"khungNghe"),"dialog")).isShowing());
                     a.dongKhungThuyetMinh();
                     phat(a);

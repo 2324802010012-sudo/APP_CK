@@ -1,0 +1,218 @@
+{
+  "date": "2026-11-20",
+  "timezone": "Asia/Bangkok",
+  "branch": "refactor/tour-architecture",
+  "files": [
+    {
+      "path": "app/src/main/java/com/example/app_ck/ui/admin/AdminGiaoDien.java",
+      "sha256": "77687c528f334257048d5129bb3dca609ac967dcc7e37407045f44230d860c9f"
+    },
+    {
+      "path": "app/src/main/java/com/example/app_ck/ui/admin/QuanLyDiemThamQuanActivity.java",
+      "sha256": "209a17ff6cf5fc85674d04284c4c2f8731dae01c75729d2fd56354edda502d50"
+    },
+    {
+      "path": "app/src/main/java/com/example/app_ck/ui/admin/QuanLyThuyetMinhActivity.java",
+      "sha256": "8b7636c999b176ce4ec26654387bcf22e39ecf4ddf9906429a0e2c0769e14682"
+    },
+    {
+      "path": "app/src/main/java/com/example/app_ck/ui/admin/QuanLyGpsAutoActivity.java",
+      "sha256": "c65b66f55a637ac3eb4eeda8513bf4edb7e328479b64bb5579fb69ead4a3f3a4"
+    },
+    {
+      "path": "app/src/main/java/com/example/app_ck/ui/admin/QuanLyTaiKhoanActivity.java",
+      "sha256": "4151e6d70127bc9ca946702c1753240989c5819e1838d120afcceec4c2502ee3"
+    },
+    {
+      "path": "app/src/main/java/com/example/app_ck/data/repository/KhoDuLieuThamQuan.java",
+      "sha256": "788a2aeda33427d589cb0974bb0f0eac1f13f438dc65605b98328e1505098d92"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_quan_ly_diem_tham_quan.xml",
+      "sha256": "c226d514604ae0d9460673de943bcecb27f07e5a722b196c55163bc4a9280fd8"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_quan_ly_thuyet_minh.xml",
+      "sha256": "5b172078425d42f0f3a9d04f739470f5e452c3b5cd1852f5702eb080e25ad627"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_quan_ly_gps_auto.xml",
+      "sha256": "c2cf90a46b32984c5dc735a081088ed8c805f3e8aa5c73892a684b7e788b07bf"
+    },
+    {
+      "path": "app/src/main/res/layout/activity_quan_ly_tai_khoan.xml",
+      "sha256": "a7fdfff1c686c4da03041fe5f94d1d4301b9585a7d0bd02966bf49bf0a384f7f"
+    },
+    {
+      "path": "app/src/main/res/layout/view_admin_header.xml",
+      "sha256": "05091858ff5e2ee85b7638aee4417cc38f7037dc01dff87c28c5487b69dcbdb1"
+    },
+    {
+      "path": "app/src/main/res/layout/item_admin_spinner.xml",
+      "sha256": "64e4a4c8d6ac52d36eaa9541f0d044a39494abe47ebd488feacecf532474c6b4"
+    },
+    {
+      "path": "app/src/main/res/layout/item_admin_spinner_dropdown.xml",
+      "sha256": "24f2945a4822b306c335daaf860a466e119020853e907cbbf6d09b6ce3f8b00d"
+    },
+    {
+      "path": "app/src/main/res/values/styles_admin.xml",
+      "sha256": "ccc1f11729158eb85acd12614f90b61ae65ecf8be7a8b709cc86236c72649c75"
+    },
+    {
+      "path": "app/src/main/res/drawable/admin_spinner_bg.xml",
+      "sha256": "e1e78212d9e25c5ec7fdece77f8a106ff4b0d8a47bdc907c6ab81ae8cf92b39f"
+    },
+    {
+      "path": "app/src/main/res/drawable/admin_ic_expand.xml",
+      "sha256": "4f7d5896ab7608459349bb836c1765d39f4d2db21de3c1fbae239c624b02dbd7"
+    },
+    {
+      "path": "app/src/main/res/color/admin_button_background.xml",
+      "sha256": "3d8ad496e4080824ae02a55e11143402f8bc8def47fec619bd92a7cff26a960b"
+    },
+    {
+      "path": "app/src/main/res/color/admin_button_text.xml",
+      "sha256": "060aab4d9b0d46761fc08ace63c3122834d86cafa11b99381c806c3ae614dba8"
+    },
+    {
+      "path": "app/src/main/res/color/admin_secondary_button_text.xml",
+      "sha256": "588db136a414622fe94f41e55af84914f4597a10f2544cac9f3fc682accf1cd2"
+    },
+    {
+      "path": "app/src/androidTest/java/com/example/app_ck/QuanTriGiaoDienFlowTest.java",
+      "sha256": "77a87e52fac5977a65d9104e3a248e8f09855d3fccccc0e610efaa9ac92da9d2"
+    },
+    {
+      "path": "app/src/androidTest/java/com/example/app_ck/AdminCaptureTest.java",
+      "sha256": "8fa002d536958b072962a976509c7ec5e92a3afb517542cb2e49e63652596aa1"
+    }
+  ],
+  "ui_changes": {
+    "diem_tham_quan": "Danh sách cuộn cả bộ chọn và tìm kiếm; tìm tên/mã/tên khu vực không dấu; biểu mẫu nhóm rõ, lỗi tại ô, thanh Lưu cố định, cảnh báo bản nháp và khôi phục khi tạo lại Activity.",
+    "thuyet_minh": "Thay bố cục Java bằng XML dùng chung; phân biệt bài chính/bài điểm, đếm ký tự, trạng thái chưa lưu, nghe thử/dừng và trạng thái TTS; chuẩn bị ngôn ngữ ngoài luồng giao diện.",
+    "gps_auto": "Thay biểu mẫu phẳng bằng các thẻ vị trí, kích hoạt, xác minh; giữ lựa chọn theo ID; xác nhận lưu, cảnh báo bản nháp, giữ nguyên GPS/X/Y khi tắt AUTO.",
+    "tai_khoan": "Header và thẻ đồng bộ; avatar, vai trò/trạng thái rõ; tìm kiếm không dấu trên tên đăng nhập, họ tên, email; giữ vị trí cuộn và xác nhận khóa/mở khóa; tài khoản hiện tại không có nút tự khóa."
+  },
+  "preserved": [
+    "SQLite schema và dữ liệu mẫu",
+    "ID điểm, tầng/khu vực và thứ tự",
+    "Ảnh/nguồn riêng của điểm và ảnh sơ đồ độc lập",
+    "Phép tính và zoom marker",
+    "Cơ chế GPS MAIN/AUTO SUB/DEMO và điều kiện phát",
+    "TTS và cách lưu bài chính/bài marker",
+    "Đăng nhập, phân quyền, chống tự khóa",
+    "Các màn khách tham quan và quản lý địa điểm"
+  ],
+  "necessary_shared_fix": "Sao chép từng cột SQLite theo kiểu INTEGER/REAL/TEXT/BLOB/NULL. DatabaseUtils.cursorRowToContentValues làm tròn REAL khi chuyển sang chuỗi, khiến sửa tên hoặc tắt AUTO thay đổi GPS ngoài ý muốn. Không đổi schema, thuật toán hoặc quyền.",
+  "verification": {
+    "build_command": ".\\gradlew.bat assembleDebug testDebugUnitTest",
+    "instrumentation_command": ".\\gradlew.bat --no-daemon --max-workers=2 \"-Dorg.gradle.jvmargs=-Xmx768m -Dfile.encoding=UTF-8\" connectedDebugAndroidTest",
+    "instrumentation_device": {
+      "avd": "Medium_Phone_API_37.0",
+      "api_level": 37
+    },
+    "unit_tests": {
+      "tests": 39,
+      "failures": 0
+    },
+    "baseline_instrumentation": {
+      "tests": 103,
+      "failures": [
+        {
+          "test": "com.example.app_ck.NguonThongTinFlowTest#chiTietHienDuDanhSachVaMoDungDiemCuoiCuaNamDiaDiem",
+          "message": "java.lang.AssertionError: expected:<25> but was:<26>"
+        },
+        {
+          "test": "com.example.app_ck.SQLiteQuanTriFlowTest#adminCreatesFloorAndPointThenNewPlaceTourReadsSameData",
+          "message": "androidx.test.espresso.NoMatchingViewException: No views in hierarchy found matching: an instance of android.widget.TextView and view.getHint() matching: is \"Tên tài liệu / cơ quan cung cấp\""
+        }
+      ],
+      "skipped": 0,
+      "seconds": 1625.599
+    },
+    "final_instrumentation": {
+      "tests": 114,
+      "failures": [
+        {
+          "test": "com.example.app_ck.SQLiteQuanTriFlowTest#adminCreatesFloorAndPointThenNewPlaceTourReadsSameData",
+          "message": "androidx.test.espresso.PerformException: Error performing 'scroll to' on view 'view.getId() is <2131231045/com.example.app_ck:id/dtLuu>'."
+        }
+      ],
+      "skipped": 0,
+      "seconds": 1687.478
+    },
+    "new_failed_test_cases": [],
+    "baseline_failed_cases_now_passing": [
+      "com.example.app_ck.NguonThongTinFlowTest#chiTietHienDuDanhSachVaMoDungDiemCuoiCuaNamDiaDiem"
+    ],
+    "comparison_note": "So sánh theo tên testcase. SQLiteQuanTriFlowTest đã lỗi baseline ở hint nguồn; lượt cuối dừng ở scrollTo() trên dtLuu vì thanh Lưu mới cố định ngoài vùng cuộn. Không sửa hoặc xóa testcase cũ.",
+    "small_screen": {
+      "size_px": "720x1280",
+      "density_dpi": 320,
+      "size_dp": "360x640",
+      "font_scale": 1.5,
+      "cases_including_recheck": {
+        "markerPickerZoomAndCancelLeaveStoredRatiosUntouched": "passed",
+        "pointDraftSurvivesRecreateAndCancelThenSaveKeepsGps": "passed",
+        "createValidatesFieldsAcceptsNoMarkerAndDeletesAfterConfirmation": "passed",
+        "gpsOffOnlyChangesPermissionAndCancelKeepsDraftSelection": "passed",
+        "accountsFindAccentsLockUnlockAndPreventSelfLock": "passed",
+        "gpsMainAndSubValidateSourceAndKeepIndependentRadius": "passed",
+        "keyboardLeavesSaveReachableOnAllThreeEditors": "passed",
+        "previewUsesCurrentDraftAndStopsWithTheActivity": "passed",
+        "narrationCancelSwitchRecreateAndSaveTargetTheCorrectRecord": "passed",
+        "pointImageAndSourceStaySeparateFromThePlaceMapAndSource": "passed",
+        "captureScreens": "passed"
+      },
+      "logs": [
+        "small-screen.log",
+        "small-screen-recheck.log"
+      ]
+    },
+    "standard_screen": {
+      "size_px": "1080x2400",
+      "density_dpi": 420,
+      "font_scale": 1.0
+    },
+    "screenshots": [
+      "after/accounts.png",
+      "after/gps-keyboard.png",
+      "after/gps.png",
+      "after/narration-keyboard.png",
+      "after/narration.png",
+      "after/points-form.png",
+      "after/points-keyboard.png",
+      "after/points.png",
+      "before/accounts.png",
+      "before/gps-keyboard.png",
+      "before/gps.png",
+      "before/narration-keyboard.png",
+      "before/narration.png",
+      "before/points-form.png",
+      "before/points-keyboard.png",
+      "before/points.png",
+      "small-large-font/accounts.png",
+      "small-large-font/gps-keyboard.png",
+      "small-large-font/gps.png",
+      "small-large-font/narration-keyboard.png",
+      "small-large-font/narration.png",
+      "small-large-font/points-form.png",
+      "small-large-font/points-keyboard.png",
+      "small-large-font/points.png"
+    ],
+    "limitations": [
+      "Chưa kiểm tra trên điện thoại vật lý hoặc GPS thực địa.",
+      "Không xác nhận chất lượng âm thanh bằng nghe trực tiếp; TTS phụ thuộc giọng tiếng Việt trên thiết bị.",
+      "Luồng chọn ảnh qua nhà cung cấp tệp hệ thống chưa kiểm tra tự động; đã kiểm tra drawable, bỏ ảnh, nguồn riêng và không ghi đè sơ đồ."
+    ]
+  },
+  "environment_cleanup": {
+    "status": "Temporary API 35 emulator is stopped; automatic approval review rejected cleanup with blocked by policy. Original API 37 emulator remains in use.",
+    "temporary_avd_paths_left": [
+      "C:/CodexAndroidAdminAVD/HanhTrinhAdmin_API35.avd",
+      "D:/Android/.android/avd/HanhTrinhAdmin_API35.avd"
+    ],
+    "temporary_avd_registration_left": "C:/Users/Sunth/.android/avd/HanhTrinhAdmin_API35.ini"
+  }
+}

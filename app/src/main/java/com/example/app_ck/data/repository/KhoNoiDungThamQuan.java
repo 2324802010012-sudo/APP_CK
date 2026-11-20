@@ -2,8 +2,8 @@ package com.example.app_ck.data.repository;
 
 import com.example.app_ck.data.model.BaiThuyetMinh;
 import com.example.app_ck.data.model.DiemThamQuan;
+import com.example.app_ck.data.model.DiaDiem;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 
@@ -17,15 +17,14 @@ public final class KhoNoiDungThamQuan {
             if (d == null) throw new IllegalArgumentException("Không có nội dung: " + diaDiem + "/" + diem);
             return BaiThuyetMinh.tuSqlite(d.id,d.ten,d.noiDung,new String[0]);
         }
-        try (Cursor c = db.rawQuery("SELECT ten,COALESCE(mo_ta,'') FROM dia_diem WHERE id=?",
-                new String[]{String.valueOf(diaDiem)})) {
-            if (!c.moveToFirst()) throw new IllegalArgumentException("Không có địa điểm: " + diaDiem);
-            ArrayList<BaiThuyetMinh> cacDiem = new ArrayList<>();
-            for (DiemThamQuan d : KhoDuLieuThamQuan.danhSach(db,diaDiem))
-                cacDiem.add(BaiThuyetMinh.tuSqlite(d.id,d.ten,d.noiDung,new String[0]));
-            return BaiThuyetMinh.tuSqlite(diaDiem,c.getString(0),c.getString(1),
-                    new String[0],cacDiem.toArray(new BaiThuyetMinh[0]));
-        }
+        DiaDiem diaDiemChinh = KhoDiaDiem.lay(db, diaDiem);
+        if (diaDiemChinh == null) throw new IllegalArgumentException("Không có địa điểm: " + diaDiem);
+        ArrayList<BaiThuyetMinh> cacDiem = new ArrayList<>();
+        for (DiemThamQuan d : KhoDuLieuThamQuan.danhSach(db,diaDiem))
+            cacDiem.add(BaiThuyetMinh.tuSqlite(d.id,d.ten,d.noiDung,new String[0]));
+        return BaiThuyetMinh.tuSqlite(diaDiem,diaDiemChinh.ten,
+                diaDiemChinh.moTa == null ? "" : diaDiemChinh.moTa,
+                new String[0],cacDiem.toArray(new BaiThuyetMinh[0]));
     }
     public static String bai(BaiThuyetMinh d) { return d.noiDung(); }
 

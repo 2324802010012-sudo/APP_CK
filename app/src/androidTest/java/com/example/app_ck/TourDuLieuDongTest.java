@@ -101,13 +101,15 @@ public class TourDuLieuDongTest {
             scenario.onActivity(activity -> {
                 assertEquals(tenDiem(place), chu(activity, R.id.tqTenKhuVuc));
                 assertEquals(noiDung(place), chu(activity, R.id.tqMoTaKhuVuc));
-                View khuVuc = timNhan(activity.findViewById(R.id.tqDanhSachKhuVuc), "Khu vực thử " + place);
+                View khuVuc = timNhan(activity.findViewById(R.id.tqKhungSoDo), "Khu vực thử " + place);
                 assertNotNull("Tầng mới từ SQLite phải có nút chọn", khuVuc);
                 assertFalse(activity.findViewById(R.id.tqNutTiep).isEnabled());
                 activity.findViewById(R.id.tqNutTruoc).performClick();
                 assertNotEquals(tenDiem(place), chu(activity, R.id.tqTenKhuVuc));
                 activity.findViewById(R.id.tqNutTiep).performClick();
                 assertEquals(tenDiem(place), chu(activity, R.id.tqTenKhuVuc));
+                assertNull("Chọn điểm không tự mở trình nghe",truong(activity,"khungNghe"));
+                activity.moKhungThuyetMinh(false);
                 Dialog dialog = (Dialog) truong(truong(activity, "khungNghe"), "dialog");
                 assertTrue(dialog.isShowing());
                 assertEquals(noiDung(place), ((TextView) dialog.findViewById(R.id.ngheNoiDung)).getText().toString());
@@ -115,9 +117,11 @@ public class TourDuLieuDongTest {
                 assertEquals(idDiem, ((Number) truong(activity, "diemNguon")).intValue());
                 assertNull("Chọn điểm chưa tự phát âm thanh", truong(truong(activity, "khungNghe"), "player"));
                 dialog.findViewById(R.id.ngheDong).performClick();
-                View diem = timNhan(activity.findViewById(R.id.tqDanhSachKhuVuc), idDiem + ".  " + tenDiem(place));
+                View diem = UiKiemThu.timTheoMoTa(activity.findViewById(R.id.tqDanhSachDiem), "Chọn " + tenDiem(place));
                 assertNotNull("Điểm không có marker vẫn phải có trong danh sách", diem);
                 diem.performClick();
+                assertFalse(((Dialog) truong(truong(activity, "khungNghe"), "dialog")).isShowing());
+                activity.moKhungThuyetMinh(false);
                 assertTrue(((Dialog) truong(truong(activity, "khungNghe"), "dialog")).isShowing());
             });
             scenario.recreate();
