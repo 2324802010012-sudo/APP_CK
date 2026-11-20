@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 /** Đọc danh sách địa điểm và các API tương thích tour từ SQLite chung. */
 public final class KhoDiaDiem {
+    private static final String[] CAC_COT = {"id", "ten", "dia_chi", "mo_ta",
+            "vi_do", "kinh_do", "ten_anh", "danh_muc", "ban_kinh_auto"};
     private final AppDatabase helper;
     public KhoDiaDiem(AppDatabase helper) { this.helper=helper; }
 
@@ -22,17 +24,7 @@ public final class KhoDiaDiem {
 
         try (Cursor cursor = db.query(
                 "dia_diem",
-                new String[]{
-                        "id",
-                        "ten",
-                        "dia_chi",
-                        "mo_ta",
-                        "vi_do",
-                        "kinh_do",
-                        "ten_anh",
-                        "danh_muc",
-                        "ban_kinh_auto"
-                },
+                CAC_COT,
                 null,
                 null,
                 null,
@@ -42,22 +34,27 @@ public final class KhoDiaDiem {
 
             while (cursor.moveToNext()) {
 
-                DiaDiem diaDiem = new DiaDiem(
-                        cursor.getInt(0),
-                        cursor.getString(1),
-                        cursor.getString(2),
-                        cursor.getString(3),
-                        cursor.getDouble(4),
-                        cursor.getDouble(5),
-                        cursor.getString(6)
-                );
-                diaDiem.danhMuc = cursor.getString(7);
-                diaDiem.banKinhAuto = cursor.getFloat(8);
-                danhSach.add(diaDiem);
+                danhSach.add(docDiaDiem(cursor));
             }
         }
 
         return danhSach;
+    }
+
+    public static DiaDiem lay(SQLiteDatabase db, int id) {
+        try (Cursor cursor = db.query("dia_diem", CAC_COT, "id=?",
+                new String[]{String.valueOf(id)}, null, null, null)) {
+            return cursor.moveToFirst() ? docDiaDiem(cursor) : null;
+        }
+    }
+
+    private static DiaDiem docDiaDiem(Cursor cursor) {
+        DiaDiem diaDiem = new DiaDiem(cursor.getInt(0), cursor.getString(1),
+                cursor.getString(2), cursor.getString(3), cursor.getDouble(4),
+                cursor.getDouble(5), cursor.getString(6));
+        diaDiem.danhMuc = cursor.getString(7);
+        diaDiem.banKinhAuto = cursor.getFloat(8);
+        return diaDiem;
     }
 
     public ArrayList<DuLieuDinhDocLap.DiemThamQuan> layDiemDinhDocLap() {

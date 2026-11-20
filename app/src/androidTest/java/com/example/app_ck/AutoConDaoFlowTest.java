@@ -1,6 +1,6 @@
 package com.example.app_ck;
 
-import com.example.app_ck.data.seed.CauHinhAutoConDao;
+import com.example.app_ck.location.CauHinhAutoDiSan;
 import com.example.app_ck.ui.place.ChiTietDiaDiemActivity;
 import com.example.app_ck.ui.tour.ConDaoThamQuanActivity;
 
@@ -62,13 +62,17 @@ public class AutoConDaoFlowTest {
         try (ActivityScenario<ConDaoThamQuanActivity> s = mo()) {
             tangTocGiongDocTrongKiemThu(s);
             batDemo(s, false);
-            for (int i = 0; i < CauHinhAutoConDao.CAC_DIEM.size(); i++) {
-                final int id = i + 1;
-                doiChu(s, R.id.conDaoCheDo, id + "/" + CauHinhAutoConDao.CAC_DIEM.size(), 10000);
+            CauHinhAutoDiSan cauHinh = (CauHinhAutoDiSan)UiKiemThu.truong(
+                    layHuongDan(s),"cauHinh");
+            for (int i = 0; i < cauHinh.cacDiem.size(); i++) {
+                final CauHinhAutoDiSan.Diem diem = cauHinh.cacDiem.get(i);
+                final int id = diem.id;
+                final int soThuTu = i + 1;
+                doiChu(s, R.id.conDaoCheDo, soThuTu + "/" + cauHinh.cacDiem.size(), 10000);
                 denGan(s);
-                if (!CauHinhAutoConDao.tim(id).choPhepAuto) {
+                if (!diem.choPhepAuto) {
                     doiChu(s, R.id.conDaoTrangThai, "Điểm nghe thủ công", 10000);
-                    assertEquals(CauHinhAutoConDao.CAC_DIEM.get(i).ten, chu(s, R.id.tqTenKhuVuc));
+                    assertEquals(diem.ten, chu(s, R.id.tqTenKhuVuc));
                     // Hộp thoại phải chờ xác nhận, không tự đi tiếp hay tự đọc điểm thường.
                     SystemClock.sleep(1500);
                     assertTrue(chu(s, R.id.conDaoTrangThai).contains("Điểm nghe thủ công"));
@@ -77,15 +81,21 @@ public class AutoConDaoFlowTest {
                     if (id == 5) doiChu(s, R.id.conDaoTrangThai, "Đang phát theo lựa chọn:", 5000);
                 } else {
                     doiChu(s, R.id.conDaoTrangThai, "Đang tự động phát:", 15000);
-                    assertEquals(CauHinhAutoConDao.CAC_DIEM.get(i).ten, chu(s, R.id.tqTenKhuVuc));
+                    assertEquals(diem.ten, chu(s, R.id.tqTenKhuVuc));
                 }
-                doiChu(s, R.id.conDaoTrangThai, "Đã xử lý điểm " + id + "/" + CauHinhAutoConDao.CAC_DIEM.size(), 45000);
+                doiChu(s, R.id.conDaoTrangThai, "Đã xử lý điểm " + soThuTu + "/" + cauHinh.cacDiem.size(), 45000);
             }
-            doiChu(s, R.id.conDaoTrangThai, "Đã hoàn thành demo 19/19", 10000);
+            doiChu(s, R.id.conDaoTrangThai, "Đã hoàn thành demo " + cauHinh.cacDiem.size() + "/" + cauHinh.cacDiem.size(), 10000);
             assertEquals("Bật AUTO", chu(s, R.id.conDaoBatAuto));
             SystemClock.sleep(3000);
-            assertTrue(chu(s, R.id.conDaoTrangThai).contains("Đã hoàn thành demo 19/19"));
+            assertTrue(chu(s, R.id.conDaoTrangThai).contains("Đã hoàn thành demo " + cauHinh.cacDiem.size() + "/" + cauHinh.cacDiem.size()));
         }
+    }
+
+    private Object layHuongDan(ActivityScenario<ConDaoThamQuanActivity> s) {
+        AtomicReference<Object> ketQua = new AtomicReference<>();
+        s.onActivity(a -> ketQua.set(UiKiemThu.truong(a,"huongDan")));
+        return ketQua.get();
     }
 
     private void tangTocGiongDocTrongKiemThu(ActivityScenario<ConDaoThamQuanActivity> s) {
@@ -94,11 +104,9 @@ public class AutoConDaoFlowTest {
         do {
             s.onActivity(a -> {
                 try {
-                    java.lang.reflect.Field field=ConDaoThamQuanActivity.class.getDeclaredField("tts");
-                    field.setAccessible(true);
-                    android.speech.tts.TextToSpeech tts=(android.speech.tts.TextToSpeech)field.get(a);
+                    android.speech.tts.TextToSpeech tts=(android.speech.tts.TextToSpeech)UiKiemThu.truong(a,"tts");
                     sanSang.set(tts!=null && tts.setSpeechRate(3f)==android.speech.tts.TextToSpeech.SUCCESS);
-                } catch (ReflectiveOperationException e) { throw new AssertionError(e); }
+                } catch (RuntimeException e) { throw new AssertionError(e); }
             });
             if(sanSang.get()) return;
             SystemClock.sleep(100);

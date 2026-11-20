@@ -50,7 +50,10 @@ public class BanDoVaGpsThamQuanTest {
                             assertEquals(d.viDo, marker.getPosition().getLatitude(), .0000001);
                             assertEquals(d.kinhDo, marker.getPosition().getLongitude(), .0000001);
                         }
-                        android.view.View nut = timNutTheoId(a.findViewById(android.R.id.content), d.id);
+                        a.findViewById(R.id.nutDanhSachBanDo).performClick();
+                        com.google.android.material.bottomsheet.BottomSheetDialog bang =
+                                (com.google.android.material.bottomsheet.BottomSheetDialog)UiKiemThu.truong(a,"bangDanhSachDangMo");
+                        android.view.View nut = UiKiemThu.timTheoMoTa(bang.getWindow().getDecorView(),"Xem địa điểm " + d.ten);
                         assertNotNull("Thiếu nút chọn địa điểm " + d.id, nut);
                         nut.performClick();
                         assertEquals(d.ten, ((TextView) a.findViewById(R.id.tenDiaDiemBanDo)).getText().toString());
@@ -59,18 +62,6 @@ public class BanDoVaGpsThamQuanTest {
                 }
             });
         }
-    }
-
-    private android.view.View timNutTheoId(android.view.View view, int id) {
-        if (Integer.valueOf(id).equals(view.getTag())) return view;
-        if (view instanceof android.view.ViewGroup) {
-            android.view.ViewGroup group = (android.view.ViewGroup) view;
-            for (int i = 0; i < group.getChildCount(); i++) {
-                android.view.View found = timNutTheoId(group.getChildAt(i), id);
-                if (found != null) return found;
-            }
-        }
-        return null;
     }
 
     private ActivityScenario<MainActivity> moTrangChu() {
@@ -201,7 +192,7 @@ public class BanDoVaGpsThamQuanTest {
         }
         try (ActivityScenario<MainActivity> scenario = moTrangChu()) {
             scenario.onActivity(a -> {
-                android.view.View menu = a.findViewById(R.id.thanhChucNang);
+                android.view.View menu = a.findViewById(R.id.khungTraiNghiem);
                 android.view.View huongDan = a.findViewById(R.id.khungThuyetMinhTuDong);
                 android.view.ViewGroup parent = (android.view.ViewGroup) menu.getParent();
                 assertSame(parent, huongDan.getParent());
@@ -290,7 +281,12 @@ public class BanDoVaGpsThamQuanTest {
 
     private void batDemo(ActivityScenario<MainActivity> scenario) {
         final android.view.View[] root = new android.view.View[1];
-        scenario.onActivity(a -> root[0] = a.getWindow().getDecorView());
+        scenario.onActivity(a -> {
+            root[0] = a.getWindow().getDecorView();
+            if (!a.findViewById(R.id.autoDemo).isShown()) a.findViewById(R.id.autoTieuDeThuGon).performClick();
+        });
+        androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        android.os.SystemClock.sleep(350);
         onView(withId(R.id.autoDemo))
                 .inRoot(androidx.test.espresso.matcher.RootMatchers.withDecorView(org.hamcrest.Matchers.is(root[0])))
                 .perform(scrollTo());
@@ -299,7 +295,7 @@ public class BanDoVaGpsThamQuanTest {
         onView(withId(R.id.autoDemo))
                 .inRoot(androidx.test.espresso.matcher.RootMatchers.withDecorView(org.hamcrest.Matchers.is(root[0])))
                 .perform(click());
-        scenario.onActivity(a -> assertEquals("DEMO · Vị trí mô phỏng",
+        scenario.onActivity(a -> assertEquals("● Đang chạy Demo",
                 ((TextView) a.findViewById(R.id.autoCheDo)).getText().toString()));
     }
 

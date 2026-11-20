@@ -95,6 +95,7 @@ public class TaiKhoanVaYeuThichFlowTest {
 
     @Test public void dangKyTuYeuThichRoiDangNhapQuayLaiDanhSachTrong() {
         try (ActivityScenario<YeuThichActivity> scenario = ActivityScenario.launch(YeuThichActivity.class)) {
+            onView(withId(R.id.ytDangNhap)).perform(click());
             onView(withId(R.id.btnChuyenDangKy)).perform(scrollTo(), click());
             nhap(R.id.dkTenDangNhap, ten);
             nhap(R.id.dkMatKhau, MAT_KHAU);
@@ -175,8 +176,10 @@ public class TaiKhoanVaYeuThichFlowTest {
             onView(withId(R.id.ytBoLuu)).perform(click());
             onView(withText("Bỏ lưu")).perform(click());
             onView(withId(R.id.ytTongSo)).check(matches(withText("0 địa điểm đã lưu")));
-            onView(withId(R.id.ytDangXuat)).perform(click());
+            onView(withId(R.id.navCaNhan)).perform(click());
+            onView(withId(R.id.cnDangXuat)).perform(scrollTo(), click());
             onView(withText("Đăng xuất")).inRoot(UiKiemThu.hoiThoai()).perform(click());
+            onView(withId(R.id.navYeuThich)).perform(click());
             onView(withId(R.id.ytDangNhap)).check(matches(isDisplayed()));
             onView(withId(R.id.ytTenDiaDiem)).check(doesNotExist());
             assertFalse(PhienDangNhap.daDangNhap(context));
@@ -187,6 +190,7 @@ public class TaiKhoanVaYeuThichFlowTest {
 
     @Test public void huyDangNhapKhongXemDuocYeuThich() {
         try (ActivityScenario<YeuThichActivity> scenario = ActivityScenario.launch(YeuThichActivity.class)) {
+            onView(withId(R.id.ytDangNhap)).perform(click());
             onView(withId(R.id.dnQuayLai)).perform(scrollTo(), click());
             onView(withId(R.id.ytDangNhap)).check(matches(isDisplayed()));
             onView(withId(R.id.ytTenDiaDiem)).check(doesNotExist());

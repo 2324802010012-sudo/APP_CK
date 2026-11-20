@@ -1,0 +1,393 @@
+[
+  {
+    "file": "chi_tiet.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": false,
+    "changed_pixels": 116,
+    "changed_percent": 0.00448,
+    "mean_absolute_error": 2.1e-05,
+    "bbox": [
+      92,
+      148,
+      115,
+      188
+    ]
+  },
+  {
+    "file": "thu_vien.png",
+    "size": [
+      1024,
+      1865
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_0_banner_gon.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": false,
+    "changed_pixels": 486,
+    "changed_percent": 0.01875,
+    "mean_absolute_error": 0.002294,
+    "bbox": [
+      106,
+      465,
+      152,
+      510
+    ]
+  },
+  {
+    "file": "tour_0_danh_sach.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": false,
+    "changed_pixels": 626,
+    "changed_percent": 0.02415,
+    "mean_absolute_error": 0.002313,
+    "bbox": [
+      86,
+      675,
+      152,
+      976
+    ]
+  },
+  {
+    "file": "tour_0_so_do.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": false,
+    "changed_pixels": 486,
+    "changed_percent": 0.01875,
+    "mean_absolute_error": 0.002294,
+    "bbox": [
+      106,
+      675,
+      152,
+      720
+    ]
+  },
+  {
+    "file": "tour_0_toan_man_hinh.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_0_trinh_nghe.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_1_banner_gon.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_1_danh_sach.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": false,
+    "changed_pixels": 140,
+    "changed_percent": 0.0054,
+    "mean_absolute_error": 1.9e-05,
+    "bbox": [
+      86,
+      933,
+      129,
+      976
+    ]
+  },
+  {
+    "file": "tour_1_so_do.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_1_toan_man_hinh.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_1_trinh_nghe.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_2_banner_gon.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_2_danh_sach.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": false,
+    "changed_pixels": 140,
+    "changed_percent": 0.0054,
+    "mean_absolute_error": 1.9e-05,
+    "bbox": [
+      86,
+      933,
+      129,
+      976
+    ]
+  },
+  {
+    "file": "tour_2_so_do.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_2_toan_man_hinh.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_2_trinh_nghe.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_3_banner_gon.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_3_danh_sach.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": false,
+    "changed_pixels": 140,
+    "changed_percent": 0.0054,
+    "mean_absolute_error": 1.9e-05,
+    "bbox": [
+      86,
+      933,
+      129,
+      976
+    ]
+  },
+  {
+    "file": "tour_3_so_do.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_3_toan_man_hinh.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_3_trinh_nghe.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_4_banner_gon.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_4_danh_sach.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": false,
+    "changed_pixels": 140,
+    "changed_percent": 0.0054,
+    "mean_absolute_error": 1.9e-05,
+    "bbox": [
+      86,
+      933,
+      129,
+      976
+    ]
+  },
+  {
+    "file": "tour_4_so_do.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_4_toan_man_hinh.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "tour_4_trinh_nghe.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "channels": "RGBA",
+    "same": true,
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "mean_absolute_error": 0.0,
+    "bbox": null
+  }
+]

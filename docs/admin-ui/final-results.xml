@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.example.app_ck.AdminCaptureTest" tests="114" failures="1" errors="0" skipped="0" time="1687.478" timestamp="2026-11-20T16:53:41" hostname="localhost">
+  <properties>
+    <property name="device" value="Medium_Phone_API_37.0(AVD) - 17" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="captureScreens" classname="com.example.app_ck.AdminCaptureTest" time="27.512" />
+  <testcase name="kiemTraNangCapDatabase17Len18" classname="com.example.app_ck.AnhMacDinhTest" time="0.546" />
+  <testcase name="kiemTra83AnhDrawable" classname="com.example.app_ck.AnhMacDinhTest" time="0.004" />
+  <testcase name="kiemTraDuLieuAnhKhoiTao" classname="com.example.app_ck.AnhMacDinhTest" time="0.238" />
+  <testcase name="preexistingCommonEditsWinOverLegacyDuringMigration" classname="com.example.app_ck.ArchitectureDatabaseTest" time="0.418" />
+  <testcase name="upgrade14KeepsCredentialsHistoryCustomIdsMapsAndMarkerCoordinates" classname="com.example.app_ck.ArchitectureDatabaseTest" time="7.224" />
+  <testcase name="userCannotInvokeAdministrativeWritesOrViewOtherAccountDetails" classname="com.example.app_ck.ArchitectureDatabaseTest" time="6.752" />
+  <testcase name="freshInstallSeedsAllToursAndNoAdminAccount" classname="com.example.app_ck.ArchitectureDatabaseTest" time="0.271" />
+  <testcase name="lockInvalidatesExistingSessionAndUnlockRestoresPasswordLogin" classname="com.example.app_ck.ArchitectureDatabaseTest" time="16.013" />
+  <testcase name="failedUpgradeRollsBackVersionAndImportedRowsThenCanRetry" classname="com.example.app_ck.ArchitectureDatabaseTest" time="0.467" />
+  <testcase name="adminDynamicPointCanBeReadNarratedRenamedAndRecordedAfterReopen" classname="com.example.app_ck.ArchitectureDatabaseTest" time="3.847" />
+  <testcase name="roiManHinhVaXoayKhongTuBatLai" classname="com.example.app_ck.AutoConDaoFlowTest" time="11.667" />
+  <testcase name="menuChiCoDemoGpsVaVanChonDiemThuCongDuoc" classname="com.example.app_ck.AutoConDaoFlowTest" time="3.125" />
+  <testcase name="demoDiHetDanhMucChoDocXongVaHoiDiemThuCong" classname="com.example.app_ck.AutoConDaoFlowTest" time="277.123" />
+  <testcase name="chonThuCongHuyLuotDangChoTuDong" classname="com.example.app_ck.AutoConDaoFlowTest" time="7.978" />
+  <testcase name="haiTourDungKhiRoiManHinhVaXoay" classname="com.example.app_ck.AutoDiSanFlowTest" time="15.267" />
+  <testcase name="vanMieuGpsLocViTriCuSaiSoVaTourKhac" classname="com.example.app_ck.AutoDiSanFlowTest" time="16.261" />
+  <testcase name="hienThiRoDiemAutoVaThuCongTrenCaHaiTour" classname="com.example.app_ck.AutoDiSanFlowTest" time="5.298" />
+  <testcase name="hueDemoDu10DiemChoDocXongVaHoiThuCong" classname="com.example.app_ck.AutoDiSanFlowTest" time="155.51" />
+  <testcase name="vanMieuDemoDu16DiemChoDocXongVaHoiThuCong" classname="com.example.app_ck.AutoDiSanFlowTest" time="131.946" />
+  <testcase name="hueGpsLocViTriCuSaiSoVaTourKhac" classname="com.example.app_ck.AutoDiSanFlowTest" time="16.224" />
+  <testcase name="taiTaoManHinhGiuTamVaMucZoom" classname="com.example.app_ck.BanDoChaoMungTest" time="1.836" />
+  <testcase name="duNamDiemNutThuPhongVaKeoBanDoKhongCuonTrang" classname="com.example.app_ck.BanDoChaoMungTest" time="3.037" />
+  <testcase name="caNamSoDoChiCoMarkerThuCongKhongCoGpsDemo" classname="com.example.app_ck.BanDoVaGpsThamQuanTest" time="10.445" />
+  <testcase name="moChiTietThuongKhongTuDocVaKhoiHuongDanNamDuoiMenu" classname="com.example.app_ck.BanDoVaGpsThamQuanTest" time="4.268" />
+  <testcase name="welcomeBatDauMoTrangChuVaKhoiDongYeuCauViTri" classname="com.example.app_ck.BanDoVaGpsThamQuanTest" time="2.655" />
+  <testcase name="demoCaNamDiaDiemTuTrangChuHoiTruocKhiPhat" classname="com.example.app_ck.BanDoVaGpsThamQuanTest" time="30.229" />
+  <testcase name="batDauTuDongMoDungChiTietVaPhatSauXacNhan" classname="com.example.app_ck.BanDoVaGpsThamQuanTest" time="14.077" />
+  <testcase name="gpsSaiSoLonVanHienDangTheoDoiVaKhongMoLoiMoi" classname="com.example.app_ck.BanDoVaGpsThamQuanTest" time="1.706" />
+  <testcase name="roiTrangChuKhiDangHoiKhongTuPhatLai" classname="com.example.app_ck.BanDoVaGpsThamQuanTest" time="12.653" />
+  <testcase name="banDoDocMarkerVaNutChonTheoIdVaToaDoSQLite" classname="com.example.app_ck.BanDoVaGpsThamQuanTest" time="4.143" />
+  <testcase name="suaHoSoKiemTraEmailVaLuuQuaLanMoLai" classname="com.example.app_ck.CaNhanVaDieuHuongTest" time="11.073" />
+  <testcase name="khachDangNhapTuCaNhanVaDangXuatGiuYeuThich" classname="com.example.app_ck.CaNhanVaDieuHuongTest" time="11.379" />
+  <testcase name="namTabDungChungMenuVaMoManHinhThat" classname="com.example.app_ck.CaNhanVaDieuHuongTest" time="13.707" />
+  <testcase name="doiMatKhauCanMatKhauCuVaCapMaKhoiPhucMoi" classname="com.example.app_ck.CaNhanVaDieuHuongTest" time="26.389" />
+  <testcase name="chupChiTietVaThuVienAnhSauKhiTachSlider" classname="com.example.app_ck.GiaoDienBaoToanTest" time="4.35" />
+  <testcase name="chupNamTourTabBannerToanManHinhVaTrinhNghe" classname="com.example.app_ck.GiaoDienBaoToanTest" time="42.929" />
+  <testcase name="nangCapBayDiemCuKhongMatBangKhacVaKhongTrungKhiChayLai" classname="com.example.app_ck.KhoDuLieuConDaoTest" time="0.122" />
+  <testcase name="cauHinhAutoDocDuLieuChungVaKiemTraQuyenTaiLucGhi" classname="com.example.app_ck.KhoDuLieuConDaoTest" time="0.26" />
+  <testcase name="dungChuSoHuuThuTuThoiGianVaKhongTrungCallback" classname="com.example.app_ck.KhoLichSuTest" time="0.259" />
+  <testcase name="chuanHoaCheDoVaTuChoiAutoSaiCapDiaDiem" classname="com.example.app_ck.KhoLichSuTest" time="0.181" />
+  <testcase name="xoaRiengMotLuotVaTatCaKhongAnhHuongTaiKhoanKhac" classname="com.example.app_ck.KhoLichSuTest" time="0.184" />
+  <testcase name="tuChoiDuLieuKhongHopLeVaTaiKhoanKhongTonTai" classname="com.example.app_ck.KhoLichSuTest" time="0.16" />
+  <testcase name="baiDaiTuaSangDoanKhacVaRoiTrangDungAmThanh" classname="com.example.app_ck.KhungNgheFlowTest" time="15.172" />
+  <testcase name="tuaAmThanhThatTamDungTiepTucDungVaXoaCacheKhiDong" classname="com.example.app_ck.KhungNgheFlowTest" time="9.947" />
+  <testcase name="chonSoThuCongMoDungNoiDungAnhVaDongTrenCaNamTour" classname="com.example.app_ck.KhungNgheFlowTest" time="36.851" />
+  <testcase name="mediaPlayerBatDauMoiGhiPauseTiepTucKhongTrungDungNgheLaiTaoLuotMoi" classname="com.example.app_ck.LichSuFlowTest" time="17.261" />
+  <testcase name="intentMoLaiDuNamNoiVaDiemThanhPhanKhongTuPhat" classname="com.example.app_ck.LichSuFlowTest" time="10.259" />
+  <testcase name="chiTietNgheThuCongTamDungTuaNgheLaiVaGhiLichSuTongQuan" classname="com.example.app_ck.LichSuFlowTest" time="24.512" />
+  <testcase name="khongGhiLucChuanBiKhongGhiTrungVaKhongGanLuotKhachChoTaiKhoanMoi" classname="com.example.app_ck.LichSuFlowTest" time="9.912" />
+  <testcase name="moLichSuTuCaNhanVaKhamPhaRongQuayVeTimKiemTrangChu" classname="com.example.app_ck.LichSuFlowTest" time="12.215" />
+  <testcase name="callbackCuVaLuotDaHuyKhongDuocGhi" classname="com.example.app_ck.LichSuFlowTest" time="13.372" />
+  <testcase name="ttsBaTourGhiDungDiemVaPhanBietGpsVoiDemo" classname="com.example.app_ck.LichSuFlowTest" time="34.372" />
+  <testcase name="chiTietNamDiaDiemMoDungBaiVaAnhChuaPhatKhongGhiLichSu" classname="com.example.app_ck.LichSuFlowTest" time="20.561" />
+  <testcase name="nhanCheDoDongBoVaXoaMotLuotCoXacNhan" classname="com.example.app_ck.LichSuFlowTest" time="14.064" />
+  <testcase name="moDungDiemXoaCoXacNhanVaKhongMatYeuThichHayLichSuNguoiKhac" classname="com.example.app_ck.LichSuFlowTest" time="14.927" />
+  <testcase name="khachMoTuTrangChuDangNhapVaXemTrangThaiRong" classname="com.example.app_ck.LichSuFlowTest" time="16.273" />
+  <testcase name="chiTietTuViTriGiuCheDoGpsDemoVaKhongTuPhatLaiKhiXoay" classname="com.example.app_ck.LichSuFlowTest" time="26.744" />
+  <testcase name="chamDu18MarkerMoDungNoiDungKhongNhanSoSoDoLamId" classname="com.example.app_ck.MarkerConDaoTest" time="3.443" />
+  <testcase name="chonDungMuoiDiemSauKhiPhongVaKeoAnhNgang" classname="com.example.app_ck.MarkerHueTest" time="3.973" />
+  <testcase name="chamDung16SoTrenAnhSauPhongVaKeo" classname="com.example.app_ck.MarkerVanMieuTest" time="5.093" />
+  <testcase name="chiTietHienDuDanhSachVaMoDungDiemCuoiCuaNamDiaDiem" classname="com.example.app_ck.NguonThongTinFlowTest" time="18.737" />
+  <testcase name="namTourDocBaiMoiVaMoNguonDungDiem" classname="com.example.app_ck.NguonThongTinFlowTest" time="17.577" />
+  <testcase name="moLaiKhongDongBoGhiDeNoiDungDaSuaVaKhongBatBuocDuSoDiemMau" classname="com.example.app_ck.NoiDungThamQuanTest" time="0.234" />
+  <testcase name="caiMoiDuNoiDungVaNguonTrongSQLite" classname="com.example.app_ck.NoiDungThamQuanTest" time="0.261" />
+  <testcase name="duNamDiaDiemTamMuoiBaDiemVaNguonChinhThuc" classname="com.example.app_ck.NoiDungThamQuanTest" time="0.004" />
+  <testcase name="markerPickerZoomAndCancelLeaveStoredRatiosUntouched" classname="com.example.app_ck.QuanTriGiaoDienFlowTest" time="10.966" />
+  <testcase name="pointDraftSurvivesRecreateAndCancelThenSaveKeepsGps" classname="com.example.app_ck.QuanTriGiaoDienFlowTest" time="11.251" />
+  <testcase name="createValidatesFieldsAcceptsNoMarkerAndDeletesAfterConfirmation" classname="com.example.app_ck.QuanTriGiaoDienFlowTest" time="13.267" />
+  <testcase name="gpsOffOnlyChangesPermissionAndCancelKeepsDraftSelection" classname="com.example.app_ck.QuanTriGiaoDienFlowTest" time="10.106" />
+  <testcase name="accountsFindAccentsLockUnlockAndPreventSelfLock" classname="com.example.app_ck.QuanTriGiaoDienFlowTest" time="13.511" />
+  <testcase name="gpsMainAndSubValidateSourceAndKeepIndependentRadius" classname="com.example.app_ck.QuanTriGiaoDienFlowTest" time="13.06" />
+  <testcase name="keyboardLeavesSaveReachableOnAllThreeEditors" classname="com.example.app_ck.QuanTriGiaoDienFlowTest" time="14.842" />
+  <testcase name="previewUsesCurrentDraftAndStopsWithTheActivity" classname="com.example.app_ck.QuanTriGiaoDienFlowTest" time="51.023" />
+  <testcase name="narrationCancelSwitchRecreateAndSaveTargetTheCorrectRecord" classname="com.example.app_ck.QuanTriGiaoDienFlowTest" time="53.825" />
+  <testcase name="pointImageAndSourceStaySeparateFromThePlaceMapAndSource" classname="com.example.app_ck.QuanTriGiaoDienFlowTest" time="10.215" />
+  <testcase name="adminCreatesFloorAndPointThenNewPlaceTourReadsSameData" classname="com.example.app_ck.SQLiteQuanTriFlowTest" time="12.873">
+    <failure>androidx.test.espresso.PerformException: Error performing 'scroll to' on view 'view.getId() is &lt;2131231045/com.example.app_ck:id/dtLuu&gt;'.
+at androidx.test.espresso.PerformException$Builder.build(PerformException.java:86)
+at androidx.test.espresso.base.PerformExceptionHandler.handleSafely(PerformExceptionHandler.java:56)
+at androidx.test.espresso.base.PerformExceptionHandler.handleSafely(PerformExceptionHandler.java:31)
+at androidx.test.espresso.base.DefaultFailureHandler$TypedFailureHandler.handle(DefaultFailureHandler.java:158)
+at androidx.test.espresso.base.DefaultFailureHandler.handle(DefaultFailureHandler.java:120)
+at androidx.test.espresso.ViewInteraction.waitForAndHandleInteractionResults(ViewInteraction.java:385)
+at androidx.test.espresso.ViewInteraction.desugaredPerform(ViewInteraction.java:212)
+at androidx.test.espresso.ViewInteraction.perform(ViewInteraction.java:140)
+at com.example.app_ck.SQLiteQuanTriFlowTest.adminCreatesFloorAndPointThenNewPlaceTourReadsSameData(SQLiteQuanTriFlowTest.java:82)
+... 34 trimmed
+Caused by: java.lang.RuntimeException: Action will not be performed because the target view does not match one or more of the following constraints:
+(view has effective visibility &lt;VISIBLE&gt; and is descendant of a view matching (is assignable from class &lt;class android.widget.ScrollView&gt; or is assignable from class &lt;class android.widget.HorizontalScrollView&gt; or is assignable from class &lt;class android.widget.ListView&gt; or is assignable from class &lt;class androidx.core.widget.NestedScrollView&gt; or  or is assignable from class &lt;class androidx.recyclerview.widget.RecyclerView&gt;))
+Target view: "MaterialButton{id=2131231045, res-name=dtLuu, visibility=VISIBLE, width=739, height=137, has-focus=false, has-focusable=true, has-window-focus=true, is-clickable=true, is-enabled=true, is-focused=false, is-focusable=true, is-layout-requested=false, is-selected=false, layout-params=android.widget.LinearLayout$LayoutParams&#64;YYYYYY, tag=null, root-is-layout-requested=false, has-input-connection=false, x=299.0, y=26.0, text=Lưu điểm tham quan, input-type=0, ime-target=false, has-links=false, is-checked=false}"
+at androidx.test.espresso.ViewInteraction.doPerform(ViewInteraction.java:287)
+at androidx.test.espresso.ViewInteraction.-$$Nest$mdoPerform(ViewInteraction.java:0)
+at androidx.test.espresso.ViewInteraction$1.call(ViewInteraction.java:193)
+at androidx.test.espresso.ViewInteraction$1.call(ViewInteraction.java:182)
+at java.util.concurrent.FutureTask.run(FutureTask.java:328)
+at android.os.Handler.handleCallback(Handler.java:1095)
+at android.os.Handler.dispatchMessageImpl(Handler.java:135)
+at android.os.Handler.dispatchMessage(Handler.java:125)
+at android.os.Looper.loopOnce(Looper.java:296)
+at android.os.Looper.loop(Looper.java:397)
+at android.app.ActivityThread.main(ActivityThread.java:9523)
+at java.lang.reflect.Method.invoke(Native Method)
+at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:575)
+at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:939)
+</failure>
+  </testcase>
+  <testcase name="cannotDeleteReferencedPointThenCanDeleteAfterHistoryCleared" classname="com.example.app_ck.SQLiteToanVenTest" time="5.306" />
+  <testcase name="adminSetupRequiresPasswordAndCannotBeRepeatedEvenIfAdminLocked" classname="com.example.app_ck.SQLiteToanVenTest" time="13.775" />
+  <testcase name="sourcesUpdateWithoutReplaceAndFailureRollsBackWholeEdit" classname="com.example.app_ck.SQLiteToanVenTest" time="5.206" />
+  <testcase name="freshAndReopenEnforceAllReferences" classname="com.example.app_ck.SQLiteToanVenTest" time="5.324" />
+  <testcase name="upgrade15PreservesEditsAndDeletionAndArchivesOrphans" classname="com.example.app_ck.SQLiteToanVenTest" time="7.072" />
+  <testcase name="generatedIdsStayAboveSeedAndAreNotReusedAfterDeletion" classname="com.example.app_ck.SQLiteToanVenTest" time="5.173" />
+  <testcase name="personalDataCannotCrossSessionsOrLockedAccount" classname="com.example.app_ck.SQLiteToanVenTest" time="10.568" />
+  <testcase name="zoomVaKeoVanChonDungToaDoGocVaDatLai" classname="com.example.app_ck.SoDoThuPhongLayoutTest" time="0.032" />
+  <testcase name="gioiHanZoomTuMotDenNamLan" classname="com.example.app_ck.SoDoThuPhongLayoutTest" time="0.005" />
+  <testcase name="haiNgonPhongToKhongKichHoatChonMarker" classname="com.example.app_ck.SoDoThuPhongLayoutTest" time="0.006" />
+  <testcase name="upgradeFromTwelveAddsHistoryAndKeepsExistingData" classname="com.example.app_ck.TaiKhoanDbMigrationTest" time="0.443" />
+  <testcase name="upgradeFromTwoDoesNotAddCategoryTwice" classname="com.example.app_ck.TaiKhoanDbMigrationTest" time="0.34" />
+  <testcase name="freshInstallContainsFiveActivePlaces" classname="com.example.app_ck.TaiKhoanDbMigrationTest" time="0.186" />
+  <testcase name="upgradeFromSixPreservesExistingPlaceAndEveryRelatedRow" classname="com.example.app_ck.TaiKhoanDbMigrationTest" time="0.44" />
+  <testcase name="upgradeFromElevenAddsProfileWithoutChangingCredentialsFavoritesOrGps" classname="com.example.app_ck.TaiKhoanDbMigrationTest" time="0.538" />
+  <testcase name="gpsPointIsScopedByDestinationAndRetainsFloorAndRadius" classname="com.example.app_ck.TaiKhoanDbMigrationTest" time="0.212" />
+  <testcase name="upgradeFromEightPreservesLegacyDestinationTablesFavoritesAndEditedGps" classname="com.example.app_ck.TaiKhoanDbMigrationTest" time="0.616" />
+  <testcase name="upgradeFromTenKeepsHueFavoriteAndExistingGps" classname="com.example.app_ck.TaiKhoanDbMigrationTest" time="0.483" />
+  <testcase name="upgradeFromThirteenPreservesEveryHistoryRowAndConvertsModes" classname="com.example.app_ck.TaiKhoanDbMigrationTest" time="0.637" />
+  <testcase name="upgradeFromOnePreservesAccountAndActiveFavorite" classname="com.example.app_ck.TaiKhoanDbMigrationTest" time="0.312" />
+  <testcase name="quenMatKhauDoiMaVaDangNhapBangMatKhauMoi" classname="com.example.app_ck.TaiKhoanVaYeuThichFlowTest" time="23.712" />
+  <testcase name="dangKyTuYeuThichRoiDangNhapQuayLaiDanhSachTrong" classname="com.example.app_ck.TaiKhoanVaYeuThichFlowTest" time="19.34" />
+  <testcase name="dangNhapTuChiTietTiepTucLuuVaKhongXoaDiemDaLuu" classname="com.example.app_ck.TaiKhoanVaYeuThichFlowTest" time="11.427" />
+  <testcase name="huyDangNhapKhongXemDuocYeuThich" classname="com.example.app_ck.TaiKhoanVaYeuThichFlowTest" time="2.573" />
+  <testcase name="dangNhapTuWelcomeMoTrangChu" classname="com.example.app_ck.TaiKhoanVaYeuThichFlowTest" time="10.955" />
+  <testcase name="welcomeCoHaiDuongVaoVaHuyDangNhapQuayVeWelcome" classname="com.example.app_ck.TaiKhoanVaYeuThichFlowTest" time="3.215" />
+  <testcase name="yeuThichHienHueBoLuuVaDangXuatKhongLoDanhSach" classname="com.example.app_ck.TaiKhoanVaYeuThichFlowTest" time="16.753" />
+  <testcase name="xacNhanDongBoNutXanhVaNoiDungTiengViet" classname="com.example.app_ck.ThongBaoUiTest" time="2.786" />
+  <testcase name="tienDoGiuKhoaCuVaKhongGhiCheoPhienNoiDungHoacCheDo" classname="com.example.app_ck.TienDoNgheTest" time="5.212" />
+  <testcase name="lichSuDiemTrungIdKhacDiaDiemVaDoiTenVanGiuDungLienKet" classname="com.example.app_ck.TourDuLieuDongTest" time="5.203" />
+  <testcase name="diemMoiKhongSoDoHienThiVaMoDungBaiNgheSauKhiTaoLai" classname="com.example.app_ck.TourDuLieuDongTest" time="15.135" />
+  <testcase name="namDiaDiemDungMotActivityGiuDungIdVaTrangThaiKhiTaoLai" classname="com.example.app_ck.TourDungChungTest" time="16.784" />
+  <testcase name="ngheNhanhChiChuyenVaMoBaiSauKhiDongYKhongGiuLenhSauOnStop" classname="com.example.app_ck.TourDungChungTest" time="24.258" />
+  <testcase name="diemConDaoKhongMarkerVanMoDungBaiThuCong" classname="com.example.app_ck.TourDungChungTest" time="2.545" />
+  <testcase name="hueGiuViewVaZoomKhiChonDiemKhacCungSoDo" classname="com.example.app_ck.TourDungChungTest" time="2.261" />
+  <testcase name="dangPhatHoiTruocHuyGiuNguyenXacNhanMoiDungVaChuyenTrenBaTour" classname="com.example.app_ck.XacNhanChuyenDiemTest" time="10.564" />
+  <testcase name="thuCongChuyenNgayRoiTrangHuyHoiThoaiKhongGiuLenhChuyenCu" classname="com.example.app_ck.XacNhanChuyenDiemTest" time="11.408" />
+</testsuite>

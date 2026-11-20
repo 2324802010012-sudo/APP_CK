@@ -1,36 +1,219 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="#F6F8F5" android:orientation="vertical">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:gravity="center_vertical" android:orientation="horizontal" android:padding="16dp">
-        <TextView android:id="@+id/qlddQuayLai" android:layout_width="48dp" android:layout_height="48dp"
-            android:gravity="center" android:text="‹" android:textSize="32sp" android:textColor="#245B43"
-            android:clickable="true" android:focusable="true" android:contentDescription="Quay lại" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-            android:text="Địa điểm du lịch" android:textStyle="bold" android:textColor="#20382A" android:textSize="21sp" />
-    </LinearLayout>
-    <EditText android:id="@+id/qlddTimKiem" android:layout_width="match_parent" android:layout_height="52dp"
-        android:layout_marginHorizontal="20dp" android:layout_marginBottom="12dp" android:background="@drawable/ui_card"
-        android:paddingHorizontal="16dp" android:hint="Tìm tên, địa chỉ, danh mục..." android:singleLine="true"
-        android:textSize="14sp" android:textColor="#20382A" android:textColorHint="#85968A" />
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:gravity="center_vertical" android:paddingHorizontal="20dp" android:orientation="horizontal">
-        <TextView android:id="@+id/qlddTongSo" android:layout_width="0dp" android:layout_weight="1"
-            android:layout_height="wrap_content" android:text="ĐỊA ĐIỂM" android:textSize="12sp"
-            android:textStyle="bold" android:textColor="#245B43" />
-        <Button android:id="@+id/qlddThemMoi" android:layout_width="wrap_content" android:layout_height="48dp"
-            android:text="+ Thêm mới" android:textAllCaps="false" android:textColor="#FFFFFF" android:backgroundTint="#2C7351" />
-    </LinearLayout>
-    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
-        android:fillViewport="true" android:scrollbars="none">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:padding="20dp" android:orientation="vertical">
-            <LinearLayout android:id="@+id/qlddDanhSach" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:orientation="vertical" />
-            <TextView android:id="@+id/qlddTrong" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:padding="24dp" android:gravity="center"
-                android:text="Không có địa điểm phù hợp" android:textColor="#718277" android:visibility="gone" />
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F6F8F5"
+    android:orientation="vertical">
+
+    <!-- THANH TIEU DE -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="68dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/qlddQuayLai"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:padding="11dp"
+            android:gravity="center"
+            android:drawableStart="@drawable/ui_tq_back"
+            android:drawableTint="#2C7351"
+            android:background="@drawable/ui_ct_audio_bg"
+            android:foreground="?attr/selectableItemBackground"
+            android:contentDescription="Quay lại quản trị"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Địa điểm du lịch"
+                android:textColor="#182D22"
+                android:textSize="19sp"
+                android:fontFamily="sans-serif-medium"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="Quản lý thông tin và hình ảnh"
+                android:textColor="#687B6E"
+                android:textSize="12sp"/>
+
         </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- THANH TIM KIEM -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="14dp"
+        android:paddingEnd="4dp"
+        android:background="@drawable/ui_ct_action_bg">
+
+        <ImageView
+            android:layout_width="21dp"
+            android:layout_height="21dp"
+            android:src="@drawable/ui_ic_search"
+            android:tint="#687B6E"
+            android:importantForAccessibility="no"/>
+
+        <EditText
+            android:id="@+id/qlddTimKiem"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:padding="0dp"
+            android:background="@android:color/transparent"
+            android:hint="Tìm tên, địa chỉ, danh mục..."
+            android:singleLine="true"
+            android:inputType="text"
+            android:imeOptions="actionDone"
+            android:textColor="#182D22"
+            android:textColorHint="#849488"
+            android:textSize="14sp"/>
+
+        <!-- XOA TU KHOA -->
+
+        <TextView
+            android:id="@+id/qlddXoaTimKiem"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="×"
+            android:textSize="24sp"
+            android:textColor="#687B6E"
+            android:contentDescription="Xóa từ khóa tìm kiếm"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+    <!-- SO LUONG VA NUT THEM -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/qlddTongSo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="0 địa điểm"
+            android:textColor="#2C7351"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:accessibilityLiveRegion="polite"/>
+
+        <Button
+            android:id="@+id/qlddThemMoi"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:minWidth="110dp"
+            android:text="+ Thêm mới"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:backgroundTint="#2C7351"/>
+
+    </LinearLayout>
+
+    <!-- NOI DUNG DANH SACH -->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="20dp">
+
+            <LinearLayout
+                android:id="@+id/qlddDanhSach"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+            <!-- TRANG THAI KHONG CO KET QUA -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/qlddTrong"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp"
+                    android:gravity="center"
+                    android:text="Không tìm thấy địa điểm phù hợp"
+                    android:textColor="#687B6E"
+                    android:textSize="14sp"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/qlddXoaLoc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:gravity="center"
+                    android:text="Xóa từ khóa tìm kiếm"
+                    android:textColor="#2C7351"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:background="@drawable/ui_ct_audio_bg"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
     </ScrollView>
+
 </LinearLayout>

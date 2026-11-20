@@ -1,0 +1,672 @@
+{
+  "android_runs": [
+    {
+      "source": "build\\refactor-android-full-results.xml",
+      "tests": 103,
+      "passed": 96,
+      "failed": 7,
+      "skipped": 0,
+      "failures": [
+        "com.example.app_ck.BanDoVaGpsThamQuanTest#demoCaNamDiaDiemTuTrangChuHoiTruocKhiPhat",
+        "com.example.app_ck.BanDoVaGpsThamQuanTest#batDauTuDongMoDungChiTietVaPhatSauXacNhan",
+        "com.example.app_ck.BanDoVaGpsThamQuanTest#roiTrangChuKhiDangHoiKhongTuPhatLai",
+        "com.example.app_ck.CaNhanVaDieuHuongTest#suaHoSoKiemTraEmailVaLuuQuaLanMoLai",
+        "com.example.app_ck.CaNhanVaDieuHuongTest#doiMatKhauCanMatKhauCuVaCapMaKhoiPhucMoi",
+        "com.example.app_ck.MarkerConDaoTest#chamDu18MarkerMoDungNoiDungKhongNhanSoSoDoLamId",
+        "com.example.app_ck.MarkerVanMieuTest#chamDung16SoTrenAnhSauPhongVaKeo"
+      ]
+    },
+    {
+      "source": "build\\refactor-android-retry-results.xml",
+      "tests": 24,
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0,
+      "failures": []
+    },
+    {
+      "source": "build\\refactor-android-lifecycle-results.xml",
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "failures": []
+    }
+  ],
+  "android_latest": {
+    "tests": 103,
+    "passed": 103,
+    "failed": 0,
+    "skipped": 0
+  },
+  "unit": {
+    "tests": 39,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 800
+  },
+  "cases": [
+    {
+      "test": "com.example.app_ck.AnhMacDinhTest#kiemTra83AnhDrawable",
+      "status": "passed",
+      "time_seconds": 0.001,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AnhMacDinhTest#kiemTraDuLieuAnhKhoiTao",
+      "status": "passed",
+      "time_seconds": 0.178,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AnhMacDinhTest#kiemTraNangCapDatabase17Len18",
+      "status": "passed",
+      "time_seconds": 0.399,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.ArchitectureDatabaseTest#adminDynamicPointCanBeReadNarratedRenamedAndRecordedAfterReopen",
+      "status": "passed",
+      "time_seconds": 3.763,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.ArchitectureDatabaseTest#failedUpgradeRollsBackVersionAndImportedRowsThenCanRetry",
+      "status": "passed",
+      "time_seconds": 0.47,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.ArchitectureDatabaseTest#freshInstallSeedsAllToursAndNoAdminAccount",
+      "status": "passed",
+      "time_seconds": 0.213,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.ArchitectureDatabaseTest#lockInvalidatesExistingSessionAndUnlockRestoresPasswordLogin",
+      "status": "passed",
+      "time_seconds": 15.788,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.ArchitectureDatabaseTest#preexistingCommonEditsWinOverLegacyDuringMigration",
+      "status": "passed",
+      "time_seconds": 0.391,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.ArchitectureDatabaseTest#upgrade14KeepsCredentialsHistoryCustomIdsMapsAndMarkerCoordinates",
+      "status": "passed",
+      "time_seconds": 7.534,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.ArchitectureDatabaseTest#userCannotInvokeAdministrativeWritesOrViewOtherAccountDetails",
+      "status": "passed",
+      "time_seconds": 7.299,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AutoConDaoFlowTest#chonThuCongHuyLuotDangChoTuDong",
+      "status": "passed",
+      "time_seconds": 7.443,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AutoConDaoFlowTest#demoDiHetDanhMucChoDocXongVaHoiDiemThuCong",
+      "status": "passed",
+      "time_seconds": 272.108,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AutoConDaoFlowTest#menuChiCoDemoGpsVaVanChonDiemThuCongDuoc",
+      "status": "passed",
+      "time_seconds": 3.028,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AutoConDaoFlowTest#roiManHinhVaXoayKhongTuBatLai",
+      "status": "passed",
+      "time_seconds": 8.604,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AutoDiSanFlowTest#haiTourDungKhiRoiManHinhVaXoay",
+      "status": "passed",
+      "time_seconds": 16.091,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AutoDiSanFlowTest#hienThiRoDiemAutoVaThuCongTrenCaHaiTour",
+      "status": "passed",
+      "time_seconds": 6.474,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AutoDiSanFlowTest#hueDemoDu10DiemChoDocXongVaHoiThuCong",
+      "status": "passed",
+      "time_seconds": 156.838,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AutoDiSanFlowTest#hueGpsLocViTriCuSaiSoVaTourKhac",
+      "status": "passed",
+      "time_seconds": 16.692,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AutoDiSanFlowTest#vanMieuDemoDu16DiemChoDocXongVaHoiThuCong",
+      "status": "passed",
+      "time_seconds": 133.228,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.AutoDiSanFlowTest#vanMieuGpsLocViTriCuSaiSoVaTourKhac",
+      "status": "passed",
+      "time_seconds": 16.178,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.BanDoChaoMungTest#duNamDiemNutThuPhongVaKeoBanDoKhongCuonTrang",
+      "status": "passed",
+      "time_seconds": 3.06,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.BanDoChaoMungTest#taiTaoManHinhGiuTamVaMucZoom",
+      "status": "passed",
+      "time_seconds": 2.744,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.BanDoVaGpsThamQuanTest#banDoDocMarkerVaNutChonTheoIdVaToaDoSQLite",
+      "status": "passed",
+      "time_seconds": 2.81,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.BanDoVaGpsThamQuanTest#batDauTuDongMoDungChiTietVaPhatSauXacNhan",
+      "status": "passed",
+      "time_seconds": 15.028,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.BanDoVaGpsThamQuanTest#caNamSoDoChiCoMarkerThuCongKhongCoGpsDemo",
+      "status": "passed",
+      "time_seconds": 17.935,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.BanDoVaGpsThamQuanTest#demoCaNamDiaDiemTuTrangChuHoiTruocKhiPhat",
+      "status": "passed",
+      "time_seconds": 30.18,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.BanDoVaGpsThamQuanTest#gpsSaiSoLonVanHienDangTheoDoiVaKhongMoLoiMoi",
+      "status": "passed",
+      "time_seconds": 2.429,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.BanDoVaGpsThamQuanTest#moChiTietThuongKhongTuDocVaKhoiHuongDanNamDuoiMenu",
+      "status": "passed",
+      "time_seconds": 4.042,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.BanDoVaGpsThamQuanTest#roiTrangChuKhiDangHoiKhongTuPhatLai",
+      "status": "passed",
+      "time_seconds": 12.943,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.BanDoVaGpsThamQuanTest#welcomeBatDauMoTrangChuVaKhoiDongYeuCauViTri",
+      "status": "passed",
+      "time_seconds": 4.769,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.CaNhanVaDieuHuongTest#doiMatKhauCanMatKhauCuVaCapMaKhoiPhucMoi",
+      "status": "passed",
+      "time_seconds": 30.613,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.CaNhanVaDieuHuongTest#khachDangNhapTuCaNhanVaDangXuatGiuYeuThich",
+      "status": "passed",
+      "time_seconds": 12.361,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.CaNhanVaDieuHuongTest#namTabDungChungMenuVaMoManHinhThat",
+      "status": "passed",
+      "time_seconds": 15.478,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.CaNhanVaDieuHuongTest#suaHoSoKiemTraEmailVaLuuQuaLanMoLai",
+      "status": "passed",
+      "time_seconds": 11.451,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.GiaoDienBaoToanTest#chupChiTietVaThuVienAnhSauKhiTachSlider",
+      "status": "passed",
+      "time_seconds": 4.839,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.GiaoDienBaoToanTest#chupNamTourTabBannerToanManHinhVaTrinhNghe",
+      "status": "passed",
+      "time_seconds": 44.292,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.KhoDuLieuConDaoTest#cauHinhAutoDocDuLieuChungVaKiemTraQuyenTaiLucGhi",
+      "status": "passed",
+      "time_seconds": 0.469,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.KhoDuLieuConDaoTest#nangCapBayDiemCuKhongMatBangKhacVaKhongTrungKhiChayLai",
+      "status": "passed",
+      "time_seconds": 0.031,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.KhoLichSuTest#chuanHoaCheDoVaTuChoiAutoSaiCapDiaDiem",
+      "status": "passed",
+      "time_seconds": 0.134,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.KhoLichSuTest#dungChuSoHuuThuTuThoiGianVaKhongTrungCallback",
+      "status": "passed",
+      "time_seconds": 0.161,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.KhoLichSuTest#tuChoiDuLieuKhongHopLeVaTaiKhoanKhongTonTai",
+      "status": "passed",
+      "time_seconds": 0.158,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.KhoLichSuTest#xoaRiengMotLuotVaTatCaKhongAnhHuongTaiKhoanKhac",
+      "status": "passed",
+      "time_seconds": 0.158,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.KhungNgheFlowTest#baiDaiTuaSangDoanKhacVaRoiTrangDungAmThanh",
+      "status": "passed",
+      "time_seconds": 15.374,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.KhungNgheFlowTest#chonSoThuCongMoDungNoiDungAnhVaDongTrenCaNamTour",
+      "status": "passed",
+      "time_seconds": 38.842,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.KhungNgheFlowTest#tuaAmThanhThatTamDungTiepTucDungVaXoaCacheKhiDong",
+      "status": "passed",
+      "time_seconds": 10.358,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#callbackCuVaLuotDaHuyKhongDuocGhi",
+      "status": "passed",
+      "time_seconds": 13.013,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#chiTietNamDiaDiemMoDungBaiVaAnhChuaPhatKhongGhiLichSu",
+      "status": "passed",
+      "time_seconds": 21.521,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#chiTietNgheThuCongTamDungTuaNgheLaiVaGhiLichSuTongQuan",
+      "status": "passed",
+      "time_seconds": 25.196,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#chiTietTuViTriGiuCheDoGpsDemoVaKhongTuPhatLaiKhiXoay",
+      "status": "passed",
+      "time_seconds": 26.636,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#intentMoLaiDuNamNoiVaDiemThanhPhanKhongTuPhat",
+      "status": "passed",
+      "time_seconds": 10.858,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#khachMoTuTrangChuDangNhapVaXemTrangThaiRong",
+      "status": "passed",
+      "time_seconds": 17.644,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#khongGhiLucChuanBiKhongGhiTrungVaKhongGanLuotKhachChoTaiKhoanMoi",
+      "status": "passed",
+      "time_seconds": 10.714,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#mediaPlayerBatDauMoiGhiPauseTiepTucKhongTrungDungNgheLaiTaoLuotMoi",
+      "status": "passed",
+      "time_seconds": 18.576,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#moDungDiemXoaCoXacNhanVaKhongMatYeuThichHayLichSuNguoiKhac",
+      "status": "passed",
+      "time_seconds": 16.839,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#moLichSuTuCaNhanVaKhamPhaRongQuayVeTimKiemTrangChu",
+      "status": "passed",
+      "time_seconds": 13.786,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#nhanCheDoDongBoVaXoaMotLuotCoXacNhan",
+      "status": "passed",
+      "time_seconds": 14.439,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.LichSuFlowTest#ttsBaTourGhiDungDiemVaPhanBietGpsVoiDemo",
+      "status": "passed",
+      "time_seconds": 34.402,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.MarkerConDaoTest#chamDu18MarkerMoDungNoiDungKhongNhanSoSoDoLamId",
+      "status": "passed",
+      "time_seconds": 3.765,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.MarkerHueTest#chonDungMuoiDiemSauKhiPhongVaKeoAnhNgang",
+      "status": "passed",
+      "time_seconds": 3.328,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.MarkerVanMieuTest#chamDung16SoTrenAnhSauPhongVaKeo",
+      "status": "passed",
+      "time_seconds": 5.451,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.NguonThongTinFlowTest#chiTietHienDuDanhSachVaMoDungDiemCuoiCuaNamDiaDiem",
+      "status": "passed",
+      "time_seconds": 17.29,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.NguonThongTinFlowTest#namTourDocBaiMoiVaMoNguonDungDiem",
+      "status": "passed",
+      "time_seconds": 19.752,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.NoiDungThamQuanTest#caiMoiDuNoiDungVaNguonTrongSQLite",
+      "status": "passed",
+      "time_seconds": 0.29,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.NoiDungThamQuanTest#duNamDiaDiemTamMuoiBaDiemVaNguonChinhThuc",
+      "status": "passed",
+      "time_seconds": 0.005,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.NoiDungThamQuanTest#moLaiKhongDongBoGhiDeNoiDungDaSuaVaKhongBatBuocDuSoDiemMau",
+      "status": "passed",
+      "time_seconds": 0.506,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.SQLiteQuanTriFlowTest#adminCreatesFloorAndPointThenNewPlaceTourReadsSameData",
+      "status": "passed",
+      "time_seconds": 13.32,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.SQLiteToanVenTest#adminSetupRequiresPasswordAndCannotBeRepeatedEvenIfAdminLocked",
+      "status": "passed",
+      "time_seconds": 14.165,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.SQLiteToanVenTest#cannotDeleteReferencedPointThenCanDeleteAfterHistoryCleared",
+      "status": "passed",
+      "time_seconds": 5.716,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.SQLiteToanVenTest#freshAndReopenEnforceAllReferences",
+      "status": "passed",
+      "time_seconds": 5.611,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.SQLiteToanVenTest#generatedIdsStayAboveSeedAndAreNotReusedAfterDeletion",
+      "status": "passed",
+      "time_seconds": 5.393,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.SQLiteToanVenTest#personalDataCannotCrossSessionsOrLockedAccount",
+      "status": "passed",
+      "time_seconds": 10.782,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.SQLiteToanVenTest#sourcesUpdateWithoutReplaceAndFailureRollsBackWholeEdit",
+      "status": "passed",
+      "time_seconds": 5.558,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.SQLiteToanVenTest#upgrade15PreservesEditsAndDeletionAndArchivesOrphans",
+      "status": "passed",
+      "time_seconds": 7.417,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.SoDoThuPhongLayoutTest#gioiHanZoomTuMotDenNamLan",
+      "status": "passed",
+      "time_seconds": 0.004,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.SoDoThuPhongLayoutTest#haiNgonPhongToKhongKichHoatChonMarker",
+      "status": "passed",
+      "time_seconds": 0.031,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.SoDoThuPhongLayoutTest#zoomVaKeoVanChonDungToaDoGocVaDatLai",
+      "status": "passed",
+      "time_seconds": 0.007,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanDbMigrationTest#freshInstallContainsFiveActivePlaces",
+      "status": "passed",
+      "time_seconds": 0.236,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanDbMigrationTest#gpsPointIsScopedByDestinationAndRetainsFloorAndRadius",
+      "status": "passed",
+      "time_seconds": 0.261,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanDbMigrationTest#upgradeFromEightPreservesLegacyDestinationTablesFavoritesAndEditedGps",
+      "status": "passed",
+      "time_seconds": 0.669,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanDbMigrationTest#upgradeFromElevenAddsProfileWithoutChangingCredentialsFavoritesOrGps",
+      "status": "passed",
+      "time_seconds": 0.565,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanDbMigrationTest#upgradeFromOnePreservesAccountAndActiveFavorite",
+      "status": "passed",
+      "time_seconds": 0.388,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanDbMigrationTest#upgradeFromSixPreservesExistingPlaceAndEveryRelatedRow",
+      "status": "passed",
+      "time_seconds": 0.535,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanDbMigrationTest#upgradeFromTenKeepsHueFavoriteAndExistingGps",
+      "status": "passed",
+      "time_seconds": 0.467,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanDbMigrationTest#upgradeFromThirteenPreservesEveryHistoryRowAndConvertsModes",
+      "status": "passed",
+      "time_seconds": 0.572,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanDbMigrationTest#upgradeFromTwelveAddsHistoryAndKeepsExistingData",
+      "status": "passed",
+      "time_seconds": 0.441,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanDbMigrationTest#upgradeFromTwoDoesNotAddCategoryTwice",
+      "status": "passed",
+      "time_seconds": 0.336,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanVaYeuThichFlowTest#dangKyTuYeuThichRoiDangNhapQuayLaiDanhSachTrong",
+      "status": "passed",
+      "time_seconds": 21.579,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanVaYeuThichFlowTest#dangNhapTuChiTietTiepTucLuuVaKhongXoaDiemDaLuu",
+      "status": "passed",
+      "time_seconds": 13.182,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanVaYeuThichFlowTest#dangNhapTuWelcomeMoTrangChu",
+      "status": "passed",
+      "time_seconds": 12.092,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanVaYeuThichFlowTest#huyDangNhapKhongXemDuocYeuThich",
+      "status": "passed",
+      "time_seconds": 2.278,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanVaYeuThichFlowTest#quenMatKhauDoiMaVaDangNhapBangMatKhauMoi",
+      "status": "passed",
+      "time_seconds": 25.871,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanVaYeuThichFlowTest#welcomeCoHaiDuongVaoVaHuyDangNhapQuayVeWelcome",
+      "status": "passed",
+      "time_seconds": 3.248,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TaiKhoanVaYeuThichFlowTest#yeuThichHienHueBoLuuVaDangXuatKhongLoDanhSach",
+      "status": "passed",
+      "time_seconds": 17.797,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.ThongBaoUiTest#xacNhanDongBoNutXanhVaNoiDungTiengViet",
+      "status": "passed",
+      "time_seconds": 2.387,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TienDoNgheTest#tienDoGiuKhoaCuVaKhongGhiCheoPhienNoiDungHoacCheDo",
+      "status": "passed",
+      "time_seconds": 5.517,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TourDuLieuDongTest#diemMoiKhongSoDoHienThiVaMoDungBaiNgheSauKhiTaoLai",
+      "status": "passed",
+      "time_seconds": 15.973,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TourDuLieuDongTest#lichSuDiemTrungIdKhacDiaDiemVaDoiTenVanGiuDungLienKet",
+      "status": "passed",
+      "time_seconds": 5.467,
+      "source": "build\\refactor-android-full-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TourDungChungTest#diemConDaoKhongMarkerVanMoDungBaiThuCong",
+      "status": "passed",
+      "time_seconds": 2.507,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TourDungChungTest#hueGiuViewVaZoomKhiChonDiemKhacCungSoDo",
+      "status": "passed",
+      "time_seconds": 2.092,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TourDungChungTest#namDiaDiemDungMotActivityGiuDungIdVaTrangThaiKhiTaoLai",
+      "status": "passed",
+      "time_seconds": 23.078,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.TourDungChungTest#ngheNhanhChiChuyenVaMoBaiSauKhiDongYKhongGiuLenhSauOnStop",
+      "status": "passed",
+      "time_seconds": 28.972,
+      "source": "build\\refactor-android-lifecycle-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.XacNhanChuyenDiemTest#dangPhatHoiTruocHuyGiuNguyenXacNhanMoiDungVaChuyenTrenBaTour",
+      "status": "passed",
+      "time_seconds": 11.309,
+      "source": "build\\refactor-android-retry-results.xml"
+    },
+    {
+      "test": "com.example.app_ck.XacNhanChuyenDiemTest#thuCongChuyenNgayRoiTrangHuyHoiThoaiKhongGiuLenhChuyenCu",
+      "status": "passed",
+      "time_seconds": 10.989,
+      "source": "build\\refactor-android-retry-results.xml"
+    }
+  ]
+}

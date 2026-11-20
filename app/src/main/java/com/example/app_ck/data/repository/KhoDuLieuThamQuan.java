@@ -2,16 +2,17 @@ package com.example.app_ck.data.repository;
 
 import com.example.app_ck.data.local.NangCapDatabase;
 import com.example.app_ck.data.model.DiemThamQuan;
+import com.example.app_ck.data.model.DuLieuTour;
 import com.example.app_ck.session.PhienDangNhap;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 /** Nguồn dữ liệu vận hành chung cho cả 5 tour; bảng tour cũ chỉ phục vụ chuyển đổi. */
@@ -84,6 +85,24 @@ public final class KhoDuLieuThamQuan {
     /** Chỉ gọi trong transaction tạo/nâng cấp. Không dùng làm đồng bộ khi mở app. */
     public static void nangCap(SQLiteDatabase db) { NangCapDatabase.chuyenDoiDuLieuThamQuan(db); }
 
+    /** Đọc dữ liệu tour trên cùng connection, không truy vấn lại danh sách cho AUTO/sơ đồ. */
+    public static DuLieuTour docTour(SQLiteDatabase db, int place) {
+        LinkedHashMap<Integer, String> tang = new LinkedHashMap<>();
+        LinkedHashMap<Integer, String> anh = new LinkedHashMap<>();
+        try (Cursor c = db.query(BANG_SO_DO, new String[]{"tang", "ten", "ten_anh"},
+                "dia_diem_id=?", new String[]{String.valueOf(place)}, null, null, "tang")) {
+            while (c.moveToNext()) {
+                tang.put(c.getInt(0), c.getString(1));
+                anh.put(c.getInt(0), c.getString(2));
+            }
+        }
+        ArrayList<DiemThamQuan> diem = danhSach(db, place);
+        for (DiemThamQuan d : diem) {
+            if (!tang.containsKey(d.tang)) tang.put(d.tang, "Khu vực " + d.tang);
+        }
+        return new DuLieuTour(KhoDiaDiem.lay(db, place), diem, tang, anh);
+    }
+
     public static ArrayList<DiemThamQuan> danhSach(SQLiteDatabase db,int place) {
         ArrayList<DiemThamQuan> ds=new ArrayList<>();
         try(Cursor c=db.query(BANG_DIEM,null,"dia_diem_id=?",new String[]{""+place},null,null,"thu_tu,id")) {
@@ -140,7 +159,7 @@ public final class KhoDuLieuThamQuan {
             ContentValues v=new ContentValues();
             boolean tonTai=false;
             try (Cursor c=db.query(BANG_DIEM,null,"dia_diem_id=? AND id=?",new String[]{""+place,""+id},null,null,null)) {
-                if (c.moveToFirst()) { DatabaseUtils.cursorRowToContentValues(c,v); tonTai=true; }
+                if (c.moveToFirst()) { docDongGiuKieu(c,v); tonTai=true; }
             }
             v.putAll(thayDoi); v.put("dia_diem_id",place); v.put("id",id);
             if (!v.containsKey("tang")) v.put("tang",0);
@@ -181,7 +200,7 @@ public final class KhoDuLieuThamQuan {
             if (id<0 || thayDoi==null || thayDoi.size()==0 || !cot.containsAll(thayDoi.keySet())) return false;
             ContentValues v=new ContentValues(); boolean tonTai=false;
             try (Cursor c=db.query("dia_diem",null,"id=?",new String[]{""+id},null,null,null)) {
-                if (c.moveToFirst()) { DatabaseUtils.cursorRowToContentValues(c,v); tonTai=true; }
+                if (c.moveToFirst()) { docDongGiuKieu(c,v); tonTai=true; }
             }
             v.putAll(thayDoi); v.put("id",id);
             if (v.getAsString("ten")==null || v.getAsString("ten").trim().isEmpty()
@@ -254,6 +273,20 @@ public final class KhoDuLieuThamQuan {
     private static long dem(SQLiteDatabase db,String sql,String[] a) {
         try (Cursor c=db.rawQuery(sql,a)) { c.moveToFirst(); return c.getLong(0); }
     }
+    /** Giữ nguyên REAL khi sửa một phần bản ghi; getString() có thể làm tròn GPS/X/Y. */
+    private static void docDongGiuKieu(Cursor cursor, ContentValues values) {
+        for (int i = 0; i < cursor.getColumnCount(); i++) {
+            String column = cursor.getColumnName(i);
+            switch (cursor.getType(i)) {
+                case Cursor.FIELD_TYPE_NULL: values.putNull(column); break;
+                case Cursor.FIELD_TYPE_INTEGER: values.put(column, cursor.getLong(i)); break;
+                case Cursor.FIELD_TYPE_FLOAT: values.put(column, cursor.getDouble(i)); break;
+                case Cursor.FIELD_TYPE_BLOB: values.put(column, cursor.getBlob(i)); break;
+                default: values.put(column, cursor.getString(i)); break;
+            }
+        }
+    }
+
     private static boolean soHopLe(ContentValues v,String cot,double min,double max) {
         Double n=v.getAsDouble(cot); return n!=null && Double.isFinite(n) && n>=min && n<=max;
     }

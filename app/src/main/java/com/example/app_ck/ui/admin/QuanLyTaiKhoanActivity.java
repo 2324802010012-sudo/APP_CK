@@ -24,6 +24,8 @@ import com.example.app_ck.data.model.HoSoTaiKhoan;
 import com.example.app_ck.data.repository.KhoQuanTriTaiKhoan;
 import com.example.app_ck.session.PhienDangNhap;
 import com.example.app_ck.ui.common.BaseActivity;
+import com.example.app_ck.util.VanBanTimKiem;
+import android.widget.ScrollView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.SimpleDateFormat;
@@ -36,9 +38,10 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
     private static final String TAG = "QuanLyTaiKhoan";
 
     private static final int XANH = Color.rgb(44, 115, 81);
-    private static final int CHU = Color.rgb(32, 56, 42);
-    private static final int PHU = Color.rgb(113, 130, 119);
-    private static final int VIEN = Color.rgb(232, 237, 232);
+    private static final int CHU = Color.parseColor("#182D22");
+    private static final int PHU = Color.parseColor("#687B6E");
+    private static final int VIEN = Color.parseColor("#DFE9E1");
+    private final ArrayList<HoSoTaiKhoan> duLieu = new ArrayList<>();
 
     private LinearLayout danhSach;
     private TextView tongSo;
@@ -56,7 +59,9 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
         }
 
         setContentView(R.layout.activity_quan_ly_tai_khoan);
+        AdminGiaoDien.apDung(this);
         apDungKhoangTrongHeThong();
+        AdminGiaoDien.hoTroBanPhim(this);
 
         danhSach = findViewById(R.id.qltkDanhSach);
         tongSo = findViewById(R.id.qltkTongSo);
@@ -86,7 +91,7 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
                         s.length() > 0 ? View.VISIBLE : View.GONE
                 );
 
-                taiDanhSach();
+                veDanhSach();
             }
 
             @Override
@@ -94,7 +99,6 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
             }
         });
 
-        taiDanhSach();
     }
 
     @Override
@@ -133,28 +137,15 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
     private void taiDanhSach() {
         if (danhSach == null) return;
 
-        danhSach.removeAllViews();
-
-        String tuKhoa = timKiem.getText().toString().trim();
-
         try (AppDatabase helper = new AppDatabase(this)) {
 
             SQLiteDatabase db = helper.getReadableDatabase();
 
-            ArrayList<HoSoTaiKhoan> ds =
-                    KhoQuanTriTaiKhoan.danhSach(
-                            this, db, tuKhoa
-                    );
-
-            tongSo.setText(ds.size() + " tài khoản");
-
-            thongBaoTrong.setVisibility(
-                    ds.isEmpty() ? View.VISIBLE : View.GONE
-            );
-
-            for (HoSoTaiKhoan taiKhoan : ds) {
-                themDongTaiKhoan(taiKhoan);
-            }
+            duLieu.clear();
+            duLieu.addAll(KhoQuanTriTaiKhoan.danhSach(this, db, ""));
+            thongBaoTrong.setOnClickListener(null);
+            thongBaoTrong.setClickable(false);
+            veDanhSach();
 
         } catch (SecurityException e) {
 
@@ -164,11 +155,14 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
         } catch (Exception e) {
 
             Log.e(TAG, "Không tải được tài khoản", e);
+            duLieu.clear();
             tongSo.setText("Không tải được");
+            danhSach.removeAllViews();
             thongBaoTrong.setText(
-                    "Có lỗi khi tải danh sách tài khoản."
+                    "Không tải được tài khoản. Chạm để thử lại."
             );
             thongBaoTrong.setVisibility(View.VISIBLE);
+            thongBaoTrong.setOnClickListener(v -> taiDanhSach());
 
             Toast.makeText(
                     this,
@@ -176,6 +170,27 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
                     Toast.LENGTH_SHORT
             ).show();
         }
+    }
+
+    private void veDanhSach() {
+        if (!coQuyenAdmin()) { finish(); return; }
+        ScrollView scroll = findViewById(R.id.qltkCuonDanhSach);
+        int viTri = scroll.getScrollY();
+        danhSach.removeAllViews();
+        String key = VanBanTimKiem.chuanHoa(timKiem.getText().toString());
+        int count = 0;
+        // Cùng ba trường mà repository cho phép; ký tự %, _ vẫn được tìm như văn bản.
+        for (HoSoTaiKhoan tk : duLieu) {
+            if (!VanBanTimKiem.chuanHoa(tk.tenDangNhap).contains(key)
+                    && !VanBanTimKiem.chuanHoa(tk.hoTen).contains(key)
+                    && !VanBanTimKiem.chuanHoa(tk.email).contains(key)) continue;
+            themDongTaiKhoan(tk);
+            count++;
+        }
+        tongSo.setText(key.isEmpty() ? count + " tài khoản" : count + "/" + duLieu.size() + " tài khoản phù hợp");
+        thongBaoTrong.setText(duLieu.isEmpty() ? "Chưa có tài khoản" : "Không tìm thấy tài khoản phù hợp");
+        thongBaoTrong.setVisibility(count == 0 ? View.VISIBLE : View.GONE);
+        scroll.post(() -> scroll.scrollTo(0, viTri));
     }
 
     // TAO MOT DONG TAI KHOAN
@@ -190,6 +205,7 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
         ));
         dong.setClickable(true);
         dong.setFocusable(true);
+        AdminGiaoDien.hieuUngNhan(dong);
         dong.setContentDescription(
                 "Xem chi tiết tài khoản " + tk.tenDangNhap
         );
@@ -207,7 +223,7 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
         );
         avatar.setGravity(Gravity.CENTER);
         avatar.setBackground(
-                nen(Color.rgb(234, 243, 235), 14, 0)
+                nen(Color.parseColor("#EDF5EC"), 14, 0)
         );
 
         dong.addView(
@@ -238,14 +254,14 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
         boolean active = tk.hoatDong();
 
         String trangThai =
-                (admin ? "ADMIN" : "USER")
+                (admin ? "Admin" : "Khách hàng")
                         + " · "
                         + (active ? "Đang hoạt động" : "Đã khóa");
 
         TextView trangThaiView = text(
                 trangThai,
                 12,
-                active ? XANH : Color.rgb(167, 76, 61),
+                active ? XANH : Color.parseColor("#B5534A"),
                 false
         );
         trangThaiView.setPadding(0, dp(5), 0, 0);
@@ -258,10 +274,10 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
                 )
         );
 
-        TextView muiTen = text(
-                "›", 26, PHU, false
-        );
-        dong.addView(muiTen);
+        android.widget.ImageView muiTen = new android.widget.ImageView(this);
+        muiTen.setImageResource(R.drawable.ui_ic_chevron);
+        muiTen.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        dong.addView(muiTen, new LinearLayout.LayoutParams(dp(20), dp(20)));
 
         dong.setOnClickListener(v ->
                 xemChiTiet(tk.id)
@@ -300,28 +316,16 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
         long idHienTai = PhienDangNhap.id(this);
         boolean laChinhMinh = tk.id == idHienTai;
 
-        String ngayTao = "Chưa có thông tin";
-        if (tk.ngayTao > 0) {
-            long millis = tk.ngayTao < 100000000000L
-                    ? tk.ngayTao * 1000L
-                    : tk.ngayTao;
-            ngayTao = new SimpleDateFormat(
-                    "dd/MM/yyyy HH:mm",
-                    new Locale("vi", "VN")
-            ).format(new Date(millis));
-        }
-
         String noiDung =
-                "Tên đăng nhập: " + anNull(tk.tenDangNhap)
-                        + "\n\nHọ tên: " + anNull(tk.hoTen)
-                        + "\n\nEmail: " + anNull(tk.email)
-                        + "\n\nVai trò: " + tk.vaiTro
+                "Họ tên: " + anNull(tk.hoTen)
+                        + "\n\nTên đăng nhập: " + anNull(tk.tenDangNhap)
+                        + "\n\nVai trò: " + (HoSoTaiKhoan.ADMIN.equals(tk.vaiTro) ? "Admin" : "Khách hàng")
                         + "\n\nTrạng thái: "
                         + (dangKhoa ? "Đã khóa" : "Đang hoạt động")
-                        + "\n\nNgày tạo: " + ngayTao;
+                        + (laChinhMinh ? "\n\nĐây là tài khoản của bạn, không thể tự khóa." : "");
 
         MaterialAlertDialogBuilder builder =
-                new MaterialAlertDialogBuilder(this)
+                    new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Admin_Dialog)
                         .setTitle("Chi tiết tài khoản")
                         .setMessage(noiDung)
                         .setNegativeButton("Đóng", null);
@@ -337,18 +341,9 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
                             )
             );
 
-        } else {
-
-            builder.setNeutralButton(
-                    "Tài khoản của bạn",
-                    (dialog, which) ->
-                            thongBao(
-                                    "Không thể tự khóa tài khoản quản trị"
-                            )
-            );
         }
-
-        builder.show();
+        AlertDialog detail = builder.show();
+        if (!laChinhMinh && !dangKhoa) AdminGiaoDien.toMauNguyHiem(detail);
     }
 
     // XAC NHAN THAY DOI TRANG THAI
@@ -357,7 +352,7 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
             boolean khoa
     ) {
 
-        new MaterialAlertDialogBuilder(this)
+        AlertDialog confirm = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Admin_Dialog)
                 .setTitle(
                         khoa ? "Khóa tài khoản?" : "Mở khóa tài khoản?"
                 )
@@ -373,6 +368,7 @@ public class QuanLyTaiKhoanActivity extends BaseActivity {
                                 doiTrangThai(taiKhoanId, khoa)
                 )
                 .show();
+        if (khoa) AdminGiaoDien.toMauNguyHiem(confirm);
     }
 
     // GHI THAY DOI VAO SQLITE

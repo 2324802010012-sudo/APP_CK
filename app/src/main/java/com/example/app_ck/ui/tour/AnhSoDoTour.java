@@ -123,6 +123,11 @@ public final class AnhSoDoTour {
             }
         }
 
+        themSoDo(activity, khung, place, tenAnh, markers, idDangChon, chon);
+    }
+
+    static void themSoDo(Activity activity, LinearLayout khung, int place, String tenAnh,
+                         List<DiemThamQuan> markers, int idDangChon, ChonDiem chon) {
         TextView nhan = new TextView(activity);
 
         nhan.setText("Sơ đồ tham quan");
@@ -266,6 +271,20 @@ public final class AnhSoDoTour {
     // VIEW VE SO DO
     // =====================================================
 
+    static void giaiPhong(View view) {
+        if (view instanceof SoDoTrongTrang) {
+            SoDoTrongTrang soDo = (SoDoTrongTrang) view;
+            Bitmap anh = soDo.anh;
+            soDo.anh = null;
+            if (anh != null && !anh.isRecycled()) anh.recycle();
+        } else if (view instanceof SoDoHueView) {
+            ((SoDoHueView) view).giaiPhongAnh();
+        } else if (view instanceof ViewGroup) {
+            ViewGroup nhom = (ViewGroup) view;
+            for (int i = 0; i < nhom.getChildCount(); i++) giaiPhong(nhom.getChildAt(i));
+        }
+    }
+
     private static final class SoDoTrongTrang extends View {
 
         private final Paint paint = new Paint(
@@ -279,7 +298,7 @@ public final class AnhSoDoTour {
 
         private final ChonDiem chon;
 
-        private final Bitmap anh;
+        private Bitmap anh;
 
         private final GestureDetector cuChi;
 
@@ -329,6 +348,9 @@ public final class AnhSoDoTour {
                         }
                     }
             );
+            // Sơ đồ chỉ xử lý chạm đơn. Listener double-tap mặc định có thể nuốt
+            // lần chạm vào marker kế tiếp khi hai điểm gần nhau được chọn nhanh.
+            cuChi.setOnDoubleTapListener(null);
         }
 
         private float layZoom() {
@@ -479,6 +501,7 @@ public final class AnhSoDoTour {
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
+            if (anh == null || anh.isRecycled()) return false;
 
             return cuChi.onTouchEvent(event)
                     || event.getAction()

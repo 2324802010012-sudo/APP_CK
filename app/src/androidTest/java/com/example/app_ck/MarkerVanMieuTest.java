@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class MarkerVanMieuTest {
     private View tim(View v) {
-        if("Sơ đồ tham quan có Marker tương tác".contentEquals(
+        if("Sơ đồ tham quan có marker tương tác".contentEquals(
                 v.getContentDescription()==null ? "" : v.getContentDescription())) return v;
         if(v instanceof ViewGroup) for(int i=0;i<((ViewGroup)v).getChildCount();i++) {
             View k=tim(((ViewGroup)v).getChildAt(i));if(k!=null)return k;

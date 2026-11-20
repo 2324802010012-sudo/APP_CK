@@ -46,7 +46,7 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.text.Normalizer;
+import static com.example.app_ck.util.VanBanTimKiem.chuanHoa;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -1089,25 +1089,7 @@ public class BanDoActivity extends BaseActivity {
         );
     }
 
-    private String chuanHoa(String noiDung) {
 
-        if (noiDung == null) {
-            return "";
-        }
-
-        String chuoi = Normalizer.normalize(
-                noiDung.toLowerCase(
-                        Locale.ROOT
-                ),
-                Normalizer.Form.NFD
-        );
-
-        return chuoi
-                .replaceAll("\\p{M}+", "")
-                .replace('đ', 'd')
-                .trim()
-                .replaceAll("\\s+", " ");
-    }
 
     // =================================================
     // 16. QUYEN GPS

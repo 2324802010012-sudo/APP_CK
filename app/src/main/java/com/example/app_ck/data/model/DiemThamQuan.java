@@ -30,4 +30,9 @@ public final class DiemThamQuan {
         int i=c.getColumnIndexOrThrow(ten); return c.isNull(i)?Double.NaN:c.getDouble(i);
     }
     public boolean coMarker() { return Double.isFinite(x)&&Double.isFinite(y)&&x>=0&&x<=1&&y>=0&&y<=1; }
+
+    public String baiThuyetMinh() {
+        String bai = noiDung == null || noiDung.trim().isEmpty() ? moTa : noiDung;
+        return bai == null ? "" : bai;
+    }
 }

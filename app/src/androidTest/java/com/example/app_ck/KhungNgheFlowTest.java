@@ -80,6 +80,8 @@ public class KhungNgheFlowTest {
                 a.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 a.findViewById(R.id.tqNutTiep).performClick();
                 expected.set(((TextView)a.findViewById(R.id.tqTenKhuVuc)).getText().toString());
+                assertNull("Chọn điểm không tự mở/phát trình nghe",truong(a,"khungNghe"));
+                a.moKhungThuyetMinh(false);
                 Dialog d=(Dialog)truong(truong(a,"khungNghe"),"dialog");
                 assertTrue(d.isShowing());
                 assertEquals(expected.get(),((TextView)d.findViewById(R.id.ngheTenDiem)).getText().toString());

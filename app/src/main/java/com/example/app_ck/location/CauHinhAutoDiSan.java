@@ -1,9 +1,10 @@
 package com.example.app_ck.location;
 
 import com.example.app_ck.data.model.DiemThamQuan;
+import com.example.app_ck.data.model.DiaDiem;
+import com.example.app_ck.data.repository.KhoDiaDiem;
 import com.example.app_ck.data.repository.KhoDuLieuThamQuan;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,13 +40,14 @@ public final class CauHinhAutoDiSan {
 
     /** Cấu hình vận hành đọc từ SQLite; các hàm hue/vanMieu chỉ dùng để seed. */
     public static CauHinhAutoDiSan tuSQLite(SQLiteDatabase db, int diaDiem) {
-        String ten = "Địa điểm tham quan", anh = "";
-        try (Cursor c = db.rawQuery("SELECT ten,ten_anh FROM dia_diem WHERE id=?",
-                new String[]{String.valueOf(diaDiem)})) {
-            if (c.moveToFirst()) { ten = c.getString(0); anh = c.getString(1); }
-        }
+        return tuDuLieu(KhoDiaDiem.lay(db, diaDiem), KhoDuLieuThamQuan.danhSach(db, diaDiem));
+    }
+
+    public static CauHinhAutoDiSan tuDuLieu(DiaDiem diaDiem, List<DiemThamQuan> cacDiem) {
+        String ten = diaDiem == null ? "Địa điểm tham quan" : diaDiem.ten;
+        String anh = diaDiem == null ? "" : diaDiem.tenAnh;
         List<Diem> ds = new ArrayList<>();
-        for (DiemThamQuan d : KhoDuLieuThamQuan.danhSach(db, diaDiem)) {
+        for (DiemThamQuan d : cacDiem) {
             ds.add(new Diem(d.id, d.ten, d.choPhepAuto, d.viDo, d.kinhDo, d.banKinh, d.nguonGps));
         }
         return new CauHinhAutoDiSan(ten, anh == null ? "" : anh, ds);

@@ -1,17 +1,21 @@
 package com.example.app_ck.ui.admin;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,39 +37,54 @@ import com.example.app_ck.ui.common.AnhDiaDiem;
 import com.example.app_ck.ui.common.BaseActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class QuanLyDiaDiemActivity extends BaseActivity {
 
+    private static final String TAG = "QuanLyDiaDiem";
+
+    private static final int MAU_CHU =
+            Color.parseColor("#182D22");
+
+    private static final int MAU_PHU =
+            Color.parseColor("#687B6E");
+
+    private static final int MAU_XANH =
+            Color.parseColor("#2C7351");
+
+    // Danh sach
     private LinearLayout danhSach;
     private EditText timKiem;
     private TextView tong, trong;
+    private TextView nutXoaTimKiem, nutXoaLoc;
 
     private ArrayList<DiaDiem> duLieu = new ArrayList<>();
 
+    // Hai man hinh trong cung Activity
     private View manDanhSach, manBieuMau;
 
+    // Bieu mau
     private EditText ten, diaChi, moTa;
     private EditText viDo, kinhDo;
     private EditText tenNguon, urlNguon;
-
-    // O nhap thu cong ten anh drawable
     private EditText tenAnhDrawable;
 
     private Spinner danhMuc;
     private ImageView anh;
 
-    // Anh moi chon tu dien thoai
+    // Anh moi chon tu thiet bi
     private Uri anhMoi;
 
-    // Ten anh da luu trong SQLite
+    // Anh dang luu trong SQLite
     private String anhHienTai = "";
 
+    // -1: them moi, >= 0: chinh sua
     private int id = -1;
 
     // =====================================================
-    // CHON ANH TU DIEN THOAI
+    // CHON ANH TU THIET BI
     // =====================================================
 
     private final ActivityResultLauncher<String> layAnh =
@@ -76,7 +95,6 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
                             return;
                         }
 
-                        // Xoa ten drawable de tranh nham nguon
                         if (tenAnhDrawable != null) {
                             tenAnhDrawable.setText("");
                         }
@@ -87,12 +105,6 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
                         thongBao("Đã chọn ảnh từ điện thoại");
                     }
             );
-
-    private int dp(int value) {
-        return Math.round(
-                value * getResources().getDisplayMetrics().density
-        );
-    }
 
     // =====================================================
     // KHOI TAO
@@ -110,9 +122,37 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
         setContentView(R.layout.activity_quan_ly_dia_diem);
         apDungKhoangTrongHeThong();
 
+        anhXaGiaoDien();
+        ganSuKien();
+
+        // Giu lop giao dien dung chung da co trong du an
+        AdminGiaoDien.apDung(this);
+
+        cauHinhAnhDrawable();
+        taiDuLieu();
+    }
+
+    private void anhXaGiaoDien() {
+
+        // Man hinh
         manDanhSach = findViewById(R.id.qlddManDanhSach);
         manBieuMau = findViewById(R.id.qlddManBieuMau);
 
+        // Danh sach
+        danhSach = findViewById(R.id.qlddDanhSach);
+        timKiem = findViewById(R.id.qlddTimKiem);
+        tong = findViewById(R.id.qlddTongSo);
+        trong = findViewById(R.id.qlddTrong);
+
+        nutXoaTimKiem = findViewById(
+                R.id.qlddXoaTimKiem
+        );
+
+        nutXoaLoc = findViewById(
+                R.id.qlddXoaLoc
+        );
+
+        // Bieu mau
         ten = findViewById(R.id.ddFormTen);
         diaChi = findViewById(R.id.ddFormDiaChi);
         moTa = findViewById(R.id.ddFormMoTa);
@@ -120,74 +160,106 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
         viDo = findViewById(R.id.ddFormViDo);
         kinhDo = findViewById(R.id.ddFormKinhDo);
 
-        danhMuc = findViewById(R.id.ddFormDanhMuc);
-
-        anh = findViewById(R.id.ddFormAnh);
-
-        // O nhap moi trong XML
-        tenAnhDrawable = findViewById(R.id.ddFormTenAnh);
-
         tenNguon = findViewById(R.id.ddFormTenNguon);
         urlNguon = findViewById(R.id.ddFormUrlNguon);
 
-        // Nut quay lai bieu mau
-        findViewById(R.id.ddFormQuayLai)
-                .setOnClickListener(v -> dongBieuMau());
+        danhMuc = findViewById(R.id.ddFormDanhMuc);
+        anh = findViewById(R.id.ddFormAnh);
 
-        // Nut chon anh tu dien thoai
-        findViewById(R.id.ddFormChonAnh)
-                .setOnClickListener(
-                        v -> layAnh.launch("image/*")
-                );
+        tenAnhDrawable = findViewById(
+                R.id.ddFormTenAnh
+        );
+    }
 
-        // Nut luu
-        findViewById(R.id.ddFormLuu)
-                .setOnClickListener(v -> luu());
+    private void ganSuKien() {
 
-        // Nut xoa
-        findViewById(R.id.ddFormXoa)
-                .setOnClickListener(v -> xacNhanXoa());
-
-        // Danh sach dia diem
-        danhSach = findViewById(R.id.qlddDanhSach);
-        timKiem = findViewById(R.id.qlddTimKiem);
-        tong = findViewById(R.id.qlddTongSo);
-        trong = findViewById(R.id.qlddTrong);
-
+        // Dieu huong
         findViewById(R.id.qlddQuayLai)
                 .setOnClickListener(v -> finish());
 
         findViewById(R.id.qlddThemMoi)
                 .setOnClickListener(v -> moBieuMau(-1));
 
-        // Tim kiem
+        // Bieu mau
+        findViewById(R.id.ddFormQuayLai)
+                .setOnClickListener(v -> dongBieuMau());
+
+        findViewById(R.id.ddFormChonAnh)
+                .setOnClickListener(
+                        v -> layAnh.launch("image/*")
+                );
+
+        findViewById(R.id.ddFormLuu)
+                .setOnClickListener(v -> luu());
+
+        findViewById(R.id.ddFormXoa)
+                .setOnClickListener(v -> xacNhanXoa());
+
+        // Xoa tu khoa
+        nutXoaTimKiem.setOnClickListener(
+                v -> timKiem.setText("")
+        );
+
+        nutXoaLoc.setOnClickListener(
+                v -> timKiem.setText("")
+        );
+
+        // Tim kiem theo thoi gian thuc
         timKiem.addTextChangedListener(new TextWatcher() {
+
             @Override
             public void beforeTextChanged(
                     CharSequence s,
                     int start,
                     int count,
-                    int after
-            ) {}
+                    int after) {
+            }
 
             @Override
             public void onTextChanged(
                     CharSequence s,
                     int start,
                     int before,
-                    int count
-            ) {
+                    int count) {
+
+                nutXoaTimKiem.setVisibility(
+                        s.length() > 0
+                                ? View.VISIBLE
+                                : View.GONE
+                );
+
                 hienThi();
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
-        // Xu ly nhap ten anh drawable
-        cauHinhAnhDrawable();
+        // An ban phim khi nhan Done
+        timKiem.setOnEditorActionListener(
+                (view, actionId, event) -> {
 
-        taiDuLieu();
+                    if (actionId != EditorInfo.IME_ACTION_DONE) {
+                        return false;
+                    }
+
+                    InputMethodManager imm =
+                            (InputMethodManager)
+                                    getSystemService(
+                                            Context.INPUT_METHOD_SERVICE
+                                    );
+
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(
+                                timKiem.getWindowToken(), 0
+                        );
+                    }
+
+                    timKiem.clearFocus();
+                    return true;
+                }
+        );
     }
 
     @Override
@@ -209,157 +281,314 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     // =====================================================
 
     private boolean coQuyen() {
+
         try (AppDatabase helper = new AppDatabase(this)) {
+
             PhienDangNhap.yeuCauQuanTri(
                     this,
                     helper.getReadableDatabase()
             );
+
             return true;
+
         } catch (Exception e) {
+            Log.e(TAG, "Không xác minh được quyền Admin", e);
             return false;
         }
     }
 
     // =====================================================
-    // DOC DANH SACH DIA DIEM
+    // TAI DU LIEU SQLITE
     // =====================================================
 
     private void taiDuLieu() {
-        try (AppDatabase db = new AppDatabase(this)) {
+
+        try (AppDatabase helper = new AppDatabase(this)) {
+
             PhienDangNhap.yeuCauQuanTri(
                     this,
-                    db.getReadableDatabase()
+                    helper.getReadableDatabase()
             );
 
-            duLieu = db.danhSachDiaDiem();
+            duLieu = helper.danhSachDiaDiem();
+
             hienThi();
 
         } catch (Exception e) {
+
+            Log.e(TAG, "Không tải được địa điểm", e);
             thongBao("Không tải được danh sách địa điểm");
         }
     }
 
+    // =====================================================
+    // TIM KIEM KHONG DAU TIENG VIET
+    // =====================================================
+
+    private String chuanHoaTimKiem(String text) {
+
+        if (text == null) {
+            return "";
+        }
+
+        return Normalizer.normalize(
+                        text,
+                        Normalizer.Form.NFD
+                )
+                .replaceAll("\\p{M}+", "")
+                .replace('đ', 'd')
+                .replace('Đ', 'D')
+                .toLowerCase(Locale.ROOT)
+                .trim()
+                .replaceAll("\\s+", " ");
+    }
+
+    // =====================================================
+    // HIEN THI DANH SACH DIA DIEM
+    // =====================================================
+
     private void hienThi() {
-        if (danhSach == null) {
+
+        if (danhSach == null || timKiem == null) {
             return;
         }
 
         danhSach.removeAllViews();
 
-        String key = timKiem.getText()
-                .toString()
-                .trim()
-                .toLowerCase(Locale.ROOT);
+        String tuKhoa = chuanHoaTimKiem(
+                timKiem.getText().toString()
+        );
 
-        int count = 0;
+        int soKetQua = 0;
 
-        for (DiaDiem d : duLieu) {
-            String haystack = (
-                    s(d.ten) + " " +
-                            s(d.diaChi) + " " +
-                            s(d.danhMuc)
-            ).toLowerCase(Locale.ROOT);
+        for (DiaDiem diem : duLieu) {
 
-            if (!haystack.contains(key)) {
+            String noiDungTim = chuanHoaTimKiem(
+                    s(diem.ten) + " "
+                            + s(diem.diaChi) + " "
+                            + s(diem.danhMuc)
+            );
+
+            if (!noiDungTim.contains(tuKhoa)) {
                 continue;
             }
 
-            count++;
+            soKetQua++;
 
-            LinearLayout row = new LinearLayout(this);
-            row.setOrientation(LinearLayout.HORIZONTAL);
-            row.setGravity(Gravity.CENTER_VERTICAL);
-            row.setPadding(
-                    dp(14), dp(14), dp(14), dp(14)
+            // THE DIA DIEM
+            LinearLayout the = new LinearLayout(this);
+
+            the.setOrientation(LinearLayout.HORIZONTAL);
+            the.setGravity(Gravity.CENTER_VERTICAL);
+
+            the.setPadding(
+                    dp(9), dp(9), dp(12), dp(9)
             );
 
-            GradientDrawable bg = new GradientDrawable();
-            bg.setColor(Color.WHITE);
-            bg.setCornerRadius(dp(16));
-            bg.setStroke(
-                    dp(1),
-                    Color.rgb(232, 237, 232)
+            the.setMinimumHeight(dp(80));
+            the.setBackgroundResource(R.drawable.ui_card);
+            the.setClickable(true);
+            the.setFocusable(true);
+
+            the.setContentDescription(
+                    "Chỉnh sửa địa điểm " + s(diem.ten)
             );
 
-            row.setBackground(bg);
-            row.setClickable(true);
-            row.setFocusable(true);
+            // Hieu ung khi cham
+            TypedValue hieuUng = new TypedValue();
 
-            TextView icon = new TextView(this);
-            icon.setText("⌖");
-            icon.setTextSize(25);
-            icon.setTextColor(Color.rgb(44, 115, 81));
-            icon.setGravity(Gravity.CENTER);
+            if (getTheme().resolveAttribute(
+                    android.R.attr.selectableItemBackground,
+                    hieuUng,
+                    true
+            ) && hieuUng.resourceId != 0) {
 
-            row.addView(
-                    icon,
+                the.setForeground(
+                        getDrawable(hieuUng.resourceId)
+                );
+            }
+
+            // ANH DAI DIEN
+            ImageView anhDaiDien = new ImageView(this);
+
+            anhDaiDien.setScaleType(
+                    ImageView.ScaleType.CENTER_CROP
+            );
+
+            anhDaiDien.setBackgroundResource(
+                    R.drawable.ui_ct_thumb
+            );
+
+            anhDaiDien.setClipToOutline(true);
+
+            AnhDiaDiem.hien(
+                    anhDaiDien,
+                    diem.tenAnh
+            );
+
+            the.addView(
+                    anhDaiDien,
                     new LinearLayout.LayoutParams(
-                            dp(40),
-                            dp(40)
+                            dp(58), dp(58)
                     )
             );
 
-            LinearLayout info = new LinearLayout(this);
-            info.setOrientation(LinearLayout.VERTICAL);
-            info.setPadding(dp(12), 0, 0, 0);
+            // THONG TIN
+            LinearLayout thongTin =
+                    new LinearLayout(this);
 
-            TextView title = new TextView(this);
-            title.setText(s(d.ten));
-            title.setTextSize(15);
-            title.setTextColor(
-                    Color.rgb(32, 56, 42)
+            thongTin.setOrientation(
+                    LinearLayout.VERTICAL
             );
-            title.setTypeface(null, Typeface.BOLD);
 
-            TextView desc = new TextView(this);
-            desc.setText(s(d.diaChi));
-            desc.setTextSize(12);
-            desc.setTextColor(
-                    Color.rgb(113, 130, 119)
-            );
-            desc.setPadding(0, dp(5), 0, 0);
-
-            info.addView(title);
-            info.addView(desc);
-
-            row.addView(
-                    info,
+            LinearLayout.LayoutParams lpThongTin =
                     new LinearLayout.LayoutParams(
-                            0,
-                            -2,
-                            1
+                            0, -2, 1f
+                    );
+
+            lpThongTin.leftMargin = dp(11);
+            lpThongTin.rightMargin = dp(6);
+
+            the.addView(thongTin, lpThongTin);
+
+            // TEN DIA DIEM
+            TextView tenDiaDiem = new TextView(this);
+
+            tenDiaDiem.setText(s(diem.ten));
+            tenDiaDiem.setTextSize(14.5f);
+            tenDiaDiem.setTextColor(MAU_CHU);
+
+            tenDiaDiem.setTypeface(
+                    Typeface.create(
+                            "sans-serif-medium",
+                            Typeface.NORMAL
                     )
             );
 
-            TextView arrow = new TextView(this);
-            arrow.setText("›");
-            arrow.setTextSize(26);
-            arrow.setTextColor(Color.GRAY);
+            tenDiaDiem.setMaxLines(2);
 
-            row.addView(arrow);
-
-            row.setOnClickListener(
-                    v -> moBieuMau(d.id)
+            tenDiaDiem.setEllipsize(
+                    android.text.TextUtils.TruncateAt.END
             );
 
-            LinearLayout.LayoutParams lp =
+            thongTin.addView(tenDiaDiem);
+
+            // DIA CHI
+            if (!s(diem.diaChi).trim().isEmpty()) {
+
+                TextView tvDiaChi = new TextView(this);
+
+                tvDiaChi.setText(diem.diaChi);
+                tvDiaChi.setTextSize(12.5f);
+                tvDiaChi.setTextColor(MAU_PHU);
+
+                tvDiaChi.setMaxLines(2);
+
+                tvDiaChi.setEllipsize(
+                        android.text.TextUtils.TruncateAt.END
+                );
+
+                tvDiaChi.setPadding(
+                        0, dp(4), 0, 0
+                );
+
+                thongTin.addView(tvDiaChi);
+            }
+
+            // DANH MUC
+            if (!s(diem.danhMuc).trim().isEmpty()) {
+
+                TextView tvDanhMuc = new TextView(this);
+
+                tvDanhMuc.setText(diem.danhMuc);
+                tvDanhMuc.setTextSize(11.5f);
+                tvDanhMuc.setTextColor(MAU_XANH);
+
+                tvDanhMuc.setMaxLines(1);
+
+                tvDanhMuc.setEllipsize(
+                        android.text.TextUtils.TruncateAt.END
+                );
+
+                tvDanhMuc.setPadding(
+                        0, dp(4), 0, 0
+                );
+
+                thongTin.addView(tvDanhMuc);
+            }
+
+            // MUI TEN
+            ImageView muiTen = new ImageView(this);
+
+            muiTen.setImageResource(
+                    R.drawable.ui_ic_chevron
+            );
+
+            muiTen.setImportantForAccessibility(
+                    View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            );
+
+            the.addView(
+                    muiTen,
+                    new LinearLayout.LayoutParams(
+                            dp(20), dp(20)
+                    )
+            );
+
+            // MO BIEU MAU CHINH SUA
+            the.setOnClickListener(
+                    v -> moBieuMau(diem.id)
+            );
+
+            LinearLayout.LayoutParams lpThe =
                     new LinearLayout.LayoutParams(
                             -1, -2
                     );
 
-            lp.bottomMargin = dp(10);
+            lpThe.bottomMargin = dp(9);
 
-            danhSach.addView(row, lp);
+            danhSach.addView(the, lpThe);
         }
 
-        tong.setText(
-                "DANH SÁCH · " +
-                        count +
-                        " ĐỊA ĐIỂM"
-        );
+        // CAP NHAT SO LUONG
+        if (tuKhoa.isEmpty()) {
+
+            tong.setText(
+                    duLieu.size() + " địa điểm"
+            );
+
+        } else {
+
+            tong.setText(
+                    soKetQua + "/" + duLieu.size()
+                            + " địa điểm phù hợp"
+            );
+        }
+
+        // TRANG THAI RONG
+        boolean khongCoKetQua = soKetQua == 0;
 
         trong.setVisibility(
-                count == 0 ? View.VISIBLE : View.GONE
+                khongCoKetQua
+                        ? View.VISIBLE
+                        : View.GONE
+        );
+
+        if (khongCoKetQua) {
+
+            trong.setText(
+                    tuKhoa.isEmpty()
+                            ? "Chưa có địa điểm nào.\n"
+                            + "Nhấn Thêm mới để bắt đầu."
+                            : "Không tìm thấy địa điểm "
+                            + "phù hợp với từ khóa."
+            );
+        }
+
+        nutXoaLoc.setVisibility(
+                khongCoKetQua && !tuKhoa.isEmpty()
+                        ? View.VISIBLE
+                        : View.GONE
         );
     }
 
@@ -368,6 +597,7 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     // =====================================================
 
     private void moBieuMau(int idDiaDiem) {
+
         id = idDiaDiem;
 
         anhMoi = null;
@@ -383,8 +613,8 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
         viDo.setText("");
         kinhDo.setText("");
 
-        // Reset anh
         tenAnhDrawable.setText("");
+
         anh.setImageResource(
                 android.R.drawable.ic_menu_gallery
         );
@@ -414,6 +644,7 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     }
 
     private void dongBieuMau() {
+
         manBieuMau.setVisibility(View.GONE);
         manDanhSach.setVisibility(View.VISIBLE);
 
@@ -423,12 +654,14 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (
-                manBieuMau != null &&
-                        manBieuMau.getVisibility() == View.VISIBLE
-        ) {
+
+        if (manBieuMau != null
+                && manBieuMau.getVisibility() == View.VISIBLE) {
+
             dongBieuMau();
+
         } else {
+
             super.onBackPressed();
         }
     }
@@ -438,23 +671,25 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     // =====================================================
 
     private void taoDanhMuc(String hienTai) {
+
         ArrayList<String> items = new ArrayList<>();
 
         try (
                 AppDatabase helper = new AppDatabase(this);
-
-                Cursor c = helper.getReadableDatabase()
+                Cursor cursor = helper.getReadableDatabase()
                         .rawQuery(
-                                "SELECT DISTINCT TRIM(danh_muc) " +
-                                        "FROM dia_diem " +
-                                        "WHERE danh_muc IS NOT NULL " +
-                                        "AND TRIM(danh_muc)<>'' " +
-                                        "ORDER BY danh_muc COLLATE NOCASE",
+                                "SELECT DISTINCT TRIM(danh_muc) "
+                                        + "FROM dia_diem "
+                                        + "WHERE danh_muc IS NOT NULL "
+                                        + "AND TRIM(danh_muc)<>'' "
+                                        + "ORDER BY danh_muc COLLATE NOCASE",
                                 null
                         )
         ) {
-            while (c.moveToNext()) {
-                String dm = c.getString(0);
+
+            while (cursor.moveToNext()) {
+
+                String dm = cursor.getString(0);
 
                 if (!items.contains(dm)) {
                     items.add(dm);
@@ -462,22 +697,19 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
             }
 
         } catch (Exception e) {
-            android.util.Log.e(
-                    "APP_CK_DIA_DIEM",
-                    "Khong lay duoc danh muc",
-                    e
-            );
+
+            Log.e(TAG, "Không lấy được danh mục", e);
         }
 
-        if (
-                hienTai != null &&
-                        !hienTai.trim().isEmpty() &&
-                        !items.contains(hienTai)
-        ) {
+        if (hienTai != null
+                && !hienTai.trim().isEmpty()
+                && !items.contains(hienTai)) {
+
             items.add(0, hienTai);
         }
 
         if (items.isEmpty()) {
+
             items.add("Chưa có danh mục");
         }
 
@@ -494,10 +726,8 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
 
         danhMuc.setAdapter(adapter);
 
-        if (
-                hienTai != null &&
-                        items.contains(hienTai)
-        ) {
+        if (hienTai != null && items.contains(hienTai)) {
+
             danhMuc.setSelection(
                     items.indexOf(hienTai)
             );
@@ -505,10 +735,11 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     }
 
     // =====================================================
-    // CAU HINH NHAP TEN ANH DRAWABLE
+    // ANH DRAWABLE VA ANH CHON TU MAY
     // =====================================================
 
     private void cauHinhAnhDrawable() {
+
         tenAnhDrawable.addTextChangedListener(
                 new TextWatcher() {
 
@@ -517,32 +748,32 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
                             CharSequence s,
                             int start,
                             int count,
-                            int after
-                    ) {}
+                            int after) {
+                    }
 
                     @Override
                     public void onTextChanged(
                             CharSequence s,
                             int start,
                             int before,
-                            int count
-                    ) {}
+                            int count) {
+                    }
 
                     @Override
                     public void afterTextChanged(
-                            Editable editable
-                    ) {
-                        String name = editable.toString().trim();
+                            Editable editable) {
+
+                        String name =
+                                editable.toString().trim();
 
                         if (name.isEmpty()) {
                             return;
                         }
 
-                        // Neu nhap ten anh hop le,
-                        // uu tien drawable so voi anh tu may.
                         int resId = timAnhDrawable(name);
 
                         if (resId != 0) {
+
                             anhMoi = null;
                             anh.setImageResource(resId);
                         }
@@ -550,9 +781,9 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
                 }
         );
 
-        // Khi roi khoi o nhap, kiem tra va xem truoc
         tenAnhDrawable.setOnFocusChangeListener(
                 (view, hasFocus) -> {
+
                     if (!hasFocus) {
                         xemTruocAnhDrawable();
                     }
@@ -561,6 +792,7 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     }
 
     private int timAnhDrawable(String name) {
+
         if (name == null) {
             return 0;
         }
@@ -579,30 +811,35 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     }
 
     private void xemTruocAnhDrawable() {
+
         String name = value(tenAnhDrawable);
 
         if (name.isEmpty()) {
+
             if (anhMoi != null) {
+
                 anh.setImageURI(anhMoi);
+
             } else {
+
                 AnhDiaDiem.hien(anh, anhHienTai);
             }
+
             return;
         }
 
         int resId = timAnhDrawable(name);
 
         if (resId == 0) {
+
             tenAnhDrawable.setError(
                     "Không tìm thấy ảnh trong drawable"
             );
+
             return;
         }
 
-        // Xem truoc anh drawable
         anh.setImageResource(resId);
-
-        // Khong su dung anh tu dien thoai
         anhMoi = null;
 
         tenAnhDrawable.setError(null);
@@ -613,7 +850,9 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     // =====================================================
 
     private boolean taiThongTin() {
+
         try (AppDatabase db = new AppDatabase(this)) {
+
             PhienDangNhap.yeuCauQuanTri(
                     this,
                     db.getReadableDatabase()
@@ -621,14 +860,17 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
 
             DiaDiem found = null;
 
-            for (DiaDiem d : db.danhSachDiaDiem()) {
-                if (d.id == id) {
-                    found = d;
+            for (DiaDiem diem : db.danhSachDiaDiem()) {
+
+                if (diem.id == id) {
+
+                    found = diem;
                     break;
                 }
             }
 
             if (found == null) {
+
                 thongBao("Địa điểm không còn tồn tại");
                 return false;
             }
@@ -660,38 +902,41 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
 
             AnhDiaDiem.hien(anh, anhHienTai);
 
-            // Neu anh cu la drawable thi hien ten
-            // Neu anh tu dien thoai thi de trong
             if (anhHienTai.startsWith("anh_may:")) {
+
                 tenAnhDrawable.setText("");
+
             } else {
+
                 tenAnhDrawable.setText(anhHienTai);
             }
 
-            // Nguon thong tin quan tri cua dia diem
+            // DOC NGUON THONG TIN CUA DIA DIEM
             try (
-                    Cursor c = db.getReadableDatabase()
+                    Cursor cursor = db.getReadableDatabase()
                             .rawQuery(
-                                    "SELECT n.ten, n.url " +
-                                            "FROM nguon_thong_tin n " +
-                                            "JOIN bai_nguon b " +
-                                            "ON b.ma_nguon=n.ma " +
-                                            "WHERE b.dia_diem_id=? " +
-                                            "AND b.diem_id=0 " +
-                                            "AND n.ma=? LIMIT 1",
-                                    new String[] {
+                                    "SELECT n.ten, n.url "
+                                            + "FROM nguon_thong_tin n "
+                                            + "JOIN bai_nguon b "
+                                            + "ON b.ma_nguon=n.ma "
+                                            + "WHERE b.dia_diem_id=? "
+                                            + "AND b.diem_id=0 "
+                                            + "AND n.ma=? LIMIT 1",
+                                    new String[]{
                                             String.valueOf(id),
                                             "admin_dd_" + id
                                     }
                             )
             ) {
-                if (c.moveToFirst()) {
+
+                if (cursor.moveToFirst()) {
+
                     tenNguon.setText(
-                            s(c.getString(0))
+                            s(cursor.getString(0))
                     );
 
                     urlNguon.setText(
-                            s(c.getString(1))
+                            s(cursor.getString(1))
                     );
                 }
             }
@@ -699,7 +944,10 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
             return true;
 
         } catch (Exception e) {
+
+            Log.e(TAG, "Không tải được thông tin địa điểm", e);
             thongBao("Không tải được địa điểm");
+
             return false;
         }
     }
@@ -709,12 +957,15 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     // =====================================================
 
     private void luu() {
+
         String t = value(ten);
 
         if (t.isEmpty()) {
+
             ten.setError(
                     "Tên địa điểm không được để trống"
             );
+
             ten.requestFocus();
             return;
         }
@@ -722,74 +973,63 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
         double lat, lon;
 
         try {
+
             lat = Double.parseDouble(value(viDo));
             lon = Double.parseDouble(value(kinhDo));
 
         } catch (Exception e) {
+
             thongBao("Hãy chọn hoặc nhập tọa độ");
             return;
         }
 
-        if (
-                !Double.isFinite(lat) ||
-                        !Double.isFinite(lon) ||
-                        lat < -90 || lat > 90 ||
-                        lon < -180 || lon > 180
-        ) {
+        if (!Double.isFinite(lat)
+                || !Double.isFinite(lon)
+                || lat < -90 || lat > 90
+                || lon < -180 || lon > 180) {
+
             thongBao("Tọa độ không hợp lệ");
             return;
         }
 
-        if (
-                danhMuc.getSelectedItem() == null ||
-                        "Chưa có danh mục".equals(
-                                danhMuc.getSelectedItem().toString()
-                        )
-        ) {
-            thongBao(
-                    "Chưa có danh mục trong hệ thống"
-            );
+        if (danhMuc.getSelectedItem() == null
+                || "Chưa có danh mục".equals(
+                danhMuc.getSelectedItem().toString()
+        )) {
+
+            thongBao("Chưa có danh mục trong hệ thống");
             return;
         }
 
         String nguonTen = value(tenNguon);
         String nguonUrl = value(urlNguon);
 
-        if (
-                (!nguonTen.isEmpty() || !nguonUrl.isEmpty()) &&
-                        (
-                                nguonTen.isEmpty() ||
-                                        !nguonUrl.matches("(?i)^https?://.+")
-                        )
-        ) {
-            thongBao(
-                    "Nguồn cần có tên và URL hợp lệ"
-            );
+        if ((!nguonTen.isEmpty() || !nguonUrl.isEmpty())
+                && (nguonTen.isEmpty()
+                || !nguonUrl.matches("(?i)^https?://.+"))) {
+
+            thongBao("Nguồn cần có tên và URL hợp lệ");
             return;
         }
-
-        // =================================================
-        // XAC DINH NGUON ANH TRUOC KHI LUU
-        // =================================================
 
         String newName = anhHienTai;
         String tenDrawable = value(tenAnhDrawable);
 
-        // Uu tien anh dien thoai neu da chon
-        if (anhMoi != null) {
-            // Se sao chep file anh sau khi kiem tra DB
-        } else if (!tenDrawable.isEmpty()) {
+        // NEU CHON ANH TU MAY, SE SAO CHEP KHI LUU
+        if (anhMoi == null && !tenDrawable.isEmpty()) {
+
             int resId = timAnhDrawable(tenDrawable);
 
             if (resId == 0) {
+
                 tenAnhDrawable.setError(
                         "Ảnh không tồn tại trong drawable"
                 );
+
                 tenAnhDrawable.requestFocus();
                 return;
             }
 
-            // Chi luu ten khong kem jpg/png
             newName = tenDrawable;
         }
 
@@ -798,73 +1038,77 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
             SQLiteDatabase db =
                     helper.getWritableDatabase();
 
-            PhienDangNhap.yeuCauQuanTri(
-                    this,
-                    db
-            );
+            PhienDangNhap.yeuCauQuanTri(this, db);
 
             int targetId = id;
 
-            // Sao chep anh tu may vao bo nho rieng
             if (anhMoi != null) {
+
                 newName = AnhDiaDiem.luuTuMay(
-                        this,
-                        anhMoi
+                        this, anhMoi
                 );
             }
 
-            ContentValues v = new ContentValues();
+            ContentValues values = new ContentValues();
 
-            v.put("ten", t);
-            v.put("dia_chi", value(diaChi));
-
-            v.put(
+            values.put("ten", t);
+            values.put("dia_chi", value(diaChi));
+            values.put(
                     "danh_muc",
                     danhMuc.getSelectedItem().toString()
             );
 
-            v.put("mo_ta", value(moTa));
-            v.put("vi_do", lat);
-            v.put("kinh_do", lon);
-            v.put("ten_anh", newName);
+            values.put("mo_ta", value(moTa));
+            values.put("vi_do", lat);
+            values.put("kinh_do", lon);
+            values.put("ten_anh", newName);
 
-            boolean saved = KhoDuLieuThamQuan.luuKemNguon(
-                    this, db, true, targetId, 0, v, nguonTen, nguonUrl);
+            boolean saved =
+                    KhoDuLieuThamQuan.luuKemNguon(
+                            this,
+                            db,
+                            true,
+                            targetId,
+                            0,
+                            values,
+                            nguonTen,
+                            nguonUrl
+                    );
 
             if (saved) {
-                thongBao(getString(R.string.luu_dia_diem_thanh_cong));
+
+                thongBao(
+                        getString(
+                                R.string.luu_dia_diem_thanh_cong
+                        )
+                );
 
                 dongBieuMau();
                 taiDuLieu();
 
             } else {
+
                 thongBao("Không thể lưu địa điểm");
             }
 
         } catch (SecurityException e) {
+
             thongBao("Không có quyền quản trị");
             finish();
 
         } catch (Exception e) {
-            android.util.Log.e(
-                    "APP_CK_DIA_DIEM",
-                    "Khong luu duoc dia diem",
-                    e
-            );
 
+            Log.e(TAG, "Không lưu được địa điểm", e);
             thongBao("Lỗi lưu địa điểm hoặc ảnh");
         }
     }
-
-    // =====================================================
-    // LUU NGUON THONG TIN
-    // =====================================================
 
     // =====================================================
     // XOA DIA DIEM
     // =====================================================
 
     private void xacNhanXoa() {
+
         if (id < 0) {
             return;
         }
@@ -872,9 +1116,9 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Xóa địa điểm?")
                 .setMessage(
-                        "Hệ thống chỉ cho xóa khi địa điểm " +
-                                "không còn dữ liệu tham quan, " +
-                                "yêu thích, lịch sử hoặc liên kết khác."
+                        "Hệ thống chỉ cho xóa khi địa điểm "
+                                + "không còn dữ liệu tham quan, "
+                                + "yêu thích, lịch sử hoặc liên kết khác."
                 )
                 .setNegativeButton("Hủy", null)
                 .setPositiveButton(
@@ -885,6 +1129,7 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     }
 
     private void xoa() {
+
         try (AppDatabase helper = new AppDatabase(this)) {
 
             boolean ok =
@@ -895,42 +1140,55 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
                     );
 
             if (ok) {
+
                 thongBao("Đã xóa địa điểm");
 
                 dongBieuMau();
                 taiDuLieu();
 
             } else {
+
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("Không thể xóa")
                         .setMessage(
-                                "Địa điểm còn dữ liệu liên quan " +
-                                        "hoặc được hệ thống sử dụng. " +
-                                        "Không tự động xóa dữ liệu liên kết."
+                                "Địa điểm còn dữ liệu liên quan "
+                                        + "hoặc được hệ thống sử dụng. "
+                                        + "Không tự động xóa dữ liệu liên kết."
                         )
                         .setPositiveButton(
-                                "Đã hiểu",
-                                null
+                                "Đã hiểu", null
                         )
                         .show();
             }
 
         } catch (Exception e) {
+
+            Log.e(TAG, "Không xóa được địa điểm", e);
             thongBao("Lỗi xóa địa điểm");
         }
     }
 
     // =====================================================
-    // HAM HO TRO
+    // CAC HAM HO TRO
     // =====================================================
 
+    private int dp(int value) {
+
+        return Math.round(
+                value * getResources()
+                        .getDisplayMetrics().density
+        );
+    }
+
     private String value(EditText editText) {
+
         return editText.getText()
                 .toString()
                 .trim();
     }
 
     private void thongBao(String message) {
+
         Toast.makeText(
                 this,
                 message,
@@ -939,6 +1197,7 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
     }
 
     private String s(String value) {
+
         return value == null ? "" : value;
     }
 }

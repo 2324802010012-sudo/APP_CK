@@ -3,27 +3,19 @@ package com.example.app_ck.ui.place;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import com.example.app_ck.R;
@@ -31,6 +23,7 @@ import com.example.app_ck.data.local.AppDatabase;
 import com.example.app_ck.data.model.DiaDiem;
 import com.example.app_ck.data.model.DiemThamQuan;
 import com.example.app_ck.data.repository.KhoDuLieuThamQuan;
+import com.example.app_ck.data.repository.KhoDiaDiem;
 import com.example.app_ck.data.repository.KhoLichSu;
 import com.example.app_ck.session.PhienDangNhap;
 import com.example.app_ck.ui.auth.DangNhapActivity;
@@ -40,9 +33,7 @@ import com.example.app_ck.ui.common.NguonThongTin;
 import com.example.app_ck.ui.tour.DieuHuongThamQuan;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 @SuppressWarnings("deprecation")
 public class ChiTietDiaDiemActivity extends BaseActivity {
@@ -61,7 +52,6 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
     private static final int MA_DANG_NHAP_YEU_THICH = 1001;
 
-    private static final long THOI_GIAN_CHUYEN_ANH = 4000L;
 
     private static final int MAU_CHU_DAO =
             Color.parseColor("#2C7351");
@@ -79,8 +69,6 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
     private boolean choPhatTuViTri;
     private boolean dangHienThi;
-    private boolean dangChamAnh;
-    private boolean dangMoThuVien;
 
     private DiaDiem diaDiem;
 
@@ -94,37 +82,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
     // DỮ LIỆU SLIDER ẢNH
     // =====================================================
 
-    private ImageView anhBia;
-
-    private TextView demAnhBia;
-    private TextView tenAnhBia;
-
-    private final ArrayList<String> boAnh =
-            new ArrayList<>();
-
-    private final LinkedHashMap<String, String> tenCacAnh =
-            new LinkedHashMap<>();
-
-    private int viTriAnh = 0;
-
-    private final Handler henAnh =
-            new Handler(Looper.getMainLooper());
-
-    private final Runnable tuDongChuyenAnh =
-            new Runnable() {
-
-                @Override
-                public void run() {
-
-                    if (!coTheTuChuyenAnh()) {
-                        return;
-                    }
-
-                    chuyenAnhBia(1);
-
-                    batHenAnh();
-                }
-            };
+    private BoAnhDiaDiem boAnh;
 
     // =====================================================
     // KHỞI TẠO MÀN HÌNH
@@ -178,11 +136,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
     private void anhXaGiaoDien() {
 
-        anhBia = findViewById(R.id.anhChiTiet);
-
-        demAnhBia = findViewById(R.id.soLuongAnh);
-
-        tenAnhBia = findViewById(R.id.ctTenAnh);
+        boAnh = new BoAnhDiaDiem(this);
 
         nutYeuThich =
                 findViewById(R.id.nutLuuYeuThich);
@@ -235,32 +189,9 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                         moManHinhThamQuan(0)
                 );
 
-        findViewById(R.id.nutThuVien)
-                .setOnClickListener(v -> moThuVien());
-
-        demAnhBia.setOnClickListener(v -> moThuVien());
-
-        anhBia.setOnClickListener(v -> moThuVien());
-
         nutYeuThich.setOnClickListener(v -> doiYeuThich());
 
         nutTimYeuThich.setOnClickListener(v -> doiYeuThich());
-
-        // Vuốt ngang ảnh đầu trang
-
-        ganVuotAnh(
-                anhBia,
-                () -> chuyenAnhBia(-1),
-                () -> chuyenAnhBia(1),
-                () -> {
-                    dangChamAnh = true;
-                    dungHenAnh();
-                },
-                () -> {
-                    dangChamAnh = false;
-                    batHenAnh();
-                }
-        );
 
         // Đọc thêm / Thu gọn
 
@@ -303,17 +234,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
         try (AppDatabase helper = new AppDatabase(this)) {
 
-            diaDiem = null;
-
-            for (DiaDiem d : helper.danhSachDiaDiem()) {
-
-                if (d.id == viTri) {
-
-                    diaDiem = d;
-
-                    break;
-                }
-            }
+            diaDiem = KhoDiaDiem.lay(helper.getReadableDatabase(), viTri);
 
             if (diaDiem == null) {
                 return false;
@@ -392,7 +313,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                 cacDiem.size() + " điểm tham quan"
         );
 
-        capNhatBoAnh();
+        boAnh.capNhat(diaDiem, cacDiem);
 
         capNhatNutDocThem();
     }
@@ -430,318 +351,6 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                             ? View.VISIBLE
                             : View.GONE
             );
-        });
-    }
-
-    // =====================================================
-    // CHUẨN BỊ DANH SÁCH ẢNH SLIDER
-    // =====================================================
-
-    private void capNhatBoAnh() {
-
-        String anhCu = null;
-
-        if (!boAnh.isEmpty()
-                && viTriAnh >= 0
-                && viTriAnh < boAnh.size()) {
-
-            anhCu = boAnh.get(viTriAnh);
-        }
-
-        tenCacAnh.clear();
-
-        tenCacAnh.putAll(
-                layDanhSachAnhChiTiet()
-        );
-
-        boAnh.clear();
-
-        boAnh.addAll(tenCacAnh.keySet());
-
-        viTriAnh = 0;
-
-        if (anhCu != null) {
-
-            int timThay =
-                    boAnh.indexOf(anhCu);
-
-            if (timThay >= 0) {
-                viTriAnh = timThay;
-            }
-        }
-
-        hienAnhBia(false);
-
-        View nutThuVien =
-                findViewById(R.id.nutThuVien);
-
-        nutThuVien.setEnabled(!boAnh.isEmpty());
-
-        nutThuVien.setAlpha(
-                boAnh.isEmpty() ? 0.5f : 1f
-        );
-
-        batHenAnh();
-    }
-
-    // =====================================================
-    // HIỂN THỊ ẢNH BÌA
-    // =====================================================
-
-    private void hienAnhBia(boolean hieuUng) {
-
-        if (anhBia == null) {
-            return;
-        }
-
-        anhBia.animate().cancel();
-
-        anhBia.setAlpha(1f);
-
-        if (boAnh.isEmpty()) {
-
-            AnhDiaDiem.hien(
-                    anhBia,
-                    diaDiem.tenAnh
-            );
-
-            demAnhBia.setText("0 ảnh");
-
-            tenAnhBia.setText("");
-
-            return;
-        }
-
-        String maAnh =
-                boAnh.get(viTriAnh);
-
-        Bitmap bitmap =
-                docAnhChiTiet(maAnh, 1600);
-
-        if (bitmap != null) {
-
-            anhBia.setImageBitmap(bitmap);
-
-        } else {
-
-            AnhDiaDiem.hien(
-                    anhBia,
-                    maAnh
-            );
-        }
-
-        String ten =
-                tenCacAnh.get(maAnh);
-
-        anhBia.setContentDescription(ten);
-
-        // Không lặp lại tên địa điểm chính.
-        // Chỉ hiện tên khi đang xem ảnh điểm thành phần.
-
-        tenAnhBia.setText(
-                TextUtils.equals(
-                        maAnh,
-                        diaDiem.tenAnh
-                )
-                        ? ""
-                        : ten
-        );
-
-        demAnhBia.setText(
-                (viTriAnh + 1)
-                        + " / "
-                        + boAnh.size()
-        );
-
-        // Hiệu ứng xuất hiện mềm mại
-
-        if (hieuUng) {
-
-            anhBia.setAlpha(0.45f);
-
-            anhBia.animate()
-                    .alpha(1f)
-                    .setDuration(350)
-                    .start();
-        }
-    }
-
-    private void chuyenAnhBia(int huong) {
-
-        if (boAnh.size() <= 1) {
-            return;
-        }
-
-        viTriAnh =
-                (viTriAnh + huong + boAnh.size())
-                        % boAnh.size();
-
-        hienAnhBia(true);
-    }
-
-    // =====================================================
-    // TỰ ĐỘNG CHUYỂN ẢNH
-    // =====================================================
-
-    private boolean coTheTuChuyenAnh() {
-
-        return dangHienThi
-                && !dangChamAnh
-                && !dangMoThuVien
-                && !isFinishing()
-                && !isDestroyed()
-                && hasWindowFocus()
-                && boAnh.size() > 1;
-    }
-
-    private void batHenAnh() {
-
-        henAnh.removeCallbacks(tuDongChuyenAnh);
-
-        if (coTheTuChuyenAnh()) {
-
-            henAnh.postDelayed(
-                    tuDongChuyenAnh,
-                    THOI_GIAN_CHUYEN_ANH
-            );
-        }
-    }
-
-    private void dungHenAnh() {
-
-        henAnh.removeCallbacks(tuDongChuyenAnh);
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-
-        super.onWindowFocusChanged(hasFocus);
-
-        if (hasFocus) {
-
-            batHenAnh();
-
-        } else {
-
-            dungHenAnh();
-        }
-    }
-
-    // =====================================================
-    // XỬ LÝ VUỐT NGANG
-    // =====================================================
-
-    private void ganVuotAnh(
-            ImageView anh,
-            Runnable anhTruoc,
-            Runnable anhSau,
-            Runnable batDauCham,
-            Runnable ketThucCham
-    ) {
-
-        final float[] diemCham = new float[2];
-
-        int touchSlop =
-                ViewConfiguration.get(this)
-                        .getScaledTouchSlop();
-
-        anh.setOnTouchListener((v, event) -> {
-
-            switch (event.getActionMasked()) {
-
-                case MotionEvent.ACTION_DOWN:
-
-                    diemCham[0] = event.getX();
-
-                    diemCham[1] = event.getY();
-
-                    if (batDauCham != null) {
-
-                        batDauCham.run();
-                    }
-
-                    return true;
-
-                case MotionEvent.ACTION_MOVE:
-
-                    float dx =
-                            event.getX() - diemCham[0];
-
-                    float dy =
-                            event.getY() - diemCham[1];
-
-                    // Ưu tiên vuốt ngang, vẫn cho phép
-                    // ScrollView cuộn dọc bình thường.
-
-                    if (Math.abs(dx) > touchSlop
-                            && Math.abs(dx) > Math.abs(dy)
-                            && v.getParent() != null) {
-
-                        v.getParent()
-                                .requestDisallowInterceptTouchEvent(true);
-                    }
-
-                    return true;
-
-                case MotionEvent.ACTION_UP:
-
-                    float khoangX =
-                            event.getX() - diemCham[0];
-
-                    float khoangY =
-                            event.getY() - diemCham[1];
-
-                    if (Math.abs(khoangX) > dp(45)
-                            && Math.abs(khoangX)
-                            > Math.abs(khoangY)) {
-
-                        if (khoangX < 0) {
-
-                            anhSau.run();
-
-                        } else {
-
-                            anhTruoc.run();
-                        }
-
-                    } else if (Math.abs(khoangX) < touchSlop
-                            && Math.abs(khoangY) < touchSlop) {
-
-                        v.performClick();
-                    }
-
-                    if (v.getParent() != null) {
-
-                        v.getParent()
-                                .requestDisallowInterceptTouchEvent(false);
-                    }
-
-                    if (ketThucCham != null) {
-
-                        ketThucCham.run();
-                    }
-
-                    return true;
-
-                case MotionEvent.ACTION_CANCEL:
-
-                    if (v.getParent() != null) {
-
-                        v.getParent()
-                                .requestDisallowInterceptTouchEvent(false);
-                    }
-
-                    if (ketThucCham != null) {
-
-                        ketThucCham.run();
-                    }
-
-                    return true;
-
-                default:
-
-                    return true;
-            }
         });
     }
 
@@ -825,7 +434,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
         );
 
         Bitmap bitmap =
-                docAnhChiTiet(
+                boAnh.docAnhChiTiet(
                         diem.tenAnh,
                         640
                 );
@@ -954,503 +563,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
     // ĐỌC ẢNH TỪ DRAWABLE VÀ ẢNH ADMIN
     // =====================================================
 
-    private Bitmap giaiMaAnhChiTiet(
-            String tenAnh,
-            BitmapFactory.Options options
-    ) {
-
-        if (TextUtils.isEmpty(tenAnh)
-                || AnhDiaDiem.KHONG_ANH.equals(tenAnh)) {
-
-            return null;
-        }
-
-        try {
-
-            if (tenAnh.startsWith("anh_may:")) {
-
-                String tenTep =
-                        tenAnh.substring(
-                                "anh_may:".length()
-                        );
-
-                if (tenTep.isEmpty()
-                        || tenTep.contains("/")
-                        || tenTep.contains("\\")
-                        || tenTep.contains("..")) {
-
-                    return null;
-                }
-
-                File thuMuc = new File(
-                        getFilesDir(),
-                        "anh_dia_diem"
-                );
-
-                File tep =
-                        new File(thuMuc, tenTep);
-
-                if (!tep.isFile()) {
-
-                    return null;
-                }
-
-                return BitmapFactory.decodeFile(
-                        tep.getAbsolutePath(),
-                        options
-                );
-            }
-
-            int idAnh =
-                    getResources().getIdentifier(
-                            tenAnh,
-                            "drawable",
-                            getPackageName()
-                    );
-
-            if (idAnh == 0) {
-
-                return null;
-            }
-
-            return BitmapFactory.decodeResource(
-                    getResources(),
-                    idAnh,
-                    options
-            );
-
-        } catch (RuntimeException e) {
-
-            Log.e(TAG, "Không thể đọc ảnh", e);
-
-            return null;
-        }
-    }
-
-    private boolean coAnhChiTiet(String tenAnh) {
-
-        BitmapFactory.Options options =
-                new BitmapFactory.Options();
-
-        options.inJustDecodeBounds = true;
-
-        giaiMaAnhChiTiet(
-                tenAnh,
-                options
-        );
-
-        return options.outWidth > 0
-                && options.outHeight > 0;
-    }
-
-    private Bitmap docAnhChiTiet(
-            String tenAnh,
-            int kichThuoc
-    ) {
-
-        BitmapFactory.Options options =
-                new BitmapFactory.Options();
-
-        options.inScaled = false;
-
-        options.inJustDecodeBounds = true;
-
-        giaiMaAnhChiTiet(
-                tenAnh,
-                options
-        );
-
-        if (options.outWidth <= 0
-                || options.outHeight <= 0) {
-
-            return null;
-        }
-
-        options.inSampleSize = 1;
-
-        int kichThuocGoc = Math.max(
-                options.outWidth,
-                options.outHeight
-        );
-
-        while (kichThuocGoc / options.inSampleSize
-                > kichThuoc) {
-
-            options.inSampleSize *= 2;
-        }
-
-        options.inJustDecodeBounds = false;
-
-        return giaiMaAnhChiTiet(
-                tenAnh,
-                options
-        );
-    }
-
-    // =====================================================
-    // DANH SÁCH ẢNH KHÔNG TRÙNG LẶP
-    // =====================================================
-
-    private LinkedHashMap<String, String>
-    layDanhSachAnhChiTiet() {
-
-        LinkedHashMap<String, String> danhSach =
-                new LinkedHashMap<>();
-
-        if (diaDiem == null) {
-
-            return danhSach;
-        }
-
-        // Ưu tiên ảnh địa điểm chính
-
-        if (coAnhChiTiet(diaDiem.tenAnh)) {
-
-            danhSach.put(
-                    diaDiem.tenAnh,
-                    diaDiem.ten
-            );
-        }
-
-        // Bổ sung ảnh điểm thành phần
-
-        for (DiemThamQuan diem : cacDiem) {
-
-            if (!danhSach.containsKey(diem.tenAnh)
-                    && coAnhChiTiet(diem.tenAnh)) {
-
-                danhSach.put(
-                        diem.tenAnh,
-                        diem.ten
-                );
-            }
-        }
-
-        return danhSach;
-    }
-
-    // =====================================================
-    // THƯ VIỆN ẢNH
-    // =====================================================
-
-    private void moThuVien() {
-
-        if (boAnh.isEmpty()) {
-
-            thongBao(
-                    "Địa điểm chưa có hình ảnh."
-            );
-
-            return;
-        }
-
-        dungHenAnh();
-
-        dangMoThuVien = true;
-
-        ArrayList<String> cacAnh =
-                new ArrayList<>(boAnh);
-
-        LinkedHashMap<String, String> danhSach =
-                new LinkedHashMap<>(tenCacAnh);
-
-        final int[] anhDangXem = {viTriAnh};
-
-        LinearLayout khung = new LinearLayout(this);
-
-        khung.setOrientation(
-                LinearLayout.VERTICAL
-        );
-
-        khung.setPadding(
-                dp(18),
-                dp(8),
-                dp(18),
-                dp(12)
-        );
-
-        khung.setBackgroundColor(Color.WHITE);
-
-        // ẢNH LỚN
-
-        ImageView anh = new ImageView(this);
-
-        anh.setScaleType(
-                ImageView.ScaleType.FIT_CENTER
-        );
-
-        anh.setBackgroundResource(
-                R.drawable.ui_ct_thumb
-        );
-
-        anh.setClipToOutline(true);
-
-        khung.addView(
-                anh,
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        dp(280)
-                )
-        );
-
-        // TÊN ẢNH
-
-        TextView tenAnh = new TextView(this);
-
-        tenAnh.setGravity(Gravity.CENTER);
-
-        tenAnh.setTextSize(16);
-
-        tenAnh.setTextColor(MAU_TIEU_DE);
-
-        tenAnh.setTypeface(
-                null,
-                Typeface.BOLD
-        );
-
-        tenAnh.setPadding(
-                0, dp(14),
-                0, dp(6)
-        );
-
-        khung.addView(tenAnh);
-
-        // BỘ ĐẾM
-
-        TextView demAnh = new TextView(this);
-
-        demAnh.setGravity(Gravity.CENTER);
-
-        demAnh.setTextSize(13);
-
-        demAnh.setTextColor(MAU_CHU_PHU);
-
-        khung.addView(demAnh);
-
-        // HAI NÚT CHUYỂN ẢNH
-
-        LinearLayout thanhNut =
-                new LinearLayout(this);
-
-        thanhNut.setOrientation(
-                LinearLayout.HORIZONTAL
-        );
-
-        LinearLayout.LayoutParams lpThanh =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        dp(48)
-                );
-
-        lpThanh.topMargin = dp(16);
-
-        khung.addView(
-                thanhNut,
-                lpThanh
-        );
-
-        TextView nutTruoc =
-                taoNutThuVien("‹  Ảnh trước");
-
-        TextView nutSau =
-                taoNutThuVien("Ảnh tiếp  ›");
-
-        LinearLayout.LayoutParams lpTruoc =
-                new LinearLayout.LayoutParams(
-                        0,
-                        dp(48),
-                        1
-                );
-
-        lpTruoc.setMarginEnd(dp(8));
-
-        thanhNut.addView(
-                nutTruoc,
-                lpTruoc
-        );
-
-        thanhNut.addView(
-                nutSau,
-                new LinearLayout.LayoutParams(
-                        0,
-                        dp(48),
-                        1
-                )
-        );
-
-        // HIỂN THỊ ẢNH ĐANG CHỌN
-
-        Runnable capNhatAnh = () -> {
-
-            String maAnh =
-                    cacAnh.get(anhDangXem[0]);
-
-            Bitmap bitmap =
-                    docAnhChiTiet(
-                            maAnh,
-                            1600
-                    );
-
-            if (bitmap != null) {
-
-                anh.setImageBitmap(bitmap);
-
-            } else {
-
-                AnhDiaDiem.hien(anh, maAnh);
-            }
-
-            tenAnh.setText(
-                    danhSach.get(maAnh)
-            );
-
-            anh.setContentDescription(
-                    danhSach.get(maAnh)
-            );
-
-            demAnh.setText(
-                    (anhDangXem[0] + 1)
-                            + " / "
-                            + cacAnh.size()
-            );
-
-            boolean coAnhTruoc =
-                    anhDangXem[0] > 0;
-
-            boolean coAnhSau =
-                    anhDangXem[0] < cacAnh.size() - 1;
-
-            nutTruoc.setEnabled(coAnhTruoc);
-
-            nutSau.setEnabled(coAnhSau);
-
-            nutTruoc.setAlpha(
-                    coAnhTruoc ? 1f : 0.4f
-            );
-
-            nutSau.setAlpha(
-                    coAnhSau ? 1f : 0.4f
-            );
-        };
-
-        Runnable anhTruoc = () -> {
-
-            if (anhDangXem[0] > 0) {
-
-                anhDangXem[0]--;
-
-                capNhatAnh.run();
-            }
-        };
-
-        Runnable anhSau = () -> {
-
-            if (anhDangXem[0]
-                    < cacAnh.size() - 1) {
-
-                anhDangXem[0]++;
-
-                capNhatAnh.run();
-            }
-        };
-
-        nutTruoc.setOnClickListener(v ->
-                anhTruoc.run()
-        );
-
-        nutSau.setOnClickListener(v ->
-                anhSau.run()
-        );
-
-        ganVuotAnh(
-                anh,
-                anhTruoc,
-                anhSau,
-                null,
-                null
-        );
-
-        capNhatAnh.run();
-
-        if (cacAnh.size() <= 1) {
-
-            thanhNut.setVisibility(View.GONE);
-        }
-
-        ScrollView vungCuon =
-                new ScrollView(this);
-
-        vungCuon.addView(khung);
-
-        AlertDialog dialog =
-                new MaterialAlertDialogBuilder(this)
-
-                        .setTitle("Thư viện hình ảnh")
-
-                        .setView(vungCuon)
-
-                        .setPositiveButton(
-                                "Đóng",
-                                null
-                        )
-
-                        .show();
-
-        // Khôi phục slider sau khi đóng thư viện
-
-        dialog.setOnDismissListener(d -> {
-
-            dangMoThuVien = false;
-
-            int viTriMoi =
-                    boAnh.indexOf(
-                            cacAnh.get(anhDangXem[0])
-                    );
-
-            if (viTriMoi >= 0) {
-
-                viTriAnh = viTriMoi;
-
-                hienAnhBia(false);
-            }
-
-            batHenAnh();
-        });
-    }
-
-    private TextView taoNutThuVien(
-            String noiDung
-    ) {
-
-        TextView nut = new TextView(this);
-
-        nut.setText(noiDung);
-
-        nut.setGravity(Gravity.CENTER);
-
-        nut.setTextSize(13);
-
-        nut.setTextColor(MAU_CHU_DAO);
-
-        nut.setTypeface(
-                null,
-                Typeface.BOLD
-        );
-
-        nut.setBackgroundResource(
-                R.drawable.ui_ct_audio_bg
-        );
-
-        nut.setClickable(true);
-
-        nut.setFocusable(true);
-
-        ganHieuUngNhan(nut);
-
-        return nut;
-    }
-
-    private void ganHieuUngNhan(View view) {
+    void ganHieuUngNhan(View view) {
 
         TypedValue attr = new TypedValue();
 
@@ -1544,7 +657,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
     private void moManHinhThamQuan(int idDiem) {
 
-        dungHenAnh();
+        if (boAnh != null) boAnh.dungHenAnh();
 
         dungThuyetMinh();
 
@@ -1662,7 +775,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
         hienThiThongTin();
 
-        dungHenAnh();
+        if (boAnh != null) boAnh.dungHenAnh();
 
         // Luôn sử dụng ảnh chính cho trình nghe.
         // Không sử dụng nhầm ảnh đang chạy trên slider.
@@ -1671,7 +784,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                 new ImageView(this);
 
         Bitmap bitmap =
-                docAnhChiTiet(
+                boAnh.docAnhChiTiet(
                         diaDiem.tenAnh,
                         1600
                 );
@@ -1966,7 +1079,6 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
         dangHienThi = true;
 
-        dangChamAnh = false;
 
         hienThiThongTin();
 
@@ -1974,9 +1086,14 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
         capNhatYeuThich();
 
-        batHenAnh();
+        boAnh.tiepTuc();
 
         phatSauXacNhanViTri();
+    }
+
+    @Override public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (boAnh != null) boAnh.doiFocus(hasFocus);
     }
 
     @Override
@@ -1984,14 +1101,9 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
         dangHienThi = false;
 
-        dungHenAnh();
+        if (boAnh != null) boAnh.dungHenAnh();
 
-        if (anhBia != null) {
-
-            anhBia.animate().cancel();
-
-            anhBia.setAlpha(1f);
-        }
+        if (boAnh != null) boAnh.tamDung();
 
         super.onPause();
     }
@@ -2001,7 +1113,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
         dangHienThi = false;
 
-        dungHenAnh();
+        if (boAnh != null) boAnh.dungHenAnh();
 
         dungThuyetMinh();
 
@@ -2011,7 +1123,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
 
-        dungHenAnh();
+        if (boAnh != null) boAnh.giaiPhong();
 
         super.onDestroy();
     }

@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
-import android.view.ViewGroup;
+import android.text.TextUtils;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +39,8 @@ import com.example.app_ck.session.PhienDangNhap;
 import com.example.app_ck.ui.common.BaseActivity;
 import com.example.app_ck.ui.common.AnhDiaDiem;
 import androidx.activity.OnBackPressedCallback;
+import com.example.app_ck.util.VanBanTimKiem;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -80,7 +83,7 @@ public class QuanLyDiemThamQuanActivity
     private final ArrayList<DiemThamQuan> cacDiem =
             new ArrayList<>();
 
-    private LinearLayout khungDanhSach;
+    private View khungDanhSach;
     private LinearLayout danhSach;
 
     private View khungBieuMau;
@@ -113,15 +116,20 @@ public class QuanLyDiemThamQuanActivity
     private EditText oTenNguonDiem, oUrlNguonDiem;
     private Uri anhDiemMoi;
     private String anhDiemDaLuu = "";
-
-    private final ActivityResultLauncher<String> chonAnhDiem =
+    private String trangThaiBieuMauBanDau = "";
+    private int viTriDanhSach;
+    private String loiTaiDiem;
+    private final java.util.Map<Integer, String> tenCacTang = new java.util.LinkedHashMap<>();
+    private final ActivityResultLauncher<String[]> chonAnhDiem =
             registerForActivityResult(
-                    new ActivityResultContracts.GetContent(),
+                    new ActivityResultContracts.OpenDocument(),
                     uri -> {
                         if (uri == null) return;
+                        getContentResolver().takePersistableUriPermission(uri,
+                                android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         anhDiemMoi = uri;
                         tenAnh.setText("");
-                        anhDiemXemTruoc.setImageURI(uri);
+                        hienAnhDiemDangChon();
                     }
             );
 
@@ -144,20 +152,21 @@ public class QuanLyDiemThamQuanActivity
         );
 
         apDungKhoangTrongHeThong();
+        AdminGiaoDien.hoTroBanPhim(this);
 
         anhXa();
         QuanLySoDo quanLySoDo=new QuanLySoDo(this);
         findViewById(R.id.dtQuanLySoDo).setOnClickListener(v->quanLySoDo.mo(idDiaDiem,this::taiDiem));
 
         taoKhuVucAnhVaNguonDiem();
-
+        AdminGiaoDien.apDung(this);
         // Quay lai
         findViewById(R.id.dtQuayLai)
                 .setOnClickListener(v -> {
 
                     if (khungBieuMau.getVisibility()
                             == View.VISIBLE) {
-                        hienDanhSach();
+                        hoiTruocKhiDongBieuMau();
                     } else {
                         finish();
                     }
@@ -172,7 +181,7 @@ public class QuanLyDiemThamQuanActivity
         // Huy
         findViewById(R.id.dtHuy)
                 .setOnClickListener(
-                        v -> hienDanhSach()
+                        v -> hoiTruocKhiDongBieuMau()
                 );
 
         // Luu diem
@@ -219,7 +228,40 @@ public class QuanLyDiemThamQuanActivity
                     ) {}
                 }
         );
+        View nutXoaTim = findViewById(R.id.dtXoaTim);
 
+        nutXoaTim.setOnClickListener(
+                v -> timKiem.setText("")
+        );
+
+        timKiem.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(
+                    CharSequence s,
+                    int start,
+                    int count,
+                    int after) {
+            }
+
+            @Override
+            public void onTextChanged(
+                    CharSequence s,
+                    int start,
+                    int before,
+                    int count) {
+
+                nutXoaTim.setVisibility(
+                        s.length() == 0
+                                ? View.GONE
+                                : View.VISIBLE
+                );
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
         // Chon dia diem chinh
         chonDiaDiem.setOnItemSelectedListener(
                 new AdapterView.OnItemSelectedListener() {
@@ -250,7 +292,28 @@ public class QuanLyDiemThamQuanActivity
                 }
         );
 
+        if (savedInstanceState != null) idDiaDiem = savedInstanceState.getInt("admin_place", -1);
         taiDiaDiem();
+        if (savedInstanceState != null && savedInstanceState.getBoolean("admin_form")) {
+            int pointId = savedInstanceState.getInt("admin_point", -1);
+            DiemThamQuan point = null;
+            for (DiemThamQuan candidate : cacDiem) if (candidate.id == pointId) point = candidate;
+            if (pointId < 0 || point != null) {
+                moBieuMau(point);
+                String[] values = savedInstanceState.getStringArray("admin_values");
+                EditText[] fields = cacTruong();
+                if (values != null) for (int i = 0; i < fields.length; i++) fields[i].setText(values[i]);
+                String uri = savedInstanceState.getString("admin_image");
+                anhDiemMoi = uri == null ? null : Uri.parse(uri);
+                trangThaiBieuMauBanDau = savedInstanceState.getString("admin_initial", layTrangThaiBieuMau());
+                viTriDanhSach = savedInstanceState.getInt("admin_scroll", 0);
+                if (savedInstanceState.getBoolean("admin_advanced")) {
+                    findViewById(R.id.dtAnhNangCao).setVisibility(View.VISIBLE);
+                    ((TextView) findViewById(R.id.dtMoAnhNangCao)).setText("Ẩn tùy chọn ảnh nâng cao  ▴");
+                }
+                hienAnhDiemDangChon();
+            }
+        }
         getOnBackPressedDispatcher().addCallback(
                 this,
                 new OnBackPressedCallback(true) {
@@ -260,7 +323,7 @@ public class QuanLyDiemThamQuanActivity
                         if (khungBieuMau != null
                                 && khungBieuMau.getVisibility() == View.VISIBLE) {
 
-                            hienDanhSach();
+                            hoiTruocKhiDongBieuMau();
 
                         } else {
                             setEnabled(false);
@@ -295,10 +358,11 @@ public class QuanLyDiemThamQuanActivity
     private void anhXa() {
 
         khungDanhSach =
-                findViewById(R.id.dtKhungDanhSach);
+                findViewById(R.id.dtCuonDanhSach);
 
+        // An/hien ca vung nhap va thanh Luu co dinh
         khungBieuMau =
-                findViewById(R.id.dtKhungBieuMau);
+                findViewById(R.id.dtManBieuMau);
 
         danhSach =
                 findViewById(R.id.dtDanhSach);
@@ -410,12 +474,7 @@ public class QuanLyDiemThamQuanActivity
 
             doiSpinner = true;
 
-            ArrayAdapter<String> adapter =
-                    new ArrayAdapter<>(
-                            this,
-                            android.R.layout.simple_spinner_dropdown_item,
-                            danhSachTen
-                    );
+            ArrayAdapter<String> adapter = AdminGiaoDien.adapter(this, danhSachTen);
 
             chonDiaDiem.setAdapter(adapter);
 
@@ -456,6 +515,8 @@ public class QuanLyDiemThamQuanActivity
         }
 
         cacDiem.clear();
+        tenCacTang.clear();
+        loiTaiDiem = null;
 
         if (idDiaDiem >= 0) {
 
@@ -468,10 +529,12 @@ public class QuanLyDiemThamQuanActivity
                                 idDiaDiem
                         )
                 );
+                tenCacTang.putAll(KhoDuLieuThamQuan.cacTang(helper.getReadableDatabase(), idDiaDiem));
 
             } catch (Exception e) {
 
                 Log.e(TAG, "Loi tai diem", e);
+                loiTaiDiem = "Không tải được điểm tham quan. Chạm để thử lại.";
 
                 thongBao(
                         "Không tải được điểm tham quan"
@@ -486,146 +549,268 @@ public class QuanLyDiemThamQuanActivity
     // HIEN DANH SACH DIEM
     // =====================================================
 
+
     private void veDanhSach() {
 
-        if (danhSach == null) {
-            return;
-        }
+        if (danhSach == null) return;
 
         danhSach.removeAllViews();
+        ScrollView scroll = findViewById(R.id.dtCuonDanhSach);
+        int oldScroll = scroll.getScrollY();
 
-        String filter = val(timKiem)
-                .toLowerCase(Locale.ROOT);
+        String tuKhoa = chuanHoaTim(val(timKiem));
 
         int dem = 0;
 
         for (DiemThamQuan d : cacDiem) {
 
-            String tenDiem = d.ten == null
-                    ? ""
-                    : d.ten.toLowerCase(Locale.ROOT);
+            String chuoiTim = chuanHoaTim(
+                    (d.ten == null ? "" : d.ten)
+                            + " " + d.id
+                            + " " + d.tang + " " + tenTang(d.tang)
+                            + " " + d.soHienThi
+            );
 
-            if (!tenDiem.contains(filter)
-                    && !String.valueOf(d.id)
-                    .contains(filter)) {
+            if (!chuoiTim.contains(tuKhoa)) {
                 continue;
             }
 
             dem++;
 
-            LinearLayout card =
-                    new LinearLayout(this);
+            // Khung the
+            LinearLayout the = new LinearLayout(this);
 
-            card.setOrientation(
-                    LinearLayout.HORIZONTAL
+            the.setOrientation(LinearLayout.HORIZONTAL);
+            the.setGravity(Gravity.CENTER_VERTICAL);
+            the.setPadding(
+                    dp(9), dp(10), dp(12), dp(10)
             );
 
-            card.setGravity(
-                    Gravity.CENTER_VERTICAL
+            the.setMinimumHeight(dp(82));
+            the.setBackgroundResource(R.drawable.ui_ct_action_bg);
+            the.setClickable(true);
+            the.setFocusable(true);
+            AdminGiaoDien.hieuUngNhan(the);
+
+            the.setContentDescription(
+                    "Chỉnh sửa điểm " + d.ten
             );
 
-            card.setPadding(
-                    dp(14), dp(12),
-                    dp(14), dp(12)
-            );
+            LinearLayout.LayoutParams lpThe =
+                    new LinearLayout.LayoutParams(-1, -2);
 
-            card.setBackgroundResource(
-                    R.drawable.ui_card
-            );
+            lpThe.bottomMargin = dp(9);
 
-            LinearLayout.LayoutParams cardParams =
-                    new LinearLayout.LayoutParams(
-                            -1, -2
-                    );
+            // Anh diem hoac so marker
+            if (d.tenAnh != null
+                    && !d.tenAnh.trim().isEmpty()
+                    && !AnhDiaDiem.KHONG_ANH.equals(d.tenAnh)) {
 
-            cardParams.bottomMargin = dp(10);
+                ImageView hinh = new ImageView(this);
 
-            LinearLayout noiDung =
-                    new LinearLayout(this);
+                hinh.setScaleType(
+                        ImageView.ScaleType.CENTER_CROP
+                );
 
-            noiDung.setOrientation(
+                hinh.setBackgroundResource(
+                        R.drawable.ui_ct_thumb
+                );
+
+                hinh.setClipToOutline(true);
+
+                AnhDiaDiem.hien(hinh, d.tenAnh);
+
+                the.addView(
+                        hinh,
+                        new LinearLayout.LayoutParams(
+                                dp(58), dp(58)
+                        )
+                );
+
+            } else {
+
+                TextView ma = new TextView(this);
+
+                int so = d.soHienThi > 0
+                        ? d.soHienThi
+                        : d.id;
+
+                ma.setText(
+                        String.format(Locale.ROOT, "%02d", so)
+                );
+
+                ma.setTextSize(16);
+                ma.setTextColor(MAU_XANH);
+                ma.setGravity(Gravity.CENTER);
+
+                ma.setTypeface(
+                        android.graphics.Typeface.create(
+                                "sans-serif-medium",
+                                android.graphics.Typeface.NORMAL
+                        )
+                );
+
+                ma.setBackgroundResource(
+                        R.drawable.ui_ct_audio_bg
+                );
+
+                the.addView(
+                        ma,
+                        new LinearLayout.LayoutParams(
+                                dp(58), dp(58)
+                        )
+                );
+            }
+
+            // Noi dung the
+            LinearLayout thongTin = new LinearLayout(this);
+
+            thongTin.setOrientation(
                     LinearLayout.VERTICAL
             );
 
-            TextView nhan = new TextView(this);
-
-            nhan.setText(d.ten);
-            nhan.setTextColor(MAU_CHU);
-            nhan.setTextSize(15);
-
-            nhan.setTypeface(
-                    null,
-                    android.graphics.Typeface.BOLD
-            );
-
-            noiDung.addView(nhan);
-
-            TextView phu = new TextView(this);
-
-            phu.setText(
-                    "Mã " + d.id
-                            + " · Tầng/khu " + d.tang
-                            + (d.coMarker()
-                            ? " · Có Marker"
-                            : " · Chưa đặt Marker")
-            );
-
-            phu.setTextColor(MAU_PHU);
-            phu.setTextSize(12);
-
-            noiDung.addView(phu);
-
-            card.addView(
-                    noiDung,
+            LinearLayout.LayoutParams lpThongTin =
                     new LinearLayout.LayoutParams(
-                            0, -2, 1
+                            0, -2, 1f
+                    );
+
+            lpThongTin.leftMargin = dp(11);
+            lpThongTin.rightMargin = dp(6);
+
+            the.addView(thongTin, lpThongTin);
+
+            TextView tenDiem = new TextView(this);
+
+            tenDiem.setText(d.ten);
+            tenDiem.setTextSize(14.5f);
+            tenDiem.setTextColor(
+                    Color.parseColor("#182D22")
+            );
+
+            tenDiem.setTypeface(
+                    android.graphics.Typeface.create(
+                            "sans-serif-medium",
+                            android.graphics.Typeface.NORMAL
                     )
             );
 
-            TextView muiTen = new TextView(this);
 
-            muiTen.setText("›");
-            muiTen.setTextColor(MAU_XANH);
-            muiTen.setTextSize(26);
+            thongTin.addView(tenDiem);
 
-            card.addView(muiTen);
+            TextView thongTinPhu = new TextView(this);
 
-            card.setOnClickListener(
+            thongTinPhu.setText(
+                    "Mã " + d.id
+                            + " · " + tenTang(d.tang)
+            );
+
+            thongTinPhu.setTextSize(12);
+            thongTinPhu.setTextColor(
+                    Color.parseColor("#687B6E")
+            );
+
+            thongTinPhu.setPadding(
+                    0, dp(3), 0, 0
+            );
+
+            thongTin.addView(thongTinPhu);
+
+            TextView trangThai = new TextView(this);
+
+            boolean coThuyetMinh =
+                    d.noiDung != null
+                            && !d.noiDung.trim().isEmpty();
+
+            trangThai.setText(
+                    (d.coMarker()
+                            ? "● Có marker"
+                            : "○ Chưa có marker")
+                            + " · "
+                            + (coThuyetMinh
+                            ? "Có bài nghe"
+                            : "Chưa có bài nghe")
+            );
+
+            trangThai.setTextSize(12);
+
+            trangThai.setTextColor(
+                    d.coMarker()
+                            ? MAU_XANH
+                            : Color.parseColor("#687B6E")
+            );
+
+            trangThai.setPadding(
+                    0, dp(4), 0, 0
+            );
+
+            thongTin.addView(trangThai);
+
+            // Mui ten
+            ImageView muiTen = new ImageView(this);
+
+            muiTen.setImageResource(
+                    R.drawable.ui_ic_chevron
+            );
+
+            muiTen.setImportantForAccessibility(
+                    View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            );
+
+            the.addView(
+                    muiTen,
+                    new LinearLayout.LayoutParams(
+                            dp(20), dp(20)
+                    )
+            );
+
+            the.setOnClickListener(
                     v -> moBieuMau(d)
             );
 
-            danhSach.addView(
-                    card,
-                    cardParams
-            );
+            danhSach.addView(the, lpThe);
         }
 
+        // Cap nhat ket qua tim kiem
         soLuong.setText(
-                "DANH SÁCH · " + dem + " ĐIỂM"
+                tuKhoa.isEmpty()
+                        ? cacDiem.size() + " điểm tham quan"
+                        : dem + "/" + cacDiem.size()
+                        + " điểm phù hợp"
         );
 
-        if (cacDiaDiem.isEmpty() || dem == 0) {
+        if (dem == 0) {
 
-            TextView trong = new TextView(this);
+            TextView rong = new TextView(this);
 
-            trong.setText(
-                    cacDiaDiem.isEmpty()
-                            ? "Chưa có địa điểm chính"
-                            : "Chưa có điểm tham quan phù hợp"
+            rong.setText(
+                    loiTaiDiem != null ? loiTaiDiem : cacDiaDiem.isEmpty()
+                            ? "Chưa có địa điểm du lịch"
+                            : tuKhoa.isEmpty()
+                            ? "Chưa có điểm tham quan.\n"
+                            + "Nhấn Thêm điểm để bắt đầu."
+                            : "Không tìm thấy điểm phù hợp."
             );
 
-            trong.setGravity(Gravity.CENTER);
-            trong.setTextColor(MAU_PHU);
-
-            trong.setPadding(
-                    dp(12),
-                    dp(40),
-                    dp(12),
-                    dp(40)
+            rong.setTextColor(
+                    Color.parseColor("#687B6E")
             );
 
-            danhSach.addView(trong);
+            rong.setTextSize(14);
+            rong.setGravity(Gravity.CENTER);
+
+            rong.setPadding(
+                    dp(16), dp(40),
+                    dp(16), dp(40)
+            );
+
+            danhSach.addView(rong);
+            if (loiTaiDiem != null) {
+                rong.setOnClickListener(v -> taiDiem());
+                rong.setMinimumHeight(dp(48));
+                AdminGiaoDien.hieuUngNhan(rong);
+            }
         }
+        scroll.post(() -> scroll.scrollTo(0, oldScroll));
     }
 
     // =====================================================
@@ -642,6 +827,10 @@ public class QuanLyDiemThamQuanActivity
         }
 
         idDangSua = d == null ? -1 : d.id;
+        viTriDanhSach = ((ScrollView) findViewById(R.id.dtCuonDanhSach)).getScrollY();
+        for (EditText field : cacTruong()) field.setError(null);
+        findViewById(R.id.dtAnhNangCao).setVisibility(View.GONE);
+        ((TextView) findViewById(R.id.dtMoAnhNangCao)).setText("Ảnh có sẵn trong dự án  ▾");
 
         tieuDe.setText(
                 d == null
@@ -707,23 +896,31 @@ public class QuanLyDiemThamQuanActivity
 
         khungDanhSach.setVisibility(View.GONE);
         khungBieuMau.setVisibility(View.VISIBLE);
+        trangThaiBieuMauBanDau = layTrangThaiBieuMau();
 
-        khungBieuMau.scrollTo(0, 0);
+        ScrollView vungCuon = findViewById(
+                R.id.dtKhungBieuMau
+        );
+
+        vungCuon.post(() -> vungCuon.scrollTo(0, 0));
     }
 
     private void hienDanhSach() {
+        AdminGiaoDien.anBanPhim(this);
 
         khungBieuMau.setVisibility(View.GONE);
 
         khungDanhSach.setVisibility(View.VISIBLE);
 
         tieuDe.setText(
-                "Quản lý điểm tham quan"
+                "Điểm tham quan"
         );
 
         idDangSua = -1;
 
         taiDiem();
+        ScrollView scroll = findViewById(R.id.dtCuonDanhSach);
+        scroll.post(() -> scroll.scrollTo(0, viTriDanhSach));
     }
 
 
@@ -751,41 +948,21 @@ public class QuanLyDiemThamQuanActivity
             return;
         }
 
-        int tangMoi;
-        int thuTuMoi;
-        int soMoi;
-
-        try {
-
-            tangMoi = Integer.parseInt(
-                    val(tang)
-            );
-
-            thuTuMoi = Integer.parseInt(
-                    val(thuTu)
-            );
-
-            soMoi = Integer.parseInt(
-                    val(soHienThi)
-            );
-
-        } catch (NumberFormatException e) {
-
-            thongBao(
-                    "Tầng, thứ tự và số Marker phải là số nguyên"
-            );
-
-            return;
-        }
+        Integer tangMoi = docSoNguyen(tang, "Tầng/khu vực");
+        if (tangMoi == null) return;
+        Integer thuTuMoi = docSoNguyen(thuTu, "Thứ tự");
+        if (thuTuMoi == null) return;
+        Integer soMoi = docSoNguyen(soHienThi, "Số marker");
+        if (soMoi == null) return;
 
         boolean coX = !val(x).isEmpty();
         boolean coY = !val(y).isEmpty();
 
         if (coX != coY) {
 
-            thongBao(
-                    "Phải nhập cả X và Y hoặc để trống cả hai"
-            );
+            EditText missing = coX ? y : x;
+            missing.setError("Nhập cả X và Y hoặc để trống cả hai");
+            missing.requestFocus();
 
             return;
         }
@@ -794,45 +971,23 @@ public class QuanLyDiemThamQuanActivity
         Double yy = null;
 
         if (coX) {
-
-            try {
-
-                xx = Double.parseDouble(
-                        val(x)
-                );
-
-                yy = Double.parseDouble(
-                        val(y)
-                );
-
-                if (!Double.isFinite(xx)
-                        || !Double.isFinite(yy)
-                        || xx < 0 || xx > 1
-                        || yy < 0 || yy > 1) {
-
-                    thongBao(
-                            "X/Y phải nằm trong khoảng 0–1"
-                    );
-
-                    return;
-                }
-
-            } catch (NumberFormatException e) {
-
-                thongBao(
-                        "Tọa độ Marker không hợp lệ"
-                );
-
-                return;
-            }
+            xx = docTyLeSoDo(x);
+            if (xx == null) return;
+            yy = docTyLeSoDo(y);
+            if (yy == null) return;
         }
 
         String tenNguonMoi = val(oTenNguonDiem);
         String urlNguonMoi = val(oUrlNguonDiem);
         if (!tenNguonMoi.isEmpty() || !urlNguonMoi.isEmpty()) {
-            if (tenNguonMoi.isEmpty()
-                    || !urlNguonMoi.matches("(?i)^https?://[^\\s]+$")) {
-                oUrlNguonDiem.setError("Nhập tên nguồn và URL http(s) hợp lệ");
+            if (tenNguonMoi.isEmpty()) {
+                oTenNguonDiem.setError("Nhập tên nguồn tham khảo");
+                oTenNguonDiem.requestFocus();
+                return;
+            }
+            if (!urlNguonMoi.matches("(?i)^https?://[^\\s]+$")) {
+                oUrlNguonDiem.setError("Nhập URL http(s) hợp lệ");
+                oUrlNguonDiem.requestFocus();
                 return;
             }
         }
@@ -857,6 +1012,7 @@ public class QuanLyDiemThamQuanActivity
             );
 
             if (anhId == 0) {
+                findViewById(R.id.dtAnhNangCao).setVisibility(View.VISIBLE);
                 tenAnh.setError(
                         "Không tìm thấy ảnh trong drawable"
                 );
@@ -947,110 +1103,191 @@ public class QuanLyDiemThamQuanActivity
     // ANH RIENG + NGUON RIENG CUA DIEM THANH PHAN
     // =====================================================
 
+
     private void taoKhuVucAnhVaNguonDiem() {
-        ViewGroup cha = (ViewGroup) tenAnh.getParent();
-        if (!(cha instanceof LinearLayout)) {
-            Log.e(TAG, "dtTenAnh khong nam trong LinearLayout");
+
+        anhDiemXemTruoc = findViewById(
+                R.id.dtAnhDiemXemTruoc
+        );
+
+        oTenNguonDiem = findViewById(
+                R.id.dtNguonTenDiem
+        );
+
+        oUrlNguonDiem = findViewById(
+                R.id.dtNguonUrlDiem
+        );
+
+        View khungNangCao = findViewById(
+                R.id.dtAnhNangCao
+        );
+
+        TextView nutNangCao = findViewById(
+                R.id.dtMoAnhNangCao
+        );
+
+        // Chon anh rieng tu dien thoai
+
+        findViewById(R.id.dtChonAnhDiem)
+                .setOnClickListener(
+                        v -> chonAnhDiem.launch(new String[]{"image/*"})
+                );
+
+        anhDiemXemTruoc.setOnClickListener(
+                v -> chonAnhDiem.launch(new String[]{"image/*"})
+        );
+
+        anhDiemXemTruoc.setClickable(true);
+        anhDiemXemTruoc.setFocusable(true);
+
+        // Bo anh cua diem, khong bo anh so do
+
+        findViewById(R.id.dtBoAnhDiem)
+                .setOnClickListener(v -> {
+
+                    anhDiemMoi = null;
+
+                    tenAnh.setText(
+                            AnhDiaDiem.KHONG_ANH
+                    );
+
+                    hienAnhDiemDangChon();
+                });
+
+        // Tuy chon drawable nang cao
+
+        nutNangCao.setOnClickListener(v -> {
+
+            boolean mo =
+                    khungNangCao.getVisibility()
+                            == View.GONE;
+
+            khungNangCao.setVisibility(
+                    mo ? View.VISIBLE : View.GONE
+            );
+
+            nutNangCao.setText(
+                    mo
+                            ? "Ẩn tùy chọn ảnh nâng cao  ▴"
+                            : "Ảnh có sẵn trong dự án  ▾"
+            );
+        });
+
+        // Xem truoc drawable
+
+        findViewById(R.id.dtXemAnhDrawable)
+                .setOnClickListener(v -> {
+
+                    String ma = val(tenAnh);
+
+                    if (!ma.matches("[a-z][a-z0-9_]*")) {
+
+                        tenAnh.setError(
+                                "Tên drawable không hợp lệ"
+                        );
+
+                        tenAnh.requestFocus();
+                        return;
+                    }
+
+                    int resId = getResources().getIdentifier(
+                            ma,
+                            "drawable",
+                            getPackageName()
+                    );
+
+                    if (resId == 0) {
+
+                        tenAnh.setError(
+                                "Không tìm thấy ảnh trong drawable"
+                        );
+
+                        tenAnh.requestFocus();
+                        return;
+                    }
+
+                    anhDiemMoi = null;
+                    tenAnh.setError(null);
+
+                    anhDiemXemTruoc.setPadding(0, 0, 0, 0);
+
+                    anhDiemXemTruoc.setScaleType(
+                            ImageView.ScaleType.CENTER_CROP
+                    );
+
+                    anhDiemXemTruoc.setImageResource(resId);
+                });
+    }
+
+
+    private void hienAnhDiemDangChon() {
+
+        if (anhDiemXemTruoc == null) {
             return;
         }
 
-        LinearLayout layout = (LinearLayout) cha;
-        int viTri = layout.indexOfChild(tenAnh) + 1;
+        // Anh vua chon tu thiet bi
 
-        // Nhan ro: o dtTenAnh hien co KHONG phai ten anh so do.
-        TextView ghiChu = new TextView(this);
-        ghiChu.setText("Ảnh RIÊNG của điểm tham quan. Không nhập tên ảnh sơ đồ tại đây. "
-                + "Ví dụ: anh_cong_chinh_hoa_lo (không có .jpg/.png).");
-        ghiChu.setTextSize(12);
-        ghiChu.setTextColor(MAU_PHU);
-        ghiChu.setPadding(0, dp(5), 0, dp(6));
-        layout.addView(ghiChu, viTri++);
+        if (anhDiemMoi != null) {
 
-        anhDiemXemTruoc = new ImageView(this);
-        anhDiemXemTruoc.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        anhDiemXemTruoc.setBackgroundColor(Color.rgb(239, 244, 239));
-        anhDiemXemTruoc.setImageResource(android.R.drawable.ic_menu_gallery);
-        LinearLayout.LayoutParams paramsAnh =
-                new LinearLayout.LayoutParams(-1, dp(180));
-        paramsAnh.topMargin = dp(8);
-        paramsAnh.bottomMargin = dp(6);
-        layout.addView(anhDiemXemTruoc, viTri++, paramsAnh);
+            anhDiemXemTruoc.clearColorFilter();
 
-        Button nutXem = new Button(this);
-        nutXem.setText("Xem trước ảnh drawable");
-        nutXem.setAllCaps(false);
-        nutXem.setOnClickListener(v -> {
-            String ma = val(tenAnh);
-            int idAnh = ma.matches("[a-z][a-z0-9_]*")
-                    ? getResources().getIdentifier(ma, "drawable", getPackageName()) : 0;
-            if (idAnh == 0) {
-                tenAnh.setError("Tên ảnh không tồn tại trong drawable");
-                return;
-            }
-            anhDiemMoi = null;
-            anhDiemXemTruoc.setImageResource(idAnh);
-        });
-        layout.addView(nutXem, viTri++);
+            anhDiemXemTruoc.setPadding(0, 0, 0, 0);
 
-        Button nutMay = new Button(this);
-        nutMay.setText("Chọn ảnh riêng từ điện thoại");
-        nutMay.setAllCaps(false);
-        nutMay.setOnClickListener(v -> chonAnhDiem.launch("image/*"));
-        layout.addView(nutMay, viTri++);
-        Button nutBoAnh = new Button(this);
+            anhDiemXemTruoc.setScaleType(
+                    ImageView.ScaleType.CENTER_CROP
+            );
 
-        nutBoAnh.setText("Bỏ ảnh riêng của điểm");
-        nutBoAnh.setAllCaps(false);
+            anhDiemXemTruoc.setImageURI(anhDiemMoi);
 
-        nutBoAnh.setOnClickListener(v -> {
+            return;
+        }
 
-            anhDiemMoi = null;
+        String ma = val(tenAnh);
 
-            tenAnh.setText(
-                    AnhDiaDiem.KHONG_ANH
+        if (ma.isEmpty()) {
+            ma = anhDiemDaLuu;
+        }
+
+        // Chua co anh hoac da chon bo anh
+
+        if (ma == null
+                || ma.isEmpty()
+                || AnhDiaDiem.KHONG_ANH.equals(ma)) {
+
+            anhDiemXemTruoc.setScaleType(
+                    ImageView.ScaleType.CENTER_INSIDE
+            );
+
+            anhDiemXemTruoc.setPadding(
+                    dp(22), dp(22), dp(22), dp(22)
+            );
+
+            anhDiemXemTruoc.setColorFilter(
+                    Color.parseColor("#8DAA98")
             );
 
             anhDiemXemTruoc.setImageResource(
                     android.R.drawable.ic_menu_gallery
             );
-        });
 
-        layout.addView(nutBoAnh, viTri++);
-        TextView nhanNguon = new TextView(this);
-        nhanNguon.setText("Nguồn riêng của điểm tham quan");
-        nhanNguon.setTextSize(15);
-        nhanNguon.setTextColor(MAU_XANH);
-        nhanNguon.setPadding(0, dp(18), 0, dp(5));
-        layout.addView(nhanNguon, viTri++);
-
-        oTenNguonDiem = new EditText(this);
-        oTenNguonDiem.setSingleLine(true);
-        oTenNguonDiem.setHint("Tên tài liệu / cơ quan cung cấp");
-        layout.addView(oTenNguonDiem, viTri++);
-
-        oUrlNguonDiem = new EditText(this);
-        oUrlNguonDiem.setSingleLine(true);
-        oUrlNguonDiem.setInputType(android.text.InputType.TYPE_CLASS_TEXT
-                | android.text.InputType.TYPE_TEXT_VARIATION_URI);
-        oUrlNguonDiem.setHint("https://...");
-        layout.addView(oUrlNguonDiem, viTri++);
-
-        TextView nhanGiaiThich = new TextView(this);
-        nhanGiaiThich.setText("Nguồn gắn với điểm thành phần này, không thay nguồn của địa điểm chính.");
-        nhanGiaiThich.setTextSize(12);
-        nhanGiaiThich.setTextColor(MAU_PHU);
-        layout.addView(nhanGiaiThich, viTri);
-    }
-
-    private void hienAnhDiemDangChon() {
-        if (anhDiemXemTruoc == null) return;
-        if (anhDiemMoi != null) {
-            anhDiemXemTruoc.setImageURI(anhDiemMoi);
             return;
         }
-        String ma = val(tenAnh);
-        if (ma.isEmpty()) ma = anhDiemDaLuu;
-        AnhDiaDiem.hien(anhDiemXemTruoc, ma);
+
+        // Anh da luu / anh drawable
+
+        anhDiemXemTruoc.clearColorFilter();
+
+        anhDiemXemTruoc.setPadding(0, 0, 0, 0);
+
+        anhDiemXemTruoc.setScaleType(
+                ImageView.ScaleType.CENTER_CROP
+        );
+
+        AnhDiaDiem.hien(
+                anhDiemXemTruoc,
+                ma
+        );
     }
 
     private String maNguonDiem(int diaDiemId, int diemId) {
@@ -1224,7 +1461,7 @@ public class QuanLyDiemThamQuanActivity
         if (maAnh == null
                 || maAnh.trim().isEmpty()) {
 
-            new AlertDialog.Builder(this)
+            new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Admin_Dialog)
                     .setTitle(
                             "Chưa có ảnh sơ đồ"
                     )
@@ -1341,7 +1578,9 @@ public class QuanLyDiemThamQuanActivity
                 banDo,
                 new LinearLayout.LayoutParams(
                         -1,
-                        dp(400)
+                        dp(Math.max(180, Math.min(360,
+                                (int) (getResources().getDisplayMetrics().heightPixels
+                                        / getResources().getDisplayMetrics().density) - 320)))
                 )
         );
 
@@ -1384,13 +1623,15 @@ public class QuanLyDiemThamQuanActivity
 
         khung.addView(toaDo);
 
+        ScrollView vungChon = new ScrollView(this);
+        vungChon.addView(khung);
         AlertDialog dialog =
-                new AlertDialog.Builder(this)
+                new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Admin_Dialog)
                         .setTitle(
                                 "Chọn Marker · Tầng/khu "
                                         + tangChon
                         )
-                        .setView(khung)
+                        .setView(vungChon)
                         .setNegativeButton(
                                 "Hủy", null
                         )
@@ -1458,7 +1699,7 @@ public class QuanLyDiemThamQuanActivity
 
         final int maDiem = idDangSua;
 
-        new AlertDialog.Builder(this)
+        AlertDialog confirm = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Admin_Dialog)
                 .setTitle(
                         "Xóa điểm tham quan?"
                 )
@@ -1524,6 +1765,7 @@ public class QuanLyDiemThamQuanActivity
                         }
                 )
                 .show();
+        AdminGiaoDien.toMauNguyHiem(confirm);
     }
 
     // =====================================================
@@ -1547,7 +1789,11 @@ public class QuanLyDiemThamQuanActivity
 
     private Button taoNut(String noiDung) {
 
-        Button button = new Button(this);
+        com.google.android.material.button.MaterialButton button =
+                new com.google.android.material.button.MaterialButton(this);
+        button.setCornerRadius(dp(14));
+        button.setMinimumHeight(dp(48));
+        button.setTextSize(14);
 
         button.setText(noiDung);
         button.setAllCaps(false);
@@ -1556,7 +1802,7 @@ public class QuanLyDiemThamQuanActivity
 
         button.setBackgroundTintList(
                 ColorStateList.valueOf(
-                        Color.rgb(228, 240, 230)
+                        Color.parseColor("#EDF5EC")
                 )
         );
 
@@ -1586,5 +1832,84 @@ public class QuanLyDiemThamQuanActivity
                 noiDung,
                 Toast.LENGTH_SHORT
         ).show();
+    }
+    private String chuanHoaTim(String chuoi) {
+        return VanBanTimKiem.chuanHoa(chuoi);
+    }
+
+    private String layTrangThaiBieuMau() {
+
+        return TextUtils.join(
+                "\u001F",
+                new String[]{
+                        ten.getText().toString(), tang.getText().toString(),
+                        thuTu.getText().toString(), soHienThi.getText().toString(),
+                        moTa.getText().toString(), thuyetMinh.getText().toString(),
+                        tenAnh.getText().toString(), x.getText().toString(), y.getText().toString(),
+                        oTenNguonDiem.getText().toString(), oUrlNguonDiem.getText().toString(),
+                        anhDiemMoi == null
+                                ? ""
+                                : anhDiemMoi.toString()
+                }
+        );
+    }
+
+    private void hoiTruocKhiDongBieuMau() {
+
+        if (layTrangThaiBieuMau().equals(
+                trangThaiBieuMauBanDau
+        )) {
+
+            hienDanhSach();
+            return;
+        }
+
+        AdminGiaoDien.hoiBoThayDoi(this, this::hienDanhSach, null);
+    }
+
+    private Integer docSoNguyen(EditText field, String label) {
+        try { return Integer.valueOf(val(field)); }
+        catch (NumberFormatException e) {
+            field.setError(label + " phải là số nguyên");
+            field.requestFocus();
+            return null;
+        }
+    }
+
+    private Double docTyLeSoDo(EditText field) {
+        try {
+            double value = Double.parseDouble(val(field));
+            if (!Double.isFinite(value) || value < 0 || value > 1) throw new NumberFormatException();
+            return value;
+        } catch (NumberFormatException e) {
+            field.setError("Tọa độ sơ đồ phải từ 0 đến 1");
+            field.requestFocus();
+            return null;
+        }
+    }
+
+    private String tenTang(int floor) {
+        String name = tenCacTang.get(floor);
+        return name == null || name.trim().isEmpty() ? "Tầng/khu " + floor : name;
+    }
+
+    private EditText[] cacTruong() {
+        return new EditText[]{ten, tang, thuTu, soHienThi, moTa, thuyetMinh, tenAnh,
+                x, y, oTenNguonDiem, oUrlNguonDiem};
+    }
+
+    @Override protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putInt("admin_place", idDiaDiem);
+        state.putInt("admin_point", idDangSua);
+        state.putBoolean("admin_form", khungBieuMau.getVisibility() == View.VISIBLE);
+        String[] values = new String[cacTruong().length];
+        for (int i = 0; i < values.length; i++) values[i] = cacTruong()[i].getText().toString();
+        state.putStringArray("admin_values", values);
+        state.putString("admin_image", anhDiemMoi == null ? null : anhDiemMoi.toString());
+        state.putString("admin_initial", trangThaiBieuMauBanDau);
+        state.putBoolean("admin_advanced", findViewById(R.id.dtAnhNangCao).getVisibility() == View.VISIBLE);
+        state.putInt("admin_scroll", khungBieuMau.getVisibility() == View.VISIBLE
+                ? viTriDanhSach : ((ScrollView) findViewById(R.id.dtCuonDanhSach)).getScrollY());
     }
 }

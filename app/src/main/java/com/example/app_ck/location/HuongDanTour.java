@@ -64,7 +64,7 @@ public class HuongDanTour implements LocationListener {
         this(activity, cha, cauHinh, false);
     }
 
-    protected HuongDanTour(BaseActivity activity, ViewGroup cha, CauHinhAutoDiSan cauHinh, boolean conDao) {
+    public HuongDanTour(BaseActivity activity, ViewGroup cha, CauHinhAutoDiSan cauHinh, boolean conDao) {
         this.conDao = conDao;
         this.activity = activity;
         this.manHinh = (ManHinh) activity;
