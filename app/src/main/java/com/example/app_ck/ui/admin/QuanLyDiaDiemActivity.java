@@ -188,7 +188,30 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
                 .setOnClickListener(
                         v -> layAnh.launch("image/*")
                 );
+        // Mo rong / thu gon phan anh co san trong du an
+        TextView nutMoRongAnh = findViewById(
+                R.id.ddFormMoRongAnh
+        );
 
+        View khungAnhNangCao = findViewById(
+                R.id.ddFormNangCaoAnh
+        );
+
+        nutMoRongAnh.setOnClickListener(v -> {
+
+            boolean dangAn =
+                    khungAnhNangCao.getVisibility() == View.GONE;
+
+            khungAnhNangCao.setVisibility(
+                    dangAn ? View.VISIBLE : View.GONE
+            );
+
+            nutMoRongAnh.setText(
+                    dangAn
+                            ? "Ẩn tùy chọn ảnh nâng cao  ▴"
+                            : "Ảnh có sẵn trong dự án  ▾"
+            );
+        });
         findViewById(R.id.ddFormLuu)
                 .setOnClickListener(v -> luu());
 
@@ -901,7 +924,19 @@ public class QuanLyDiaDiemActivity extends BaseActivity {
             anhMoi = null;
 
             AnhDiaDiem.hien(anh, anhHienTai);
+            TextView trangThaiAnh = findViewById(
+                    R.id.ddFormTrangThaiAnh
+            );
 
+            if (trangThaiAnh != null) {
+                trangThaiAnh.setText(
+                        anhHienTai != null
+                                && !anhHienTai.trim().isEmpty()
+                                && !AnhDiaDiem.KHONG_ANH.equals(anhHienTai)
+                                ? "Ảnh hiện tại"
+                                : "Chưa chọn ảnh"
+                );
+            }
             if (anhHienTai.startsWith("anh_may:")) {
 
                 tenAnhDrawable.setText("");
