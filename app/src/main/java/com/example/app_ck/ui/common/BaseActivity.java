@@ -190,7 +190,7 @@ public class BaseActivity extends AppCompatActivity {
         }
         huyLuotLichSu();
         dongKhungThuyetMinh();
-        if (thamQuanTuDong != null) thamQuanTuDong.dung("Đã dừng theo dõi và giọng đọc khi rời màn hình. Bấm Demo hoặc GPS thật để bắt đầu lượt mới.");
+        if (thamQuanTuDong != null) thamQuanTuDong.dung("Đã dừng theo dõi và giọng đọc khi rời màn hình. Bấm Bật GPS để bắt đầu lượt mới.");
         super.onStop();
     }
     protected void apDungKhoangTrongHeThong() {

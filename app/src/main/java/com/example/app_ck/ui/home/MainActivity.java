@@ -311,7 +311,7 @@ public class MainActivity extends BaseActivity {
                 )
         );
         ganSuKien(
-                R.id.nutTraiNghiem,
+                R.id.nutBatDauKhamPha,
                 () -> startActivity(
                         new Intent(this, KhamPhaActivity.class)
                 )

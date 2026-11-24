@@ -4,7 +4,5 @@
     <item name="conDaoCheDo" type="id" />
     <item name="conDaoBatAuto" type="id" />
     <item name="conDaoTrangThai" type="id" />
-    <item name="conDaoBuocDemo" type="id" />
-    <item name="conDaoDemo" type="id" />
     <item name="conDaoGps" type="id" />
 </resources>

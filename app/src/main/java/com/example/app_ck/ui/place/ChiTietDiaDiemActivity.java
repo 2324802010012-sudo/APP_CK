@@ -700,16 +700,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
         choPhatTuViTri = false;
 
-        String cheDo =
-                KhoLichSu.DEMO.equals(
-                        getIntent().getStringExtra(
-                                CHE_DO_VI_TRI
-                        )
-                )
-                        ? KhoLichSu.DEMO
-                        : KhoLichSu.AUTO_MAIN;
-
-        docThuyetMinh(cheDo);
+        docThuyetMinh(KhoLichSu.AUTO_MAIN);
     }
 
     private void docThuyetMinh() {

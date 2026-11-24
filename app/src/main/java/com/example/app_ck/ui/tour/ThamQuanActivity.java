@@ -239,7 +239,7 @@ public class ThamQuanActivity extends BaseActivity implements HuongDanTour.ManHi
     }
 
     @Override
-    public void hienThiDiemDemo(int id) {
+    public void hienThiDiemTuDong(int id) {
         DiemThamQuan diem = duLieu.timDiem(id);
         if (diem == null) return;
         dungThuyetMinh();
@@ -264,7 +264,7 @@ public class ThamQuanActivity extends BaseActivity implements HuongDanTour.ManHi
         if (diem == null) return false;
         String noiDung = diem.baiThuyetMinh();
         if (noiDung.trim().isEmpty()) return false;
-        hienThiDiemDemo(id);
+        hienThiDiemTuDong(id);
         luotDoc = "auto_sub_" + idDiaDiem + "_"
                 + id + "_" + System.nanoTime();
         chuanBiLichSu(

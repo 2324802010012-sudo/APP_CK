@@ -9,7 +9,9 @@ import java.util.ArrayList;
 
 /** Lịch sử nghe theo tài khoản; điểm thành phần luôn đi cùng ID địa điểm lớn. */
 public final class KhoLichSu {
-    public static final String MANUAL = "MANUAL", AUTO_MAIN = "AUTO_MAIN", AUTO_SUB = "AUTO_SUB", DEMO = "DEMO";
+    public static final String MANUAL = "MANUAL", AUTO_MAIN = "AUTO_MAIN", AUTO_SUB = "AUTO_SUB";
+    /** Giá trị lịch sử cũ trước khi bỏ mô phỏng; chỉ giữ để đọc/nâng cấp dữ liệu. */
+    @Deprecated public static final String DEMO = "DEMO";
     // Giữ đầu vào cũ cho các điểm gọi đang dùng chung; dữ liệu lưu luôn được chuẩn hóa.
     public static final String THU_CONG = MANUAL, AUTO_GPS = "AUTO_GPS";
     private KhoLichSu() {}
@@ -141,6 +143,6 @@ public final class KhoLichSu {
     public static String nhanCheDo(String cheDo) {
         return AUTO_MAIN.equals(cheDo) ? "Tự động · Địa điểm chính"
                 : AUTO_SUB.equals(cheDo) ? "Tự động · Điểm thành phần"
-                : DEMO.equals(cheDo) ? "Demo · Mô phỏng" : "Nghe thủ công";
+                : DEMO.equals(cheDo) ? "Tự động · Dữ liệu cũ" : "Nghe thủ công";
     }
 }
