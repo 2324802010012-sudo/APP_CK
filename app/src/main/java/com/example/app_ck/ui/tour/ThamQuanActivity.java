@@ -3,6 +3,7 @@ package com.example.app_ck.ui.tour;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -135,6 +136,16 @@ public class ThamQuanActivity extends BaseActivity implements HuongDanTour.ManHi
         BoHienThiAnh.hienAnhDiem(findViewById(R.id.tqAnhDiemThanhPhan), diem == null ? "" : diem.tenAnh);
         String bai = diem == null ? "" : diem.baiThuyetMinh();
         ((TextView) findViewById(R.id.tqMoTaKhuVuc)).setText(bai);
+        String tomTat = diem == null || diem.moTa == null ? "" : diem.moTa.trim();
+        if (tomTat.isEmpty() && !bai.trim().isEmpty()) {
+            int ketThuc = bai.indexOf('\n');
+            tomTat = ketThuc < 0 ? bai : bai.substring(0, ketThuc);
+        }
+        TextView nhanMoTa = findViewById(R.id.tqNhanMoTaKhuVuc);
+        TextView oTomTat = findViewById(R.id.tqTomTatKhuVuc);
+        nhanMoTa.setVisibility(tomTat.isEmpty() ? View.GONE : View.VISIBLE);
+        oTomTat.setVisibility(tomTat.isEmpty() ? View.GONE : View.VISIBLE);
+        oTomTat.setText(tomTat);
         ganNguonThongTin(idDiaDiem, diem == null ? 0 : diem.id);
         boolean coBai = !bai.trim().isEmpty();
         TextView nutPhat = findViewById(R.id.tqNutPhat);
@@ -150,6 +161,24 @@ public class ThamQuanActivity extends BaseActivity implements HuongDanTour.ManHi
         khungSoDo.capNhat(duLieu, tangDangXem, idDangChon);
         giaoDienTour.capNhat(duLieu.cacDiem, idDangChon, cauHinhAuto::choPhepAuto,
                 duLieu::tenTang, id -> chonDiem(id));
+        capNhatThongTinSoDo();
+    }
+
+    private void capNhatThongTinSoDo() {
+        int soMarker = 0;
+        for (DiemThamQuan d : duLieu.cacDiem) if (d.coMarker()) soMarker++;
+        int soAuto = cauHinhAuto.cacMocTuDong().size();
+        ((TextView) findViewById(R.id.tqThongKeSoDo)).setText(
+                "Danh sách có " + duLieu.cacDiem.size() + " điểm · "
+                        + soMarker + " marker trên sơ đồ · " + soAuto + " điểm hỗ trợ GPS");
+        StringBuilder tenDiem = new StringBuilder();
+        for (int i = 0; i < duLieu.cacDiem.size(); i++) {
+            if (i > 0) tenDiem.append('\n');
+            tenDiem.append(String.format(java.util.Locale.getDefault(), "%02d", i + 1))
+                    .append(" · ")
+                    .append(duLieu.cacDiem.get(i).ten);
+        }
+        ((TextView) findViewById(R.id.tqDanhSachTenSoDo)).setText(tenDiem);
     }
 
     private void capNhatNut(int id, boolean bat) {

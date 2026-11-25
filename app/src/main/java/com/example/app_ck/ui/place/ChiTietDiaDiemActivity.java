@@ -411,7 +411,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
         LinearLayout.LayoutParams lp =
                 new LinearLayout.LayoutParams(
-                        dp(166),
+                        dp(224),
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
 
@@ -462,7 +462,7 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
                 anh,
                 new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
-                        dp(118)
+                        dp(112)
                 )
         );
 
@@ -499,6 +499,41 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
         );
 
         the.addView(ten);
+
+        // MÔ TẢ NGẮN CỦA ĐIỂM THÀNH PHẦN
+        // Hiển thị ngay tại trang chi tiết địa điểm chính để người dùng biết
+        // nội dung của từng điểm trước khi bắt đầu hành trình.
+        String moTaDiem = TextUtils.isEmpty(diem.moTa)
+                ? diem.noiDung
+                : diem.moTa;
+
+        if (!TextUtils.isEmpty(moTaDiem)) {
+
+            TextView moTa = new TextView(this);
+
+            moTa.setText(moTaDiem.trim());
+
+            moTa.setTextColor(MAU_CHU_PHU);
+
+            moTa.setTextSize(12);
+
+            moTa.setLineSpacing(dp(2), 1f);
+
+            moTa.setMinLines(2);
+
+            moTa.setMaxLines(2);
+
+            moTa.setEllipsize(TextUtils.TruncateAt.END);
+
+            moTa.setPadding(
+                    dp(2),
+                    dp(4),
+                    dp(2),
+                    0
+            );
+
+            the.addView(moTa);
+        }
 
         // TRẠNG THÁI THUYẾT MINH
 
@@ -545,6 +580,9 @@ public class ChiTietDiaDiemActivity extends BaseActivity {
 
         the.setContentDescription(
                 diem.ten
+                        + (TextUtils.isEmpty(moTaDiem)
+                        ? ""
+                        : ", " + moTaDiem)
                         + (coThuyetMinh
                         ? ", có thuyết minh"
                         : "")

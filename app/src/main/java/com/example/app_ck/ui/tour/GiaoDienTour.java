@@ -74,6 +74,7 @@ public final class GiaoDienTour {
     private final LinearLayout khungSoDo;
     private final LinearLayout khungDanhSach;
     private final LinearLayout danhSach;
+    private final View thongTinSoDo;
 
     private final NestedScrollView vungCuon;
 
@@ -182,6 +183,8 @@ public final class GiaoDienTour {
         khungDanhSach = activity.findViewById(
                 R.id.tqKhungDanhSach
         );
+
+        thongTinSoDo = activity.findViewById(R.id.tqThongTinSoDo);
 
         danhSach = activity.findViewById(
                 R.id.tqDanhSachDiem
@@ -363,6 +366,10 @@ public final class GiaoDienTour {
         dangXemSoDo = soDo;
 
         khungSoDo.setVisibility(
+                soDo ? View.VISIBLE : View.GONE
+        );
+
+        thongTinSoDo.setVisibility(
                 soDo ? View.VISIBLE : View.GONE
         );
 
